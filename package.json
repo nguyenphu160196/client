@@ -1,6 +1,9 @@
 {
   "name": "client-cut-air",
   "version": "3.0.1",
+  "os": [
+    "linux"
+  ],
   "engines": {
     "node": "6.11.4",
     "npm": "3.10.10",
