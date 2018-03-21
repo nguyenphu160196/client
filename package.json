@@ -1,6 +1,11 @@
 {
   "name": "client-cut-air",
   "version": "3.0.1",
+  "engines": {
+    "node": "6.11.4",
+    "npm": "3.10.10",
+    "yarn": "1.5.1"
+  },
   "description": "Get started with React, Redux, and React-Router!",
   "main": "index.js",
   "scripts": {
