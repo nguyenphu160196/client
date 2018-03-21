@@ -6,7 +6,6 @@ import './styles/main.scss'
 // Store Initialization
 // ------------------------------------
 const store = createStore(window.__INITIAL_STATE__)
-
 // Render Setup
 // ------------------------------------
 const MOUNT_NODE = document.getElementById('root')
