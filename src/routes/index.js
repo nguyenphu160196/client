@@ -4,28 +4,32 @@ import Main from './Main'
 import LoginRoute from './Login'
 import {browserHistory} from 'react-router'
 
-const requireAuth = (store) => {
-  if(!localStorage.access_token){
+const loginReq = () => {
+  if(!localStorage.access_token) {
     browserHistory.push('/login');
-  }else{
+  } 
+}
+const homeRedirect = (store) => {
+  if(localStorage.access_token) {
     browserHistory.push('/');
-  }
-};
+  } 
+}
 
 export const createRoutes = (store) => ({
   path        : '/',
+  component : CoreLayout,
   childRoutes : [
     //require auth route
-    {
-      component : CoreLayout,
-      onEnter: requireAuth(store),
+    {      
+      onEnter: loginReq,
       indexRoute: Main(store),
-      childRoutes: [
-
-      ]
     },   
-    //unrequire auth route
-    LoginRoute(store)
+    {
+      onEnter: homeRedirect,
+      childRoutes: [
+        LoginRoute(store)
+      ]
+    }
   ]
 })
 

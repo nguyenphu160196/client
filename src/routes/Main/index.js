@@ -2,6 +2,9 @@ import { injectReducer } from '../../store/reducers'
 
 export default (store) => ({
   path : '',
+  childRoutes: [
+    
+  ],
   getComponent (nextState, cb) {
     
     require.ensure([], (require) => {
