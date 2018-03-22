@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 
-export const Login = ({ login, handleLogin, makeState, handleSignup }) => (
+export const Login = ({ login, handleLogin, makeState, handleSignup}) => (
   <div className="row" >
     <form onSubmit={(event)=>{
 					event.preventDefault();
@@ -10,12 +10,12 @@ export const Login = ({ login, handleLogin, makeState, handleSignup }) => (
 				}}>
       <button className="btn btn-success" type="submit">Login</button>      
     </form>
-    <form onSubmit={(event)=>{
+    {/* <form onSubmit={(event)=>{
 					event.preventDefault();
 					handleSignup()
 				}}>
       <button className="btn btn-warning" type="submit">Sign up</button>      
-    </form>
+    </form> */}
   </div>
 )
 Login.propTypes = {

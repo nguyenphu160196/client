@@ -7,6 +7,7 @@ export const HANDLE_SIGNUP = 'HANDLE SIGNUP'
 export const SIGNUP_FAILED = 'SIGNUP_FAILED'
 export const MAKE_STATE = 'MAKE_STATE'
 
+
 export function handleSignup() {
 	return (dispatch, getState) => {
 		return new Promise((resolve, reject) => {

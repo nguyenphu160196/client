@@ -7,7 +7,7 @@ import Login from '../components/Login'
 const mapDispatchToProps = {
   handleLogin,
   makeState,
-  handleSignup
+  handleSignup,
 }
 
 const mapStateToProps = (state) => ({

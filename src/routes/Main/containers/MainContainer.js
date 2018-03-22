@@ -1,12 +1,11 @@
 import { connect } from 'react-redux'
-import { increment, doubleAsync } from '../modules/main'
+import { signOut} from '../modules/main'
 
 import Main from '../components/Main'
 
 
 const mapDispatchToProps = {
-  increment : () => increment(1),
-  doubleAsync
+  signOut
 }
 
 const mapStateToProps = (state) => ({
