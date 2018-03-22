@@ -23,6 +23,9 @@ export const createRoutes = (store) => ({
     {      
       onEnter: loginReq,
       indexRoute: Main(store),
+      childRoutes: [
+
+      ]
     },   
     {
       onEnter: homeRedirect,
