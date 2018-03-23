@@ -9,14 +9,13 @@ export const Login = ({ login, handleLogin, makeState, handleSignup}) => (
 					handleLogin()
 				}}>
       <button className="btn btn-success" type="submit">Login</button>  
-      <div className="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onClick={() =>
+    </form>
+    <div className="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onClick={() =>
         <script>
           checkLoginState()
         </script>}>
       </div>
       <div className="g-signin2" data-onsuccess="onSignIn"></div>
-    </form>
-    
     
     {/* <form onSubmit={(event)=>{
 					event.preventDefault();
