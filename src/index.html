@@ -20,11 +20,22 @@
         
       FB.AppEvents.logPageView();   
 
-      FB.getLoginStatus(function(response) {
+      function checkLoginState() {
+        FB.getLoginStatus(function(response) {
           statusChangeCallback(response);
-      });
+        });
+      }
 
-      FB.login();
+      // FB.login();
+
+      // var finished_rendering = function() {
+      //   console.log("finished rendering plugins");
+      //   // var spinner = document.getElementById("spinner");
+      //   // spinner.removeAttribute("style");
+      //   // spinner.removeChild(spinner.childNodes[0]);
+      // }
+
+      // FB.Event.subscribe('xfbml.render', finished_rendering);
         
     };
 
