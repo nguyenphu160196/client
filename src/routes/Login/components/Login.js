@@ -1,9 +1,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { GoogleLogin } from 'react-google-login';
+import './Login.scss'
 
+
+const responseGoogle = (response) => {
+  console.log(response);
+}
 
 export const Login = ({ login, handleLogin, makeState, handleSignup}) => (
   <div className="row" >
+    <GoogleLogin
+        className='btn btn-danger form-inline'
+        clientId={'878435691543-6onie784kklsgrjhmbketu5lkq465t1l.apps.googleusercontent.com'}
+        onSuccess={responseGoogle}
+        onFailure={responseGoogle}
+      > 
+        <div className='google-search-icon form-control'></div>
+        <span className="form-control" style={{backgroundColor: 'inherit',color:'#fff',border:'inherit'}}>Login with Google</span>
+    </GoogleLogin>
     <form onSubmit={(event)=>{
 					event.preventDefault();
 					handleLogin()
@@ -14,8 +29,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup}) => (
         <script>
           checkLoginState()
         </script>}>
-      </div>
-      <div className="g-signin2" data-onsuccess="onSignIn"></div>
+    </div>
     
     {/* <form onSubmit={(event)=>{
 					event.preventDefault();
