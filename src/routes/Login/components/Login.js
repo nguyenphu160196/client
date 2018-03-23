@@ -14,6 +14,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup}) => (
           checkLoginState()
         </script>}>
       </div>
+      <div className="g-signin2" data-onsuccess="onSignIn"></div>
     </form>
     
     
