@@ -10,7 +10,8 @@ export function signOut() {
           dispatch({
               type: HANDLE_SIGNOUT
           })
-          localStorage.clear();
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("user");
           browserHistory.push('/login');
       })
 

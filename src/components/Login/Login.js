@@ -27,7 +27,9 @@ class Login extends React.Component {
 				<p>Login in With Cut-air</p>
 				<form onSubmit={(event)=>{
 					event.preventDefault();
-					this.props.handleLogin({email: this.email.value, password: this.password.value})
+					this.props.handleLogin(
+						// {email: this.email.value, password: this.password.value}
+					)
 				}}>
 					<input type='email' ref={(input) => {this.email = input;}} name='email' placeholder='Email' required/>
 					<input type='password' ref={(input) => {this.password = input;}} name='password' placeholder='Password' required/>

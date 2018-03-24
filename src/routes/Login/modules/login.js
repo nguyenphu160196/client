@@ -10,6 +10,7 @@ export const ICON_CHANGE = 'ICON_CHANGE'
 export const SIGNUP_CLICK = 'SIGNUP_CLICK'
 export const SIGNUP_CANCEL = 'SIGNUP_CANCEL'
 export const CLOSE_DIALOG = 'CLOSE_DIALOG'
+export const LOAD_SUCCESS = 'LOAD_SUCCESS'
 
 
 export function handleScroll() {
@@ -41,8 +42,7 @@ export function handleSignup() {
 		return new Promise((resolve, reject) => {
         dispatch({
             type: HANDLE_SIGNUP,
-            payload: true,
-            message: 'Handling signup!'
+            payload: 'block'
         })
         var body = {
             // email: getState().login.email,
@@ -64,8 +64,7 @@ export function handleSignup() {
                     }else{
                         dispatch({
                             type: HANDLE_LOGIN,
-                            payload: true,
-                            message: 'Handling login!'
+                            payload: 'block'
                         })
                         var body = {
                             // email: getState().login.email,
@@ -83,9 +82,12 @@ export function handleSignup() {
                                         })
                                     }else{
                                         localStorage.setItem('access_token', res.data.token);
-                                        // var home = {...getState().login};
-                                        // home.doctor = response.doctor;
+                                        localStorage.setItem('user', res.data.user);
                                         browserHistory.push('/');
+                                        dispatch({
+                                            type: LOAD_SUCCESS,
+                                            payload: 'none'
+                                        })
                                     }
                                 }, err => {
                                     console.log(err);
@@ -134,8 +136,11 @@ export function handleLogin() {
                         })
                     }else{
                         localStorage.setItem('access_token', res.data.token);
-                        // var home = {...getState().login};
-                        // home.doctor = response.doctor;
+                        localStorage.setItem('user', res.data.user);
+                        dispatch({
+                            type: LOAD_SUCCESS,
+                            payload: 'none'
+                        })
                         browserHistory.push('/');
                     }
                 }, err => {
@@ -212,12 +217,17 @@ const ACTION_HANDLERS = {
     },
     [HANDLE_LOGIN] : (state, action) => {
         return Object.assign({}, state, {
-          message: action.message
+          block: action.payload
         })
     },
     [HANDLE_SIGNUP] : (state, action) => {
         return Object.assign({}, state, {
-          message: action.message
+          block: action.payload
+        })
+    },
+    [LOAD_SUCCESS] : (state, action) => {
+        return Object.assign({}, state, {
+          block: action.payload
         })
     },
     [LOGIN_FALSE] : (state, action) => {
