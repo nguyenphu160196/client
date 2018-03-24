@@ -202,12 +202,12 @@ const ACTION_HANDLERS = {
     },
     [SIGNUP_CLICK] : (state, action) => {
         return Object.assign({}, state, {
-          block: action.payload
+          display: action.payload
         })
     },
     [SIGNUP_CANCEL] : (state, action) => {
         return Object.assign({}, state, {
-          block: action.payload
+          display: action.payload
         })
     },
     [HANDLE_LOGIN] : (state, action) => {
