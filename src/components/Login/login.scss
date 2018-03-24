@@ -1,0 +1,140 @@
+.mess-icon{
+	position: absolute;
+	left: 50px;
+	margin-right: 0!important;
+	width: 40px;
+	height: 40px;
+	background-image: url('./assets/MESSENGER.png');
+	background-size: 100% auto;
+	background-repeat: no-repeat;
+	}
+.devices-img{
+	height: 570px;
+	background-image: url('./assets/DEVICES.png');
+	background-repeat: no-repeat;
+	}
+	
+	.icon2x{
+	width: 120px;
+	height: 120px;
+	background-image: url('./assets/mess2x.png');
+	background-size: 120px 120px;
+	background-repeat: no-repeat;
+	}
+.page-2-img{
+	margin-right: 45px;
+	background-position-y: -57px;
+	background-image: url('./assets/intro_videocalls.png');
+	background-repeat: no-repeat;
+	background-size: 100% auto;
+	min-width: 600px;
+	min-height: 500px;
+	}
+#Aa{
+	width: 120px;
+	height: 120px;
+	background-repeat: no-repeat;
+	background-image: url('./assets/Aa.png');
+	background-size: 100% auto;
+	}
+	#phone_icon{
+	width: 120px;
+	height: 120px;
+	background-repeat: no-repeat;
+	background-image: url('./assets/phone_icon.png');
+	background-size: 100% auto;
+	}
+	#camera_icon{
+	width: 120px;
+	height: 120px;
+	background-repeat: no-repeat;
+	background-image: url('./assets/camera_icon.png');
+	background-size: 100% auto;
+	}
+	#smile{
+	width: 120px;
+	height: 120px;
+	background-repeat: no-repeat;
+	background-image: url('./assets/smile.png');
+	background-size: 100% auto;
+	}
+	#record{
+	width: 120px;
+	height: 120px;
+	background-repeat: no-repeat;
+	background-image: url('./assets/record.png');
+	background-size: 100% auto;
+	}
+	#three_somes{
+	width: 120px;
+	height: 120px;
+	background-repeat: no-repeat;
+	background-image: url('./assets/three_somes.png');
+	background-size: 100% auto;
+	}
+	.remember-me{
+		width: 320px;
+
+		}
+	.login-field{
+		padding-left: 120px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		}
+			
+	.login-field h1{
+		margin: 0!important;
+		font-family: Helvetica;
+		font-weight: 400;
+		font-size: 36px;
+		color: rgba(0,0,0,0.7);
+		}
+		
+	.login-field p{
+		font-family: Helvetica;
+		font-weight: 400;
+		color: rgba(0,0,0,0.7);
+		font-size: 17px;
+		}
+	.login-field input[type=email],
+	.login-field input[type=password]{
+			width: 320px;
+			border: 1px solid rgba(0,0,0,0.2);
+			font-family: Helvetica;
+			height: 42px;
+			font-size: 17px;
+			border-radius: 4px;
+			padding: 0 16px;
+			margin-bottom: 20px;
+			}
+			
+	.login-field button[type=submit]{
+			background-color: #0084ff;
+			border: 1px solid #0084ff;
+			border-radius: 4px;
+			width: 320px;
+			height: 42px;
+			color: #fff; 
+			font-size: 17px;
+			font-family: Helvetica;
+			cursor: pointer;
+			margin-bottom: 24px;
+			}
+	.login-field form{
+			padding-left: 35px;
+			max-width: 396.98px;
+			}
+
+	.google-search-icon {
+		background-image: url("./assets/search.png"); 
+		background-repeat: no-repeat; 
+		background-size: 100% auto;
+		min-height: 28px;
+		background-color: inherit;
+		border: unset;
+	}
+
+	.btn-gmail{
+		padding: 2px!important;
+	}
