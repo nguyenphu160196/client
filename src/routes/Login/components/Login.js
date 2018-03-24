@@ -17,7 +17,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup}) => (
         onFailure={responseGoogle}
       > 
         <div className='google-search-icon form-control'></div>
-        <span className="form-control" style={{backgroundColor: 'inherit',color:'#fff',border:'inherit'}}>Login with Google</span>
+        <span className="form-control" style={{backgroundColor: 'inherit',color:'#fff',border:'unset'}}>Login in With Google</span>
     </GoogleLogin>
     <form onSubmit={(event)=>{
 					event.preventDefault();
@@ -25,7 +25,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup}) => (
 				}}>
       <button className="btn btn-success" type="submit">Login</button>  
     </form>
-    <div className="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onClick={() =>
+    <div className="fb-login-button" data-max-rows="1" data-size="large" data-button-type="login_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false" onClick={() =>
         <script>
           checkLoginState()
         </script>}>
