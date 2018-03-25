@@ -82,7 +82,7 @@ export function handleSignup() {
                                         })
                                     }else{
                                         localStorage.setItem('access_token', res.data.token);
-                                        localStorage.setItem('user', res.data.user);
+                                        localStorage.setItem('user', JSON.stringify(res.data.user));
                                         browserHistory.push('/');
                                         dispatch({
                                             type: LOAD_SUCCESS,
@@ -136,7 +136,7 @@ export function handleLogin() {
                         })
                     }else{
                         localStorage.setItem('access_token', res.data.token);
-                        localStorage.setItem('user', res.data.user);
+                        localStorage.setItem('user', JSON.stringify(res.data.user));
                         dispatch({
                             type: LOAD_SUCCESS,
                             payload: 'none'

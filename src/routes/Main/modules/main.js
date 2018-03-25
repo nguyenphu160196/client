@@ -19,7 +19,7 @@ export function signOut() {
 }
 
 const initialState = {
-
+  friendlist: [{name:'a',avatar:'A'},{name:'b',avatar:'A'},{name:'a',avatar:'A'},{name:'b',avatar:'A'},{name:'a',avatar:'A'},{name:'b',avatar:'A'},{name:'a',avatar:'A'},{name:'b',avatar:'A'},{name:'a',avatar:'A'},{name:'b',avatar:'A'},]
 }
 
 const ACTION_HANDLERS = {
