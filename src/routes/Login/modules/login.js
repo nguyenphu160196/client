@@ -45,38 +45,34 @@ export function handleSignup() {
             payload: 'block'
         })
         var body = {
-            // email: getState().login.email,
-            // password: getState().login.password
-            name: "thien phu",
-            email: "thienphu@gmail.com",
-            password: "123123",
-            password2: '123123'
+            name: getState().login.name,
+            email: getState().login.email,
+            password: getState().login.password,
+            password2: getState().login.password2
 
         }
             api.post('/register', body)
                 .then(res => {
-                    if(res.data.success == true){
+                    if(res.data.success == false){
                         dispatch({
                             type: SIGNUP_FAILED,
                             payload: true,
-                            message: res.data.message
+                            message: (res.data.message ? res.data.message : "The password does not match!")
                         })
                     }else{
                         dispatch({
                             type: HANDLE_LOGIN,
                             payload: 'block'
                         })
-                        var body = {
-                            // email: getState().login.email,
-                            // password: getState().login.password
-                            email: "thienphu@gmail.com",
-                            password: "123123"
+                        var body2 = {
+                            email: getState().login.email,
+                            password: getState().login.password
                         }
-                            api.post('/login', body)
+                            api.post('/login', body2)
                                 .then(res => {
                                     if(res.data.success == false){
                                         dispatch({
-                                            type: LOGIN_FAILED,
+                                            type: LOGIN_FALSE,
                                             payload: true,
                                             message: res.data.message
                                         })
@@ -121,16 +117,14 @@ export function handleLogin() {
             message: 'Handling login!'
         })
         var body = {
-            // email: getState().login.email,
-            // password: getState().login.password
-            email: "thienphu@gmail.com",
-            password: "123123"
+            email: getState().login.email,
+            password: getState().login.password
         }
             api.post('/login', body)
                 .then(res => {
                     if(res.data.success == false){
                         dispatch({
-                            type: SIGNUP_FAILED,
+                            type: LOGIN_FALSE,
                             payload: true,
                             message: res.data.message
                         })
@@ -202,7 +196,8 @@ const ACTION_HANDLERS = {
     },
     [CLOSE_DIALOG] : (state, action) => {
         return Object.assign({}, state, {
-          dialog: action.payload
+          dialog: action.payload,
+          block: 'none'
         })
     },
     [SIGNUP_CLICK] : (state, action) => {
@@ -233,13 +228,15 @@ const ACTION_HANDLERS = {
     [LOGIN_FALSE] : (state, action) => {
         return Object.assign({}, state, {
           dialog: action.payload,
-          message: action.message
+          message: action.message,
+          block: 'none'
         })
     },
     [SIGNUP_FAILED] : (state, action) => {
         return Object.assign({}, state, {
           dialog: action.payload,
-          message: action.message
+          message: action.message,
+          block: 'none'
         })
     },
     [MAKE_STATE]: (state, action) => {

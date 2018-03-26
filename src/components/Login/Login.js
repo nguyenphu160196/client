@@ -27,12 +27,10 @@ class Login extends React.Component {
 				<p>Login in With Cut-air</p>
 				<form onSubmit={(event)=>{
 					event.preventDefault();
-					this.props.handleLogin(
-						// {email: this.email.value, password: this.password.value}
-					)
+					this.props.handleLogin();
 				}}>
-					<input type='email' ref={(input) => {this.email = input;}} name='email' placeholder='Email' required/>
-					<input type='password' ref={(input) => {this.password = input;}} name='password' placeholder='Password' required/>
+					<input type='email' onChange={(e) => {this.props.makeState('email',e.target.value)}}  name='email' placeholder='Email' required/>
+					<input type='password' onChange={(e) => {this.props.makeState('password',e.target.value)}}  name='password' placeholder='Password' required/>
 					<button type='submit'>Login in</button>
 					<div className='form-group remember-me'>
 						<GoogleLogin

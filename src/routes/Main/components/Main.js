@@ -37,28 +37,32 @@ export const Main = ({ main, signOut }) => (
   <div style={{ margin: '0 auto',height: '100%' }} >
     <div className='row' style={{margin: '0 auto',height: '100%'}}>
         <div className='col-md-3' style={{borderRight: '1px solid lightgray', padding: '0px'}}>
-          <div className='row' style={{margin: '0 auto'}}>
-          <Card style={{width: '100%' }}>
-            <CardHeader
-              title={JSON.parse(localStorage.user).name}
-              subtitle={JSON.parse(localStorage.user).email}
-              avatar="https://thumbs.gfycat.com/FearlessDazzlingJellyfish-max-1mb.gif"             
-            >
-              <IconMenu
-                iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
-                anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-                targetOrigin={{horizontal: 'right', vertical: 'top'}}
-              >
-                <MenuItem 
-                  primaryText="Sign out"
-                  leftIcon={<Logout />}
-                  onClick={(e) => {
-                    signOut()
-                  }}
-                />
-              </IconMenu>
-            </CardHeader>
-          </Card>
+          <div className='row' style={{margin: '0 auto',boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px'}}>
+            <div className="col-md-10" style={{}}>
+              <Card style={{width: '100%', boxShadow: 'unset' }}>
+                <CardHeader
+                  title={JSON.parse(localStorage.user).name}
+                  subtitle={JSON.parse(localStorage.user).email}
+                  avatar="https://thumbs.gfycat.com/FearlessDazzlingJellyfish-max-1mb.gif"             
+                >              
+                </CardHeader>
+              </Card>
+            </div>
+            <div className="col-md-2" style={{display: 'flex', justifyContent:'center',alignItems:'center'}}>
+            <IconMenu
+                  iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
+                  anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                  targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                >
+                  <MenuItem 
+                    primaryText="Sign out"
+                    leftIcon={<Logout />}
+                    onClick={(e) => {
+                      signOut()
+                    }}
+                  />
+                </IconMenu>
+            </div>
           </div>
           {/* <div className='row' style={{margin: '0 auto', backgroundColor:'rgba(0,0,0,.15)', height: '40px'}}>
             

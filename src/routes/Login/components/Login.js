@@ -14,6 +14,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll
 					display={login.display}
 					onCancel={signupCancel}
 					handleSignup={handleSignup}
+					makeState={makeState}
 				></Signup>
 				<div className="nav-bar col-12">
 					<ul>
@@ -30,6 +31,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll
 						message={login.message}
 						dialog={login.dialog}
 						handleScroll={handleScroll}
+						makeState={makeState}
 					></LoginPop>
 					<div className='devices-img col-7'></div>
 				</div>
