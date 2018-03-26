@@ -19,7 +19,7 @@ export function signOut() {
 }
 
 const initialState = {
-  friendlist: [{name:'a',avatar:'A'},{name:'b',avatar:'A'},{name:'a',avatar:'A'},{name:'b',avatar:'A'},{name:'a',avatar:'A'},{name:'b',avatar:'A'},{name:'a',avatar:'A'},{name:'b',avatar:'A'},{name:'a',avatar:'A'},{name:'b',avatar:'A'},]
+  friendlist: [{name:'NameA',message:'messageA',avatar:'A'},{name:'NameB',message:'messageB',avatar:'B'},{name:'NameA',message:'messageA',avatar:'A'},{name:'NameB',message:'messageB',avatar:'B'},{name:'NameA',message:'messageA',avatar:'A'},{name:'NameB',message:'messageB',avatar:'B'},{name:'NameA',message:'messageA',avatar:'A'},{name:'NameB',message:'messageB',avatar:'B'},]
 }
 
 const ACTION_HANDLERS = {

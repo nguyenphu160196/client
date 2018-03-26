@@ -22,9 +22,12 @@ const logout = (response) => {
 
 export const FriendList = ({array}) => {
   return (
-    <ListItem
+    <ListItem 
       primaryText={array.name}
-      leftAvatar={<Avatar src="" >{array.avatar}</Avatar>}
+      secondaryText	={array.message}
+      leftAvatar={<Avatar src="https://vignette.wikia.nocookie.net/epicrapbattlesofhistory/images/8/8c/Batman.gif/revision/latest?cb=20130824220307" />
+      // {array.avatar}</Avatar>
+    }
       rightIcon={<CommunicationChatBubble />}
     />
   )
@@ -39,7 +42,7 @@ export const Main = ({ main, signOut }) => (
             <CardHeader
               title={JSON.parse(localStorage.user).name}
               subtitle={JSON.parse(localStorage.user).email}
-              avatar=""             
+              avatar="https://thumbs.gfycat.com/FearlessDazzlingJellyfish-max-1mb.gif"             
             >
               <IconMenu
                 iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
@@ -57,23 +60,24 @@ export const Main = ({ main, signOut }) => (
             </CardHeader>
           </Card>
           </div>
-          <div className='row' style={{margin: '0 auto', backgroundColor:'rgba(0,0,0,.15)'}}>
-            <div className="input-group">
-              <input type="text" className="form-control" placeholder="Search friend" aria-label="Recipient's username" aria-describedby="basic-addon2" />
+          {/* <div className='row' style={{margin: '0 auto', backgroundColor:'rgba(0,0,0,.15)', height: '40px'}}>
+            
+          </div> */}
+          <div className='row' style={{margin: '0 auto', overflowY:'scroll',height:'calc(100% - 84px)'}}>
+            <div className="input-group" style={{height: '40px'}}>
+              <input type="text" className="form-control" placeholder="Search friend" />
               <div className="input-group-append">
                 <button className="btn btn-outline-secondary" type="button">{<Search/>}</button>
               </div>
             </div>
-          </div>
-          <div className='row' style={{margin: '0 auto', overflowY:'scroll',height:'calc(100% - 141px)'}}>
-            <List style={{width: '100%'}}>
+            <List style={{width: '100%', padding: '0px', height: 'calc(100% - 40px)'}}>
                 {/* <Subheader>Recent chats</Subheader> */}
                 {main.friendlist ? 
                   main.friendlist.map((value, key) => {
                     return (
-                      <FriendList 
+                      <FriendList
                         key={key}
-                        array={value} 
+                        array={value}
                       />
                     )
                   })
@@ -81,8 +85,10 @@ export const Main = ({ main, signOut }) => (
             </List>
           </div>
         </div>
-        <div className='col-md-9'>
-        
+        <div className='col-md-9' style={{padding: '0px'}}>
+            <div className='row' style={{ margin: '0 auto',width: '100%' }}></div>
+            <div className='row' style={{ margin: '0 auto',width: '100%' }}></div>
+            <div className='row' style={{ margin: '0 auto',width: '100%' }}></div>
         </div>
     </div>
   </div>
