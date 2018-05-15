@@ -6,7 +6,7 @@ import Signup from '../../../components/Signup/Signup'
 import LoginPop from '../../../components/Login/Login'
 
 
-export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll, closeDialog, signupClick, signupCancel}) => (
+export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll, closeDialog, signupClick, signupCancel, loginGoogle}) => (
   <div style={{margin: '0px!important', padding: '0px!important'}} >
     
         <Progress display={login.block}></Progress>
@@ -15,6 +15,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll
 					onCancel={signupCancel}
 					handleSignup={handleSignup}
 					makeState={makeState}
+					login={login}
 				></Signup>
 				<div className="nav-bar col-12">
 					<ul>
@@ -32,6 +33,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll
 						dialog={login.dialog}
 						handleScroll={handleScroll}
 						makeState={makeState}
+						loginGoogle={loginGoogle}
 					></LoginPop>
 					<div className='devices-img col-7'></div>
 				</div>
@@ -101,7 +103,8 @@ Login.propTypes = {
   handleScroll: PropTypes.func.isRequired,
   closeDialog: PropTypes.func.isRequired, 
   signupClick: PropTypes.func.isRequired, 
-  signupCancel: PropTypes.func.isRequired
+  signupCancel: PropTypes.func.isRequired,
+  loginGoogle: PropTypes.func.isRequired
 }
 
 export default Login

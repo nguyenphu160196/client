@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { handleLogin, makeState, handleSignup,handleScroll, closeDialog, signupClick, signupCancel } from '../modules/login'
+import { handleLogin, makeState, handleSignup,handleScroll, closeDialog, signupClick, signupCancel, loginGoogle } from '../modules/login'
 
 import Login from '../components/Login'
 
@@ -11,7 +11,8 @@ const mapDispatchToProps = {
   handleScroll,
   closeDialog, 
   signupClick, 
-  signupCancel
+  signupCancel,
+  loginGoogle
 }
 
 const mapStateToProps = (state) => ({

@@ -1,9 +1,8 @@
 import api from '../../../../src/api'
 import {browserHistory} from 'react-router'
 
+export const PROGRESS = 'PROGRESS'
 export const LOGIN_FALSE = 'LOGIN_FALSE'
-export const HANDLE_LOGIN = 'HANDLE_LOGIN'
-export const HANDLE_SIGNUP = 'HANDLE SIGNUP'
 export const SIGNUP_FAILED = 'SIGNUP_FAILED'
 export const MAKE_STATE = 'MAKE_STATE'
 export const ICON_CHANGE = 'ICON_CHANGE'
@@ -12,6 +11,52 @@ export const SIGNUP_CANCEL = 'SIGNUP_CANCEL'
 export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 export const LOAD_SUCCESS = 'LOAD_SUCCESS'
 
+export function loginGoogle(data){
+    return (dispatch, getState) => {
+        return new Promise((resolve, reject) => {
+            var body = {
+                serviceName: "google",
+                accessToken: data.accessToken,
+                idToken: data.tokenId,
+                expiresIn: 200
+            }
+            api.post('/login', body)
+            .then(res => {
+                localStorage.setItem('authToken', res.data.data.authToken);
+                localStorage.setItem('user', res.data.data.userId);
+                dispatch({
+                    type: LOAD_SUCCESS,
+                    payload: 'none'
+                })
+                browserHistory.push('/');
+            }, err => {
+                dispatch({
+                    type: LOGIN_FALSE,
+                    payload: true,
+                    message: "An error occurred"
+                })
+            })
+        resolve();
+        })
+    }
+}
+
+export function changeIndex() {
+    return (dispatch, getState) => {
+        if(getState().login.password == getState().login.password2){
+            dispatch({
+                type: CHANGE_INDEX,
+                payload: 1
+            })
+        }else{
+            dispatch({
+                type: SIGNUP_FAILED,
+                payload: true,
+                message: "The password does not match!"
+            })
+        }
+    }
+}
 
 export function handleScroll() {
     var supportPageOffset = window.pageXOffset !== undefined;
@@ -41,70 +86,34 @@ export function handleSignup() {
 	return (dispatch, getState) => {
 		return new Promise((resolve, reject) => {
         dispatch({
-            type: HANDLE_SIGNUP,
-            payload: 'block'
+            type: PROGRESS,
+            payload: "block"
         })
         var body = {
             name: getState().login.name,
             email: getState().login.email,
             password: getState().login.password,
             password2: getState().login.password2
-
         }
             api.post('/register', body)
                 .then(res => {
-                    if(res.data.success == false){
-                        dispatch({
-                            type: SIGNUP_FAILED,
-                            payload: true,
-                            message: (res.data.message ? res.data.message : "The password does not match!")
-                        })
-                    }else{
-                        dispatch({
-                            type: HANDLE_LOGIN,
-                            payload: 'block'
-                        })
-                        var body2 = {
-                            email: getState().login.email,
-                            password: getState().login.password
-                        }
-                            api.post('/login', body2)
-                                .then(res => {
-                                    if(res.data.success == false){
-                                        dispatch({
-                                            type: LOGIN_FALSE,
-                                            payload: true,
-                                            message: res.data.message
-                                        })
-                                    }else{
-                                        localStorage.setItem('access_token', res.data.token);
-                                        localStorage.setItem('user', JSON.stringify(res.data.user));
-                                        browserHistory.push('/');
-                                        dispatch({
-                                            type: LOAD_SUCCESS,
-                                            payload: 'none'
-                                        })
-                                    }
-                                }, err => {
-                                    console.log(err);
-                                    dispatch({
-                                        type: LOGIN_FALSE,
-                                        payload: true,
-                                        message: 'An error occurred!'
-                                    })
-                                })
-                            resolve();
-                    }
-                }, err => {
-                    console.log(err);
+                    localStorage.setItem('authToken', res.data.token);
+                    localStorage.setItem('user', JSON.stringify(res.data.user));
+                    dispatch({
+                        type: LOAD_SUCCESS,
+                        payload: 'none'
+                    })
+                    browserHistory.push('/');
+                })
+                .catch(err => {
                     dispatch({
                         type: SIGNUP_FAILED,
                         payload: true,
-                        message: 'An error occurred!'
+                        message: err.response.data.message
                     })
                 })
-			resolve();
-    });
+            resolve();
+        });
     }
 }
 
@@ -112,37 +121,28 @@ export function handleLogin() {
 	return (dispatch, getState) => {
 		return new Promise((resolve, reject) => {
         dispatch({
-            type: HANDLE_LOGIN,
-            payload: true,
-            message: 'Handling login!'
+            type: PROGRESS,
+            payload: "block"
         })
         var body = {
-            email: getState().login.email,
-            password: getState().login.password
+            email: getState().login.username_log,
+            password: getState().login.password_log
         }
             api.post('/login', body)
                 .then(res => {
-                    if(res.data.success == false){
-                        dispatch({
-                            type: LOGIN_FALSE,
-                            payload: true,
-                            message: res.data.message
-                        })
-                    }else{
-                        localStorage.setItem('access_token', res.data.token);
-                        localStorage.setItem('user', JSON.stringify(res.data.user));
-                        dispatch({
-                            type: LOAD_SUCCESS,
-                            payload: 'none'
-                        })
-                        browserHistory.push('/');
-                    }
-                }, err => {
-                    console.log(err);
+                    localStorage.setItem('authToken', res.data.token);
+                    localStorage.setItem('user', JSON.stringify(res.data.user));
+                    dispatch({
+                        type: LOAD_SUCCESS,
+                        payload: 'none'
+                    })
+                    browserHistory.push('/');
+                })
+                .catch(err => {
                     dispatch({
                         type: LOGIN_FALSE,
                         payload: true,
-                        message: 'An error occurred!'
+                        message: err.response.data.message
                     })
                 })
 			resolve();
@@ -184,7 +184,11 @@ export function makeState(key, text){
     message: '',
     dialog: false,
     icon: 'none',
-    block: 'none'
+    block: 'none',
+    name: '',
+    email: '',
+    password: '',
+    password2: '',
 }
 
 
@@ -210,19 +214,10 @@ const ACTION_HANDLERS = {
           display: action.payload
         })
     },
-    [HANDLE_LOGIN] : (state, action) => {
-        return Object.assign({}, state, {
-          block: action.payload
-        })
-    },
-    [HANDLE_SIGNUP] : (state, action) => {
-        return Object.assign({}, state, {
-          block: action.payload
-        })
-    },
     [LOAD_SUCCESS] : (state, action) => {
         return Object.assign({}, state, {
-          block: action.payload
+          block: action.payload,
+          display: 'none',
         })
     },
     [LOGIN_FALSE] : (state, action) => {
@@ -243,7 +238,12 @@ const ACTION_HANDLERS = {
         return Object.assign({}, state, {
           [action.key]: action.payload
         })
-    }
+    },
+    [PROGRESS] : (state, action) => {
+        return Object.assign({}, state, {
+          block: action.payload
+        })
+    },
 }
 
 export default function counterReducer (state = initialState, action) {

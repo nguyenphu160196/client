@@ -5,12 +5,12 @@ import LoginRoute from './Login'
 import {browserHistory} from 'react-router'
 
 const loginReq = () => {
-  if(!localStorage.access_token) {
+  if(!localStorage.authToken) {
     browserHistory.push('/login');
   } 
 }
 const homeRedirect = (store) => {
-  if(localStorage.access_token) {
+  if(localStorage.authToken) {
     browserHistory.push('/');
   } 
 }
@@ -22,9 +22,9 @@ export const createRoutes = (store) => ({
     //require auth route
     {      
       onEnter: loginReq,
-      indexRoute: Main(store),
+      // indexRoute: ,
       childRoutes: [
-
+        Main(store)
       ]
     },   
     {

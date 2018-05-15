@@ -1,11 +1,14 @@
 import { connect } from 'react-redux'
-import { signOut} from '../modules/main'
+import { signOut, makeState, changeStatus, closeSnacke} from '../modules/main'
 
 import Main from '../components/Main'
 
 
 const mapDispatchToProps = {
-  signOut
+  signOut,
+  makeState,
+  changeStatus,
+  closeSnacke
 }
 
 const mapStateToProps = (state) => ({

@@ -3,9 +3,6 @@ import './login.scss'
 import DialogMessage from '../../components/Common/DialogMessage'
 import { GoogleLogin } from 'react-google-login'
 
-const responseGoogle = (response) => {
-	console.log(response);
-  }
 
 class Login extends React.Component {
 	constructor(props) {
@@ -29,15 +26,15 @@ class Login extends React.Component {
 					event.preventDefault();
 					this.props.handleLogin();
 				}}>
-					<input type='email' onChange={(e) => {this.props.makeState('email',e.target.value)}}  name='email' placeholder='Email' required/>
-					<input type='password' onChange={(e) => {this.props.makeState('password',e.target.value)}}  name='password' placeholder='Password' required/>
+					<input type='email' onChange={(e) => {this.props.makeState('username_log',e.target.value)}}  name='username' placeholder='Email' required/>
+					<input type='password' onChange={(e) => {this.props.makeState('password_log',e.target.value)}}  name='password' placeholder='Password' required/>
 					<button type='submit'>Login in</button>
 					<div className='form-group remember-me'>
 						<GoogleLogin
 							className='btn btn-danger form-control form-inline btn-gmail'
-							clientId={'878435691543-6onie784kklsgrjhmbketu5lkq465t1l.apps.googleusercontent.com'}
-							onSuccess={responseGoogle}
-							onFailure={responseGoogle}
+							clientId={'878435691543-2nui68e7has4q9m9m9ogvhf6shmfcorc.apps.googleusercontent.com'}
+							onSuccess={(response) => {response.profileObj ? this.props.loginGoogle(response) : ""}}
+							onFailure={(response) => {console.log(response)}}
 						> 
 							<div className='google-search-icon form-control'></div>
 							<span className="form-control" style={{backgroundColor: 'inherit',color:'#fff',border:'unset'}}>Login in With Google</span>
