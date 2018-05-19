@@ -1,6 +1,6 @@
 import { injectReducer } from '../../store/reducers'
-import {reLogin} from './modules/main'
 import Indirect from '../Indirect'
+import {getAvatar, makeState} from './modules/main'
 
 export default (store) => ({
   path : '',
@@ -12,9 +12,10 @@ export default (store) => ({
     require.ensure([], (require) => {
       
       const Main = require('./containers/MainContainer').default
-      const reducer = require('./modules/main').default
+      const reducer = require('./modules/main').default      
       injectReducer(store, { key: 'main', reducer })
-      // store.dispatch(reLogin());
+      store.dispatch(getAvatar());
+      store.dispatch(makeState('block', 'none'));
       cb(null, Main)
 
     }, 'main')

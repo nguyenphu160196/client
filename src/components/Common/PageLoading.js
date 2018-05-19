@@ -16,7 +16,7 @@ class Progress extends React.Component{
                     height: '40px',
                     display: 'block',
                     margin: 'auto'
-                }}><CircularProgress size={70} thickness={7} color='white' /></div>
+                }}><CircularProgress size={70} thickness={7} /></div>
             </div>
         )
     }

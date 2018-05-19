@@ -46,7 +46,7 @@ const ChannelList = ({array}) => {
     return (
       <ListItem 
         primaryText={array.name}
-        leftAvatar={<Avatar src="https://vignette.wikia.nocookie.net/epicrapbattlesofhistory/images/8/8c/Batman.gif/revision/latest?cb=20130824220307" />
+        leftAvatar={<Avatar src="" />
         // {array.avatar}</Avatar>
       }
         rightIcon={notification}

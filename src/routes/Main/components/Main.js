@@ -5,6 +5,7 @@ import {browserHistory} from 'react-router'
 import './Main.scss'
 import ChannelList from './ChannelList'
 import Account from './Account'
+import Progress from '../../../components/Common/PageLoading'
 import Snackbar from '../../../components/Common/Snackbar'
 
 import { GoogleLogout } from 'react-google-login';
@@ -114,6 +115,7 @@ export const Main = ({ main, signOut, makeState, children, changeStatus, closeSn
 
 return (
   <div style={{ margin: '0 auto',height: '100%' }} >
+  <Progress display={main.block}></Progress>
     <div className='row' style={{margin: '0 auto',height: '100%'}}>
 
         <div className='col-md-3' style={{borderRight: '1px solid lightgray', padding: '0px'}}>  
