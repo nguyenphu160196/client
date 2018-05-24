@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './Profile.scss'
 
+import RequirePass from './RequirePass'
+
 function readURL(input) {
 
   if (input.files && input.files[0]) {
@@ -13,8 +15,13 @@ function readURL(input) {
   }
 }
 
-export const Profile = ({ profile, makeState, saveCond, updateProfile }) => (
+export const Profile = ({ profile, makeState, saveCond, checkPassRequire }) => (
   	<div className="row" style={{margin: 0, padding: 0}}>
+	   <RequirePass 
+		   profile={profile}
+		   updateProfile={checkPassRequire}
+		   makeState={makeState}
+	   />
   		<div className="col-md-12" style={{borderBottom: '1px solid lightgrey'}}>
 				<div className="col-md-12 d-flex flex-row" style={{padding: '14px 16px'}}>
 					<div className="col-md-10" style={{
@@ -23,7 +30,7 @@ export const Profile = ({ profile, makeState, saveCond, updateProfile }) => (
 					<div className="col-md-2">
 						<button className="btn btn-primary" disabled={profile.save_btn}
 								onClick={() => {
-									updateProfile()
+									makeState('open', true);
 								}}
 						>Save changes</button>
 					</div>
@@ -104,7 +111,7 @@ export const Profile = ({ profile, makeState, saveCond, updateProfile }) => (
 										saveCond();
 									});						
 								}}
-								name='password' placeholder='Please enter your password' 
+								name='password' placeholder='New password' 
 								value={profile.prof_pass}
 								/>
 						</div>
@@ -119,7 +126,7 @@ Profile.propTypes = {
 	profile: PropTypes.object.isRequired,
 	makeState: PropTypes.func.isRequired,
 	saveCond: PropTypes.func.isRequired,
-	updateProfile: PropTypes.func.isRequired
+	checkPassRequire: PropTypes.func.isRequired,
 }
 
 export default Profile

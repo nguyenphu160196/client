@@ -1,12 +1,12 @@
 import { connect } from 'react-redux'
-import { makeState, saveCond, updateProfile } from '../modules/profile'
+import { makeState, saveCond, checkPassRequire } from '../modules/profile'
 
 import Profile from '../components/Profile'
 
 const mapDispatchToProps = {
     makeState,
     saveCond,
-    updateProfile
+    checkPassRequire
 }
 
 const mapStateToProps = (state) => ({

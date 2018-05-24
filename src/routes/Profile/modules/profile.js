@@ -1,53 +1,198 @@
 import {browserHistory} from 'react-router'
 import api from '../../../../src/api'
-import {progress_off, progress_on} from '../../Main/modules/main'
 
 export const MAKE_STATE = 'MAKE_STATE'
 export const CHANGE_PROFILE = 'CHANGE_PROFILE'
 export const SAVE_COND = 'SAVE_COND'
 export const UPDATE_PROFILE = 'UPDATE_PROFILE'
 export const GET_AVATAR = 'GET_AVATAR'
+export const ERROR_DIALOG = 'ERROR_DIALOG'
+
+export function checkPassRequire(){
+  return (dispatch, getState) => {
+    let requirePass = {...getState().profile}.prof_require_pass;
+      return new Promise((resolve, reject) => {
+        api({
+          method: 'post',
+          url: 'check.pass',
+          headers: {'x-access-token': localStorage.getItem('authToken')},
+          data: {password: requirePass}
+        })
+        .then(res => {
+          dispatch(updateProfile());
+          dispatch(makeState('save_btn','disabled'));
+          dispatch(makeState('message',''));
+        })
+        .catch(err => {
+          dispatch(makeState('progress', false));
+          dispatch(makeState('message', 'The password is incorrect'));
+        })
+      })
+  }
+}
+
+export function progressCallback(name, email, pass, avatar){
+  return (dispatch, getstate) => {
+    if(name && email && pass && avatar){
+      dispatch(makeState('open', false));
+      dispatch(makeState('progress', false));
+    }else{
+      dispatch(makeState('progress', false));
+    }
+  }
+}
 
 export function updateProfile() {
   return (dispatch, getState) => {
-    dispatch(progress_on());
+    dispatch(makeState('progress', true));
     let getstate = {...getState().profile} 
-    // let name = getstate.prof_name;
-    // let email = getstate.prof_email;
-    // let pass = getstate.prof_pass;
+    let name = getstate.prof_name;
+    let email = getstate.prof_email;
+    let pass = getstate.prof_pass;
     let img = getstate.imageURL;
 
-    //update avatar
-    let id = localStorage.user ? JSON.parse(localStorage.user)._id : '';
-    let data = new FormData();
-    data.append('file', img);
-      return new Promise((resolve, reject) => {        
-        api.post('/avatar/' + id,data)
-        .then(res => {
-          localStorage.setItem('user', JSON.stringify(res.data.user));
-          api({
-            method: 'get',
-            url: '/avatar',
-            headers: {'x-access-token': localStorage.getItem('authToken')},
-            responseType: 'arraybuffer',
-          })
-          .then(res => {
-            let bytes = new Uint8Array(res.data);
-            let image = 'data:image/png;base64,'+ encode(bytes);
-            dispatch({
-              type: GET_AVATAR,
-              payload: image
+    const old_name = localStorage.user ? JSON.parse(localStorage.user).name : '';
+    const old_email = localStorage.user ? JSON.parse(localStorage.user).email : '';
+    const id = localStorage.user ? JSON.parse(localStorage.user)._id : '';
+
+    var bool_name = (name != '' && name != old_name) ? true : false;
+    var bool_email = (email != '' && email != old_email) ? true : false;
+    var bool_avatar = (img != '') ? true : false;
+    var bool_pass = (pass != '') ? true : false;
+
+    var name_done = (name != '' && name != old_name) ? false : true;
+    var email_done = (email != '' && email != old_email) ? false : true;
+    var avatar_done = (img != '') ? false : true;
+    var pass_done = (pass != '') ? false : true;
+    return new Promise((resolve, reject) => {
+        for(let i=0; i<4; i++){
+          //change name
+          if(bool_name){  
+            api({
+              method: 'post',
+              url: '/change.name',
+              headers: {'x-access-token': localStorage.getItem('authToken')},
+              data: {name: name}
             })
-          })
-          .catch(err => {          
-          })
-          dispatch(progress_off());
-        })
-        .catch(err => {
-          
-        })
-        resolve();
+            .then(res => {
+              let st = JSON.parse(localStorage.getItem('user'));
+              st.name = res.data.name;
+              localStorage.setItem('user', JSON.stringify(st));
+              name_done = true;
+              dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+            })
+            .catch(err => {
+              dispatch(makeState('message', err.response.data.message));
+              dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+            })
+            console.log('changed name');
+            bool_name = false;
+          }
+          //change email
+          else if(bool_email){
+  
+            api({
+              method: 'post',
+              url: '/change.email',
+              headers: {'x-access-token': localStorage.getItem('authToken')},
+              data: {email: email}
+            })
+            .then(res => {
+              let st = JSON.parse(localStorage.getItem('user'));
+              st.email = res.data.email;
+              localStorage.setItem('user', JSON.stringify(st));
+              email_done = true;
+              dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+            })
+            .catch(err => {
+              dispatch(makeState('message', err.response.data.message));
+              dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+            })
+            console.log('changed email');
+            bool_email = false;
+          }
+          //change avatar
+          else if(bool_avatar){
+            let data = new FormData();
+            data.append('file', img);
+  
+            api.post('/avatar/' + id, data)
+            .then(res => {
+              let st = JSON.parse(localStorage.getItem('user'));
+              st.avatar = res.data.avatar;
+              localStorage.setItem('user', JSON.stringify(st));
+              api({
+                method: 'get',
+                url: '/avatar',
+                headers: {'x-access-token': localStorage.getItem('authToken')},
+                responseType: 'arraybuffer'
+              })
+              .then(res => {
+                let bytes = new Uint8Array(res.data);
+                let image = 'data:image/png;base64,'+ encode(bytes);
+                avatar_done = true;
+                dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+                dispatch({
+                  type: GET_AVATAR,
+                  payload: image
+                })
+              })
+            })
+            .catch(err => {
+              dispatch(makeState('message', err.response.data.message));
+              dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+            })
+            console.log('changed avatar');
+            bool_avatar = false;
+          }
+          //change password
+          else if(bool_pass){
+            api({
+              method: 'post',
+              url: '/change.pass',
+              headers: {'x-access-token': localStorage.getItem('authToken')},
+              data: {newpass: pass}
+            })
+            .then(res => {
+              pass_done = true;
+              dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+            })
+            .catch(err => {
+              dispatch(makeState('message', err.response.data.message));
+              dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+            })
+            console.log('changed pass');
+            bool_pass = false;
+          }
+        }
+      resolve();
+    })
+  }
+}
+
+export function saveCond(){
+  return (dispatch, getState) => {
+    let getstate = {...getState().profile} 
+    let name = getstate.prof_name;
+    let email = getstate.prof_email;
+    let pass = getstate.prof_pass;
+    let img = getstate.imageURL;
+
+    let old_name = localStorage.user ? JSON.parse(localStorage.user).name : '';
+    let old_email = localStorage.user ? JSON.parse(localStorage.user).email : '';
+
+    if((name != '' && name != old_name) || (email != '' && email != old_email) || img != '' || pass != ''){
+      dispatch({
+        type: SAVE_COND,
+        payload: ''
       })
+    }else{
+      dispatch({
+        type: SAVE_COND,
+        payload: 'disabled'
+      })
+    }
+
   }
 }
 
@@ -107,32 +252,6 @@ export function getAvatar(){
   }
 }
 
-export function saveCond(){
-  return (dispatch, getState) => {
-    let getstate = {...getState().profile} 
-    let name = getstate.prof_name;
-    let email = getstate.prof_email;
-    let pass = getstate.prof_pass;
-    let img = getstate.imageURL;
-
-    let old_name = localStorage.user ? JSON.parse(localStorage.user).name : '';
-    let old_email = localStorage.user ? JSON.parse(localStorage.user).email : '';
-
-    if((name != '' && name != old_name) || (email != '' && email != old_email) || img != '' || pass != ''){
-      dispatch({
-        type: SAVE_COND,
-        payload: ''
-      })
-    }else{
-      dispatch({
-        type: SAVE_COND,
-        payload: 'disabled'
-      })
-    }
-
-  }
-}
-
 export function makeState(key, text){
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
@@ -143,8 +262,7 @@ export function makeState(key, text){
       })
       resolve();
     })
-  }
-  
+  }  
 }
 
 const ACTION_HANDLERS = {
@@ -163,10 +281,20 @@ const ACTION_HANDLERS = {
       prof_avat: action.payload
     })
   },
+  [ERROR_DIALOG]: (state, action) => {
+    return Object.assign({}, state, {
+      dialog: action.payload,
+      message: action.message
+    })
+  }
 }
 
 const initialState = {
   prof_avat: '',
+  prof_require_pass: '',
+  open: false,
+  message: '',
+  progress: false
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

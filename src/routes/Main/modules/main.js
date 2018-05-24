@@ -140,8 +140,8 @@ export function signOut() {
   return (dispatch, getState) => {
       return new Promise((resolve, reject) => {
         localStorage.clear();
-        browserHistory.push('/login');
         window.location.reload();
+        browserHistory.push('/login');
     })
   }
 }
