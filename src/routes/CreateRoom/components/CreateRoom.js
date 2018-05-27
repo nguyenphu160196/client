@@ -3,8 +3,10 @@ import PropTypes from 'prop-types'
 
 
 export const CreateRoom = ({ createRoom, children }) => (
-  	<div className="container">
-  		create room page
+  	<div className='row d-flex justify-content-center' style={{height: '100%'}}>
+				<div className='col-md-8' style={{padding: 50}}>
+						
+				</div>
   	</div>
 )
 

@@ -1,5 +1,6 @@
 import {browserHistory} from 'react-router'
 import api from '../../../../src/api'
+import socket from '../../../socketio'
 
 export const MAKE_STATE = 'MAKE_STATE'
 export const CHANGE_PROFILE = 'CHANGE_PROFILE'
@@ -69,8 +70,8 @@ export function updateProfile() {
           //change name
           if(bool_name){  
             api({
-              method: 'post',
-              url: '/change.name',
+              method: 'put',
+              url: '/user.change.name',
               headers: {'x-access-token': localStorage.getItem('authToken')},
               data: {name: name}
             })
@@ -92,8 +93,8 @@ export function updateProfile() {
           else if(bool_email){
   
             api({
-              method: 'post',
-              url: '/change.email',
+              method: 'put',
+              url: '/user.change.email',
               headers: {'x-access-token': localStorage.getItem('authToken')},
               data: {email: email}
             })
@@ -115,15 +116,20 @@ export function updateProfile() {
           else if(bool_avatar){
             let data = new FormData();
             data.append('file', img);
-  
-            api.post('/avatar/' + id, data)
+            
+            api({
+              method: 'post',
+              url: '/avatar/' + id,
+              headers: {'x-access-token': localStorage.getItem('authToken')},
+              data: data
+            })
             .then(res => {
               let st = JSON.parse(localStorage.getItem('user'));
               st.avatar = res.data.avatar;
               localStorage.setItem('user', JSON.stringify(st));
               api({
                 method: 'get',
-                url: '/avatar',
+                url: '/user.avatar',
                 headers: {'x-access-token': localStorage.getItem('authToken')},
                 responseType: 'arraybuffer'
               })
@@ -148,8 +154,8 @@ export function updateProfile() {
           //change password
           else if(bool_pass){
             api({
-              method: 'post',
-              url: '/change.pass',
+              method: 'put',
+              url: '/user.change.pass',
               headers: {'x-access-token': localStorage.getItem('authToken')},
               data: {newpass: pass}
             })
@@ -231,7 +237,7 @@ export function getAvatar(){
       return new Promise((resolve, reject) => {
         api({
           method: 'get',
-          url: '/avatar',
+          url: '/user.avatar',
           headers: {'x-access-token': localStorage.getItem('authToken')},
           responseType: 'arraybuffer',
         })

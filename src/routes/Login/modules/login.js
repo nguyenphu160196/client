@@ -87,7 +87,7 @@ export function handleSignup() {
 		return new Promise((resolve, reject) => {
         dispatch({
             type: PROGRESS,
-            payload: "block"
+            payload: "flex"
         })
         var body = {
             name: getState().login.name,
@@ -122,7 +122,7 @@ export function handleLogin() {
 		return new Promise((resolve, reject) => {
         dispatch({
             type: PROGRESS,
-            payload: "block"
+            payload: "flex"
         })
         var body = {
             email: getState().login.username_log,

@@ -1,5 +1,6 @@
 import {browserHistory} from 'react-router'
 import api from '../../../../src/api'
+import socket from '../../../socketio'
 
 export const MAKE_STATE = 'MAKE_STATE'
 export const CHANGE_STATUS = 'CHANGE_STATUS'
@@ -77,7 +78,7 @@ export function getAvatar(){
       return new Promise((resolve, reject) => {
         api({
           method: 'get',
-          url: '/avatar',
+          url: '/user.avatar',
           headers: {'x-access-token': localStorage.getItem('authToken')},
           responseType: 'arraybuffer',
         })
@@ -103,7 +104,7 @@ export function changeStatus(status){
     return new Promise((resolve, reject) => {
       if(JSON.parse(localStorage.user).status != status){
         api({
-            method: 'post',
+            method: 'put',
             url: '/user.status',
             headers: {'x-access-token': localStorage.getItem('authToken')},
             data: {status: status}

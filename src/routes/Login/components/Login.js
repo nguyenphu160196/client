@@ -19,7 +19,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll
 				></Signup>
 				<div className="nav-bar col-12">
 					<ul>
-						<li><a className="active" onClick={signupClick}>Sign Up</a></li>
+						<li><a className="activex" onClick={signupClick}>Sign Up</a></li>
 						{/* <li><a href='/feature' target='_blank'>Feature</a></li> */}
 						<li><a className='mess' style={{display: login.icon}} href="#">"Cut Air"</a></li>
 						<li><a className='mess-icon' style={{display: login.icon}} href="#"></a></li>

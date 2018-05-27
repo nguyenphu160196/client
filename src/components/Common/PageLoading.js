@@ -1,5 +1,5 @@
 import React from 'react'
-import CircularProgress from 'material-ui/CircularProgress';
+import './common.scss'
 
 class Progress extends React.Component{
     render(){
@@ -16,7 +16,7 @@ class Progress extends React.Component{
                     height: '40px',
                     display: 'block',
                     margin: 'auto'
-                }}><CircularProgress size={70} thickness={7} /></div>
+                }}><div className="loader"></div></div>
             </div>
         )
     }
