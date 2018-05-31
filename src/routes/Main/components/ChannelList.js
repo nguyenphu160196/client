@@ -11,7 +11,17 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import LeaveRoom from 'material-ui/svg-icons/action/input'
 import Favorite from 'material-ui/svg-icons/action/stars'
 
-export const rightIconMenu = (
+
+const ChannelList = ({array}) => {
+  const notification = (
+      <Badge
+        badgeContent={0}
+        secondary={true}
+        badgeStyle={{top: 0, right: 40}}
+      >
+      </Badge>
+  );
+  const rightIconMenu = (
     <IconMenu 
       iconButtonElement={<IconButton tooltip="more"><MoreVertIcon /></IconButton>}
       anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
@@ -32,22 +42,11 @@ export const rightIconMenu = (
       />
     </IconMenu>
   );
-
-
-const ChannelList = ({array}) => {
-    const notification = (
-      <Badge
-        badgeContent={0}
-        secondary={true}
-        badgeStyle={{top: 0, right: 40}}
-      >
-      </Badge>
-  );
     return (
       <ListItem 
         primaryText={array.name}
-        leftAvatar={<Avatar src="" />
-        // {array.avatar}</Avatar>
+        leftAvatar={<Avatar style={{backgroundColor: array.avatar}}
+        >{array.name.charAt(0).toUpperCase()}</Avatar>
       }
         rightIcon={notification}
         rightIconButton={rightIconMenu}

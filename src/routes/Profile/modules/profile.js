@@ -2,7 +2,7 @@ import {browserHistory} from 'react-router'
 import api from '../../../../src/api'
 import socket from '../../../socketio'
 
-export const MAKE_STATE = 'MAKE_STATE'
+export const MAKE_STATE_PROF = 'MAKE_STATE_PROF'
 export const CHANGE_PROFILE = 'CHANGE_PROFILE'
 export const SAVE_COND = 'SAVE_COND'
 export const UPDATE_PROFILE = 'UPDATE_PROFILE'
@@ -262,7 +262,7 @@ export function makeState(key, text){
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
       dispatch({
-        type : MAKE_STATE,
+        type : MAKE_STATE_PROF,
         payload : text,
         key
       })
@@ -272,7 +272,7 @@ export function makeState(key, text){
 }
 
 const ACTION_HANDLERS = {
-  [MAKE_STATE]: (state, action) => {
+  [MAKE_STATE_PROF]: (state, action) => {
     return Object.assign({}, state, {
       [action.key]: action.payload
     })

@@ -1,21 +1,150 @@
 import {browserHistory} from 'react-router'
+import '../../../external_api'
 import api from '../../../../src/api'
 import socket from '../../../socketio'
 
-export const MAKE_STATE = 'MAKE_STATE'
+export const MAKE_STATE_MAIN = 'MAKE_STATE_MAIN'
 export const CHANGE_STATUS = 'CHANGE_STATUS'
 export const CLOSE_SNACKE = 'CLOSE_SNACKE'
 export const GET_AVATAR = 'GET_AVATAR'
-export const SETT_PR = 'SETT_PR'
-export const PROGRESS = 'PROGRESS'
+
+// var domain = "http://localhost:8080/";
+// var options = {
+//     roomName: "JitsiMeetAPIExample",
+//     width: 700,
+//     height: 700,
+//     // parentNode: document.querySelector('#meet')
+// }
+// var jit = new JitsiMeetExternalAPI(domain, options);
+
+export function dirrect(id,name){
+  return (dispatch, getState) => {
+    let state = {...getState().main}
+    let array = state.roomlist;
+    let body = {
+      name: JSON.parse(localStorage.user).name + ', ' + name,
+      paticipant: [id,JSON.parse(localStorage.user)._id]
+    }
+    dispatch(makeState('block', 'flex'));
+    dispatch(makeState('search', false));
+    return new Promise((resolve, reject) => {
+      api({
+        method: 'post',
+        url: '/create.room',
+        headers: {'x-access-token': localStorage.getItem('authToken')},
+        data: body
+      })
+      .then(res => {
+        let st = JSON.parse(localStorage.getItem('user'));
+        st.room.push(res.data.user);
+        localStorage.setItem('user', JSON.stringify(st));
+        array.push(res.data.room);
+        dispatch(makeState('roomlist',array));
+        dispatch(makeState('block', 'none'));
+        dispatch(makeState('searchValue', ''));
+      })
+      .catch(err => {})
+      resolve();
+    })
+  }
+}
+
+export function getRoom(){
+  return (dispatch, getState) => {
+    let room = localStorage.user ? JSON.parse(localStorage.user).room : '';
+    let array = [];
+    return new Promise((resolve, reject) => {
+      if(room.length > 0){
+        room.map((id, i) => {
+          api({
+            method: 'get',
+            url: '/info.room/'+id,
+            headers: {'x-access-token': localStorage.getItem('authToken')},
+          })
+          .then(res => {
+            array.push(res.data.room);
+            dispatch(makeState('roomlist',array));
+          })
+          .catch(err => {})
+        })
+      }
+      resolve();
+    })
+  }
+}
+
+function checkDirect(room){
+  let c = 0;
+  let rooms = JSON.parse(localStorage.user).room;
+  if(rooms.length > 0){
+    for(let i=0; i< rooms.length; i++){
+      for(let j=0; j< room.length; j++){
+        if(rooms[i] == room[j]){
+          c = 1;
+        }
+      }
+    }
+    if(c != 1){
+      return true;
+    }
+  }else{
+    return true;
+  }
+}
+
+export function search(value){
+  return (dispatch, getState) => {
+    dispatch(makeState('searchlist',[]));
+    return new Promise((resolve, reject) => {
+      let array = [];
+      if(value != ''){
+        api({
+          method: 'get',
+          url: '/search.user/' + value,
+          headers: {'x-access-token': localStorage.getItem('authToken')},
+        })
+        .then(res => {
+            res.data.user.map((val, i) => {
+              if(val._id != JSON.parse(localStorage.user)._id && (checkDirect(val.room) == true)){
+                if(val.avatar.charAt(0) != '#'){
+                  api({
+                    method: 'get',
+                    url: '/user.avatar/'+val._id,
+                    headers: {'x-access-token': localStorage.getItem('authToken')},
+                    responseType: 'arraybuffer',
+                  })
+                  .then(ava => {
+                    let bytes = new Uint8Array(ava.data);
+                    let image = 'data:image/png;base64,'+ encode(bytes);
+                    val.avatar = image;
+                    array.push(val);
+                    dispatch(makeState('searchlist',array));
+                  })
+                  .catch(err => {      
+                  })
+                }
+                else{
+                  array.push(val);
+                  dispatch(makeState('searchlist',array));
+                }
+              }
+            })
+        })
+        .catch(err => {          
+        })
+      }else{
+        dispatch(makeState('searchlist',[]));
+      }
+      resolve();
+    })
+  }
+}
 
 export function progress_on() {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      dispatch({
-        type: PROGRESS,
-        payload: "flex"
-      })
+      dispatch(makeState('block', 'flex'));
+      resolve();
     })
   }
 }
@@ -23,10 +152,8 @@ export function progress_on() {
 export function progress_off() {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      dispatch({
-        type: PROGRESS,
-        payload: "none"
-      })
+      dispatch(makeState('block', 'none'));
+      resolve();
     })
   }
 }
@@ -34,10 +161,7 @@ export function progress_off() {
 export function sett_prof(){
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      dispatch({
-        type: SETT_PR,
-        payload: true
-      });
+      dispatch(makeState('setting', true));
       resolve();
     })
   }
@@ -74,11 +198,12 @@ export function getAvatar(){
   return (dispatch, getState) => {
     let main = {...getState().main};
     let default_avat = localStorage.user ? JSON.parse(localStorage.user).avatar.charAt(0) : '';
+    let id = localStorage.user ? JSON.parse(localStorage.user)._id : '';
     if(main.avatar == '' && default_avat != '#'){
       return new Promise((resolve, reject) => {
         api({
           method: 'get',
-          url: '/user.avatar',
+          url: '/user.avatar/'+id,
           headers: {'x-access-token': localStorage.getItem('authToken')},
           responseType: 'arraybuffer',
         })
@@ -149,7 +274,7 @@ export function signOut() {
 
 export function makeState(key, text){
     return {
-      type : MAKE_STATE,
+      type : MAKE_STATE_MAIN,
       payload : text,
       key
     }
@@ -165,7 +290,9 @@ export function closeSnacke(){
 
 
 const initialState = {
-  // friendlist: [{name:'NameA',message:'messageA',avatar:'A'},{name:'NameB',message:'messageB',avatar:'B'}],
+  roomlist: [],
+  searchlist: [],
+  searchValue: '',
   dialog: false,
   avatar: '',
   active: true,
@@ -178,7 +305,7 @@ const initialState = {
 }
 
 const ACTION_HANDLERS = {
-  [MAKE_STATE]: (state, action) => {
+  [MAKE_STATE_MAIN]: (state, action) => {
       return Object.assign({}, state, {
         [action.key]: action.payload
       })
@@ -198,16 +325,6 @@ const ACTION_HANDLERS = {
   [GET_AVATAR]: (state, action) => {
     return Object.assign({}, state, {
       avatar: action.payload
-    })
-  },
-  [SETT_PR]: (state, action) => {
-    return Object.assign({}, state, {
-      setting: action.payload
-    })
-  },
-  [PROGRESS] : (state, action) => {
-    return Object.assign({}, state, {
-      block: action.payload
     })
   },
 }

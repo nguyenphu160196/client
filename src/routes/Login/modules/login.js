@@ -4,7 +4,7 @@ import {browserHistory} from 'react-router'
 export const PROGRESS = 'PROGRESS'
 export const LOGIN_FALSE = 'LOGIN_FALSE'
 export const SIGNUP_FAILED = 'SIGNUP_FAILED'
-export const MAKE_STATE = 'MAKE_STATE'
+export const MAKE_STATE_LOGIN = 'MAKE_STATE_LOGIN'
 export const ICON_CHANGE = 'ICON_CHANGE'
 export const SIGNUP_CLICK = 'SIGNUP_CLICK'
 export const SIGNUP_CANCEL = 'SIGNUP_CANCEL'
@@ -152,7 +152,7 @@ export function handleLogin() {
 
 export function makeState(key, text){
     return {
-      type : MAKE_STATE,
+      type : MAKE_STATE_LOGIN,
       payload : text,
       key
     }
@@ -234,7 +234,7 @@ const ACTION_HANDLERS = {
           block: 'none'
         })
     },
-    [MAKE_STATE]: (state, action) => {
+    [MAKE_STATE_LOGIN]: (state, action) => {
         return Object.assign({}, state, {
           [action.key]: action.payload
         })
