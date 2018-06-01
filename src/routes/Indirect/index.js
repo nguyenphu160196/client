@@ -2,6 +2,7 @@ import { injectReducer } from '../../store/reducers'
 import Setting from '../Setting'
 import Default from '../DefaultPage'
 import CreateRoom from '../CreateRoom'
+import Room from '../Room';
 
 export default (store) => ({
   path: '',
@@ -10,6 +11,7 @@ export default (store) => ({
     Default(store),
     Setting(store),
     CreateRoom(store),
+    Room(store)
   ],
   getComponent (nextState, cb) {
     require.ensure([], (require) => {

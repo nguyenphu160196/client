@@ -45,6 +45,14 @@
       $(document).ready(function() {
         document.title = 'Cut air';
       });
+
+      $(window).on("unload", function(e) {
+        if(localStorage.user){
+          var st = JSON.parse(localStorage.user);
+          st.socketID = '';
+          localStorage.setItem('user', JSON.stringify(st));
+        }
+      });
   </script>
   
 </body>

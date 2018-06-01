@@ -103,7 +103,7 @@ export function handleSignup() {
                         type: LOAD_SUCCESS,
                         payload: 'none'
                     })
-                    browserHistory.push('/');
+                    window.location.href = '/'
                 })
                 .catch(err => {
                     dispatch({
@@ -136,7 +136,7 @@ export function handleLogin() {
                         type: LOAD_SUCCESS,
                         payload: 'none'
                     })
-                    browserHistory.push('/');
+                    window.location.href = '/'
                 })
                 .catch(err => {
                     dispatch({

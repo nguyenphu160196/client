@@ -23,7 +23,8 @@ export function createNR(){
         headers: {'x-access-token': localStorage.getItem('authToken')},
         data: {
           name: room_name,
-          paticipant: array
+          paticipant: array,
+          direct: false
         }
       })
       .then(res => {

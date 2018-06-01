@@ -3,6 +3,7 @@ import '../../../external_api'
 import api from '../../../../src/api'
 import socket from '../../../socketio'
 
+
 export const MAKE_STATE_MAIN = 'MAKE_STATE_MAIN'
 export const CHANGE_STATUS = 'CHANGE_STATUS'
 export const CLOSE_SNACKE = 'CLOSE_SNACKE'
@@ -17,13 +18,27 @@ export const GET_AVATAR = 'GET_AVATAR'
 // }
 // var jit = new JitsiMeetExternalAPI(domain, options);
 
+export function socketio(){
+  return (dispatch, getState) => {
+    let st = JSON.parse(localStorage.user);
+    return new Promise((resolve, reject) => {
+        socket.on('update-socketid',(data) => {
+          st.socketID = data;
+          localStorage.setItem('user', JSON.stringify(st));
+        })
+        resolve();
+    })
+  }
+}
+
 export function dirrect(id,name){
   return (dispatch, getState) => {
     let state = {...getState().main}
     let array = state.roomlist;
+    let brray = state.direct_room;
     let body = {
       name: JSON.parse(localStorage.user).name + ', ' + name,
-      paticipant: [id,JSON.parse(localStorage.user)._id]
+      paticipant: [id,JSON.parse(localStorage.user)._id],
     }
     dispatch(makeState('block', 'flex'));
     dispatch(makeState('search', false));
@@ -39,9 +54,12 @@ export function dirrect(id,name){
         st.room.push(res.data.user);
         localStorage.setItem('user', JSON.stringify(st));
         array.push(res.data.room);
+        brray.push(res.data.room);
         dispatch(makeState('roomlist',array));
+        dispatch(makeState('direct_room',brray));
         dispatch(makeState('block', 'none'));
         dispatch(makeState('searchValue', ''));
+        dispatch(makeState('searchlist', []));
       })
       .catch(err => {})
       resolve();
@@ -52,9 +70,11 @@ export function dirrect(id,name){
 export function getRoom(){
   return (dispatch, getState) => {
     let room = localStorage.user ? JSON.parse(localStorage.user).room : '';
+    let roomlist = {...getState().main}.roomlist;
     let array = [];
+    let brray = [];
     return new Promise((resolve, reject) => {
-      if(room.length > 0){
+      if((room.length > 0) && (roomlist.length == 0)){
         room.map((id, i) => {
           api({
             method: 'get',
@@ -64,6 +84,10 @@ export function getRoom(){
           .then(res => {
             array.push(res.data.room);
             dispatch(makeState('roomlist',array));
+            if(res.data.room.direct == true){
+              brray.push(res.data.room);
+              dispatch(makeState('direct_room',brray));
+            }
           })
           .catch(err => {})
         })
@@ -74,21 +98,23 @@ export function getRoom(){
 }
 
 function checkDirect(room){
-  let c = 0;
-  let rooms = JSON.parse(localStorage.user).room;
-  if(rooms.length > 0){
-    for(let i=0; i< rooms.length; i++){
-      for(let j=0; j< room.length; j++){
-        if(rooms[i] == room[j]){
-          c = 1;
+  return (dispatch, getState) => {
+    let direct_room = {...getState().main}.direct_room;
+    if(direct_room.length > 0){
+      let c = 0;
+      for(let i=0; i< direct_room.length; i++){
+        for(let j=0; j< room.length; j++){
+          if(direct_room[i]._id == room[j]){
+            c = 1;
+          }
         }
       }
-    }
-    if(c != 1){
+      if(c != 1){
+        return true;
+      }
+    }else{
       return true;
     }
-  }else{
-    return true;
   }
 }
 
@@ -105,7 +131,7 @@ export function search(value){
         })
         .then(res => {
             res.data.user.map((val, i) => {
-              if(val._id != JSON.parse(localStorage.user)._id && (checkDirect(val.room) == true)){
+              if(val._id != JSON.parse(localStorage.user)._id && (dispatch(checkDirect(val.room)) == true)){
                 if(val.avatar.charAt(0) != '#'){
                   api({
                     method: 'get',
@@ -290,6 +316,7 @@ export function closeSnacke(){
 
 
 const initialState = {
+  direct_room: [],
   roomlist: [],
   searchlist: [],
   searchValue: '',

@@ -1,4 +1,5 @@
 import React from 'react'
+import {browserHistory} from 'react-router'
 
 import {ListItem} from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
@@ -44,10 +45,13 @@ const ChannelList = ({array}) => {
   );
     return (
       <ListItem 
+        onClick={() => {
+          browserHistory.push('/c/' +  array._id);
+        }}
         primaryText={array.name}
         leftAvatar={<Avatar style={{backgroundColor: array.avatar}}
-        >{array.name.charAt(0).toUpperCase()}</Avatar>
-      }
+                      >{array.name.charAt(0).toUpperCase()}</Avatar>
+                    }
         rightIcon={notification}
         rightIconButton={rightIconMenu}
       >
