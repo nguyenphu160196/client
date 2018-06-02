@@ -2,16 +2,15 @@ import '../../../external_api'
 import {browserHistory} from 'react-router'
 import api from '../../../../src/api'
 import socket from '../../../socketio'
+import {makeState as makeStateMain} from '../../Main/modules/main'
 
 export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 
 export function creRoomInfo(){
   return (dispatch, getState) => {
-    let mainState = {...getState().main};
     let location = {...getState().location}
     let id = location.pathname.split('/c/')[1];
     let array = []
-    let ObjectRoom = {};
     return new Promise((resolve, reject) => {
       api({
         method: 'get',
@@ -19,7 +18,7 @@ export function creRoomInfo(){
         headers: {'x-access-token': localStorage.getItem('authToken')},
       })
       .then(res => {
-          ObjectRoom.roominfo = res.data.room;
+          dispatch(makeState('roomInfo',res.data.room));
           let user = res.data.room.paticipant;
           for(let j=0; j<user.length; j++){
             api({
@@ -29,8 +28,7 @@ export function creRoomInfo(){
             })
             .then(res => {
               array.push(res.data.user);
-              ObjectRoom.userinfor = array;
-              dispatch(makeState('roomInfo', ObjectRoom));
+              dispatch(makeState('userInfo', array));
             })
             .catch(err => {})
         }
@@ -65,7 +63,13 @@ const ACTION_HANDLERS = {
   },
 }
 
-const initialState = {}
+const initialState = {
+  widthLeft: "col-md-12",
+  displayRight: 'none',
+  iconButton: 'col-md-9',
+  emoji: 'none',
+  sendDisable: true
+}
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state

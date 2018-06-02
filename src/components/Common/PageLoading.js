@@ -5,7 +5,7 @@ class Progress extends React.Component{
     render(){
         return (
             <div style={{
-                backgroundColor: 'rgba(0,0,0,0.8)',
+                backgroundColor: 'rgba(255,255,255,0.8)',
                 position: 'fixed',
                 width: '100%',
                 height: '100%',

@@ -1,0 +1,146 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+import EmojiPicker from 'emoji-picker-react';
+import JSEMOJI from 'emoji-js';
+import './RoomChat.scss'
+import RoomSetting from './RoomSetting'
+
+import IconButton from 'material-ui/IconButton';
+
+import Info from 'material-ui/svg-icons/action/info-outline';
+import PersonAdd from 'material-ui/svg-icons/social/person-add';
+import Mic from 'material-ui/svg-icons/av/mic';
+import VideoCam from 'material-ui/svg-icons/av/videocam';
+import EmojiIcon from 'material-ui/svg-icons/image/tag-faces';
+import Send from 'material-ui/svg-icons/content/send';
+
+
+
+export const RoomChat = ({ roomChat, makeState }) => (
+  	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
+		<div className={roomChat.widthLeft} style={{padding: 0}}>
+			<div className="col-md-12" style={{borderBottom: '1px solid lightgrey', padding: 0}}
+				onClick={() => {
+					if(roomChat.emoji == 'block'){
+						makeState('emoji','none');
+					}
+				}}
+			>
+				<div className="col-md-12 d-flex flex-row" style={{padding: '9px 0px'}}>
+					<div className={roomChat.iconButton} style={{
+						alignSelf: 'center',
+						textAlign: 'center'
+					}}>{roomChat.roomInfo ? roomChat.roomInfo.name : "Room Name"}</div>
+					<div style={{marginLeft: 30}}>
+					<IconButton tooltip="Audio Call" tooltipPosition="bottom-right">
+						<Mic />
+					</IconButton>
+					<IconButton tooltip="Video Call" tooltipPosition="bottom-right">
+						<VideoCam />
+					</IconButton>
+					<IconButton tooltip="Add User" tooltipPosition="bottom-right">
+						<PersonAdd />
+					</IconButton>	
+					<IconButton tooltip="Room Info" tooltipPosition="bottom-right"
+						onClick={() => {
+							if(roomChat.widthLeft == 'col-md-8' && roomChat.iconButton == 'col-md-8'){
+								makeState('widthLeft','col-md-12');
+								makeState('iconButton','col-md-9');
+							}else{
+								makeState('widthLeft','col-md-8');
+								makeState('iconButton','col-md-8');
+							}
+						}}
+					>
+						<Info />
+					</IconButton>	
+					</div>
+				</div>
+			</div>
+			{/* message content */}
+			<div className="col-md-12" style={{height: 'calc(100vh - 132px)'}}
+				onClick={() => {
+					if(roomChat.emoji == 'block'){
+						makeState('emoji','none');
+					}
+				}}
+			>
+				
+			</div>
+
+			{/* input chat */}
+			<div className="col-md-12">
+				<div style={{display: roomChat.emoji}}><EmojiPicker onEmojiClick={(e) => {
+					console.log(e);
+				}}/></div>
+				<div className="input-group" 
+					onClick={() => {
+						if(roomChat.emoji == 'block'){
+							makeState('emoji','none');
+						}
+					}}
+				>
+					<div className="input-group-append">
+						<span className="input-group-text" 
+						style={{
+							maxHeight: 58,
+							backgroundColor: 'unset',
+							borderRight: 'none'
+						}} >
+							<IconButton tooltip="Emoji Picker" tooltipPosition="top-right"
+								onClick={() => {
+									if(roomChat.emoji == 'none'){
+										makeState('emoji','block');
+									}else{
+										makeState('emoji','none');
+									}
+								}}
+							>
+								<EmojiIcon />
+							</IconButton>
+						</span>
+					</div>
+					<textarea className="form-control" cols="40" rows="5"
+						style={{
+							maxHeight: 58,
+							outline: 'none',
+							boxShadow: 'none',
+							border: '1px solid #ccc',
+							borderLeft: 'none',
+							paddingLeft: '0px',
+							borderRight: 'none'
+						}} ></textarea>
+					<div className="input-group-append">
+						<span className="input-group-text" 
+						style={{
+							maxHeight: 58,
+							backgroundColor: 'unset',
+							borderLeft: 'none'
+						}} >
+							<IconButton tooltip="Send message" tooltipPosition="top-left"
+								onClick={() => {
+									
+								}}
+								disabled={roomChat.sendDisable}
+							>
+								<Send />
+							</IconButton>
+						</span>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		
+		<div className="col-md-4" style={{padding: 0, margin: 0}}>
+			<RoomSetting />
+		</div>
+  	</div>
+)
+
+RoomChat.propTypes = {
+	roomChat: PropTypes.object.isRequired,
+	makeState: PropTypes.func.isRequired,
+}
+
+export default RoomChat

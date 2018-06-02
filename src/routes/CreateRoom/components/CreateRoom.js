@@ -11,7 +11,7 @@ import Clear from 'material-ui/svg-icons/content/clear'
 
 
 export const CreateRoom = ({ createRoom, makeState, search, act_btn, addInviteList, deleteChip, createNR }) => (
-  	<div className='row d-flex justify-content-center'>
+  	<div className='row d-flex justify-content-center' style={{margin: 0, padding: 0}}>
 
 				<div className="col-md-12" style={{borderBottom: '1px solid lightgrey'}}>
 					<div className="col-md-12 d-flex flex-row" style={{padding: '14px 16px'}}>
