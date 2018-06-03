@@ -29,8 +29,14 @@ export const RoomChat = ({ roomChat, makeState }) => (
 				<div className="col-md-12 d-flex flex-row" style={{padding: '9px 0px'}}>
 					<div className={roomChat.iconButton} style={{
 						alignSelf: 'center',
-						textAlign: 'center'
-					}}>{roomChat.roomInfo ? roomChat.roomInfo.name : "Room Name"}</div>
+						textAlign: 'center',
+					}}><div style={{
+						margin: 'auto',
+						maxWidth: 300,
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+						whiteSpace: 'nowrap',
+					}}>{roomChat.roomInfo ? roomChat.roomInfo.name : "Room Name"}</div></div>
 					<div style={{marginLeft: 30}}>
 					<IconButton tooltip="Audio Call" tooltipPosition="bottom-right">
 						<Mic />
@@ -38,7 +44,7 @@ export const RoomChat = ({ roomChat, makeState }) => (
 					<IconButton tooltip="Video Call" tooltipPosition="bottom-right">
 						<VideoCam />
 					</IconButton>
-					<IconButton tooltip="Add User" tooltipPosition="bottom-right">
+					<IconButton tooltip="Participants" tooltipPosition="bottom-right">
 						<PersonAdd />
 					</IconButton>	
 					<IconButton tooltip="Room Info" tooltipPosition="bottom-right"
@@ -46,9 +52,11 @@ export const RoomChat = ({ roomChat, makeState }) => (
 							if(roomChat.widthLeft == 'col-md-8' && roomChat.iconButton == 'col-md-8'){
 								makeState('widthLeft','col-md-12');
 								makeState('iconButton','col-md-9');
+								makeState('settingOn','none');
 							}else{
 								makeState('widthLeft','col-md-8');
 								makeState('iconButton','col-md-8');
+								makeState('settingOn','block');
 							}
 						}}
 					>
@@ -109,7 +117,20 @@ export const RoomChat = ({ roomChat, makeState }) => (
 							borderLeft: 'none',
 							paddingLeft: '0px',
 							borderRight: 'none'
-						}} ></textarea>
+						}} 
+						value={roomChat.message_text}
+						onChange={(e) => {
+							makeState('message_text',e.target.value);
+						}}
+						onKeyPress={(e) => {
+							if (e.charCode == 13 && !e.nativeEvent.shiftKey) {
+								if(roomChat.message_text != ''){
+									makeState('message_text','');
+									e.preventDefault();
+								}
+							}
+						}}
+						></textarea>
 					<div className="input-group-append">
 						<span className="input-group-text" 
 						style={{
@@ -132,8 +153,11 @@ export const RoomChat = ({ roomChat, makeState }) => (
 
 		</div>
 		
-		<div className="col-md-4" style={{padding: 0, margin: 0}}>
-			<RoomSetting />
+		<div className="col-md-4" style={{padding: 0, margin: 0, display: roomChat.settingOn}}>
+			<RoomSetting 
+				makeState={makeState}
+				roomChat={roomChat}
+			/>
 		</div>
   	</div>
 )

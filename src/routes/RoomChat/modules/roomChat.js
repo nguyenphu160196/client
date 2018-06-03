@@ -68,7 +68,13 @@ const initialState = {
   displayRight: 'none',
   iconButton: 'col-md-9',
   emoji: 'none',
-  sendDisable: true
+  sendDisable: true,
+  message_text:'',
+  settingOn: 'none',
+  settingDel: 'disabled',
+  name_hidden: 'hidden',
+  name_show: '',
+  new_room_name: ''
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

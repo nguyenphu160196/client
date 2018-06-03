@@ -233,11 +233,12 @@ export function getAvatar(){
   return (dispatch, getState) => {
     let profile = {...getState().profile};
     let default_avat = localStorage.user ? JSON.parse(localStorage.user).avatar.charAt(0) : '';
+    let id = localStorage.user ? JSON.parse(localStorage.user)._id : '';
     if(profile.prof_avat == '' && default_avat != '#'){
       return new Promise((resolve, reject) => {
         api({
           method: 'get',
-          url: '/user.avatar',
+          url: '/user.avatar/'+id,
           headers: {'x-access-token': localStorage.getItem('authToken')},
           responseType: 'arraybuffer',
         })

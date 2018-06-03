@@ -12,6 +12,8 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import LeaveRoom from 'material-ui/svg-icons/action/input'
 import Favorite from 'material-ui/svg-icons/action/stars'
 
+import './Main.scss'
+
 
 const ChannelList = ({array}) => {
   const notification = (
@@ -44,7 +46,8 @@ const ChannelList = ({array}) => {
     </IconMenu>
   );
     return (
-      <ListItem 
+      <ListItem
+        className="main-room-list"
         onClick={() => {
           browserHistory.push('/c/' +  array._id);
         }}
