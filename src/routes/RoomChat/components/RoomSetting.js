@@ -17,7 +17,7 @@ export const RoomSetting = ({ makeState, roomChat }) => (
     <div style={{height: '100%', borderLeft: '1px solid lightgrey'}}>
         <div className="col-md-12 d-flex flex-row" style={{padding: '10px 0px'}}>
             <div className="col-md-10" style={{alignSelf: 'center'}}>
-                {roomChat.roomInfo && roomChat.roomInfo.direct == true ? "Conversation Info" : "Room Info"}
+                {roomChat.roomInfo && roomChat.roomInfo.direct == true ? "User Info" : "Room Info"}
             </div>
             <IconButton
                 onClick={() => {
@@ -139,16 +139,6 @@ export const RoomSetting = ({ makeState, roomChat }) => (
                 })
                     :'' 
                 }	 */}
-            </div>
-        </div>
-
-        <div className="col-md-12">
-            <div className={roomChat.roomInfo && roomChat.roomInfo.direct == true ? "hidden" : '' + "col-md-12 d-flex justify-content-between"} style={{margin: '20px 0px'}}>
-                <button className="btn btn-primary form-control"style={{width: '45%'}}>Add User</button>
-                <button className="btn btn-outline-warning form-control" style={{width: '45%'}}>Leave</button>
-            </div>
-            <div className="col-md-12">
-                <button className="btn btn-danger form-control" disabled={roomChat.settingEdit}>Delete</button>
             </div>
         </div>
 

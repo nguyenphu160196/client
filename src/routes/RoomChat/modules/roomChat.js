@@ -6,6 +6,36 @@ import {makeState as makeStateMain} from '../../Main/modules/main'
 
 export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 
+export function recieveMessage(){
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      socket.on('recieve-message', data => {
+        console.log(data);
+      });
+      resolve();
+    })
+  }
+}
+
+export function sendMessage(message){
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      let state = {...getState().roomChat}
+      let id = JSON.parse(localStorage.user)._id;
+      let room_id = state.roomInfo._id;
+      let userInfo = state.userInfo;
+      let array = []
+      userInfo.map((val, i) => {
+        if(val._id != id){
+          array.push(val._id);
+        }
+      })
+      socket.emit('client-send-message', {room: room_id, message: message, recieve: array});
+      resolve();
+    })
+  }
+}
+
 export function creRoomInfo(){
   return (dispatch, getState) => {
     let location = {...getState().location}
@@ -38,6 +68,33 @@ export function creRoomInfo(){
       resolve();
     })
   }
+}
+
+function encode (input) {
+  var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+  var output = "";
+  var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+  var i = 0;
+
+  while (i < input.length) {
+      chr1 = input[i++];
+      chr2 = i < input.length ? input[i++] : Number.NaN; // Not sure if the index 
+      chr3 = i < input.length ? input[i++] : Number.NaN; // checks are needed here
+
+      enc1 = chr1 >> 2;
+      enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+      enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+      enc4 = chr3 & 63;
+
+      if (isNaN(chr2)) {
+          enc3 = enc4 = 64;
+      } else if (isNaN(chr3)) {
+          enc4 = 64;
+      }
+      output += keyStr.charAt(enc1) + keyStr.charAt(enc2) +
+                keyStr.charAt(enc3) + keyStr.charAt(enc4);
+  }
+  return output;
 }
 
 

@@ -16,7 +16,7 @@ import Send from 'material-ui/svg-icons/content/send';
 
 
 
-export const RoomChat = ({ roomChat, makeState }) => (
+export const RoomChat = ({ roomChat, makeState, sendMessage }) => (
   	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
 		<div className={roomChat.widthLeft} style={{padding: 0}}>
 			<div className="col-md-12" style={{borderBottom: '1px solid lightgrey', padding: 0}}
@@ -125,6 +125,7 @@ export const RoomChat = ({ roomChat, makeState }) => (
 						onKeyPress={(e) => {
 							if (e.charCode == 13 && !e.nativeEvent.shiftKey) {
 								if(roomChat.message_text != ''){
+									sendMessage(e.target.value);
 									makeState('message_text','');
 									e.preventDefault();
 								}
@@ -165,6 +166,7 @@ export const RoomChat = ({ roomChat, makeState }) => (
 RoomChat.propTypes = {
 	roomChat: PropTypes.object.isRequired,
 	makeState: PropTypes.func.isRequired,
+	sendMessage: PropTypes.func.isRequired
 }
 
 export default RoomChat

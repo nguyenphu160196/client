@@ -1,4 +1,5 @@
 import api from '../../../../src/api'
+import {browserHistory} from 'react-router'
 import {makeState as makeStateMain} from '../../Main/modules/main'
 
 export const GET_AVATAR = 'GET_AVATAR'
@@ -33,6 +34,7 @@ export function createNR(){
         localStorage.setItem('user', JSON.stringify(st));
         brray.push(res.data.room);
         dispatch(makeStateMain('roomlist',brray));
+        browserHistory.push('/c/' + res.data.room._id);
         dispatch(makeStateMain('block', 'none'));
       })
       .catch(err => {})

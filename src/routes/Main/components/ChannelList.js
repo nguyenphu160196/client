@@ -52,7 +52,11 @@ const ChannelList = ({array}) => {
           browserHistory.push('/c/' +  array._id);
         }}
         primaryText={array.name}
-        leftAvatar={<Avatar style={{backgroundColor: array.avatar}}
+        leftAvatar={array.avatar.charAt(0) != "#" 
+                    ? 
+                      <Avatar src={array.avatar} style={{backgroundColor: "none"}} />
+                    :
+                      <Avatar style={{backgroundColor: array.avatar}}
                       >{array.name.charAt(0).toUpperCase()}</Avatar>
                     }
         rightIcon={notification}

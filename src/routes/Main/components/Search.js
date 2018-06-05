@@ -71,7 +71,7 @@ export const Search = ({main, makeState, search, dirrect}) => {
                                 <Avatar src={value.avatar}></Avatar>
                               }
                               onClick={() => {
-                                dirrect(value._id,value.name);
+                                dirrect(value);
                               }}
                           ></ListItem>
                       )
