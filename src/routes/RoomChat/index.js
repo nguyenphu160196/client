@@ -1,5 +1,5 @@
 import { injectReducer } from '../../store/reducers'
-import  {creRoomInfo, makeState, recieveMessage} from './modules/roomChat'
+import  {creRoomInfo, makeState, recieveMessage, roomStatus} from './modules/roomChat'
 
 
 
@@ -18,6 +18,7 @@ export default (store) => ({
       // store.dispatch(makeState('iconButton','col-md-9'));
       // store.dispatch(makeState('settingOn','none'));
       store.dispatch(recieveMessage());
+      store.dispatch(roomStatus());
       store.dispatch(makeState('name_hidden','hidden'));
       store.dispatch(makeState('name_show',''));
       store.dispatch(makeState('new_room_name',''));

@@ -30,38 +30,45 @@ export const RoomChat = ({ roomChat, makeState, sendMessage }) => (
 					<div className={roomChat.iconButton} style={{
 						alignSelf: 'center',
 						textAlign: 'center',
-					}}><div style={{
-						margin: 'auto',
-						maxWidth: 300,
-						overflow: 'hidden',
-						textOverflow: 'ellipsis',
-						whiteSpace: 'nowrap',
-					}}>{roomChat.roomInfo ? roomChat.roomInfo.name : "Room Name"}</div></div>
+					}}>
+						<div style={{
+							margin: 'auto',
+							maxWidth: 300,
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							whiteSpace: 'nowrap',
+						}}>
+							<div>{roomChat.roomInfo ? roomChat.roomInfo.name : "Room Name"}</div>
+							<div style={{color: 'lightgrey', fontSize: 11, fontWeight: 'normal'}}>
+								{roomChat.roomInfo && (roomChat.roomInfo.direct == true) ? roomChat.status : ""}
+							</div>								
+						</div>
+					</div>
 					<div style={{marginLeft: 30}}>
-					<IconButton tooltip="Audio Call" tooltipPosition="bottom-right">
-						<Mic />
-					</IconButton>
-					<IconButton tooltip="Video Call" tooltipPosition="bottom-right">
-						<VideoCam />
-					</IconButton>
-					<IconButton tooltip="Participants" tooltipPosition="bottom-right">
-						<PersonAdd />
-					</IconButton>	
-					<IconButton tooltip="Room Info" tooltipPosition="bottom-right"
-						onClick={() => {
-							if(roomChat.widthLeft == 'col-md-8' && roomChat.iconButton == 'col-md-8'){
-								makeState('widthLeft','col-md-12');
-								makeState('iconButton','col-md-9');
-								makeState('settingOn','none');
-							}else{
-								makeState('widthLeft','col-md-8');
-								makeState('iconButton','col-md-8');
-								makeState('settingOn','block');
-							}
-						}}
-					>
-						<Info />
-					</IconButton>	
+						<IconButton tooltip="Audio Call" tooltipPosition="bottom-right">
+							<Mic />
+						</IconButton>
+						<IconButton tooltip="Video Call" tooltipPosition="bottom-right">
+							<VideoCam />
+						</IconButton>
+						<IconButton tooltip="Participants" tooltipPosition="bottom-right">
+							<PersonAdd />
+						</IconButton>	
+						<IconButton tooltip="Room Info" tooltipPosition="bottom-right"
+							onClick={() => {
+								if(roomChat.widthLeft == 'col-md-8' && roomChat.iconButton == 'col-md-8'){
+									makeState('widthLeft','col-md-12');
+									makeState('iconButton','col-md-9');
+									makeState('settingOn','none');
+								}else{
+									makeState('widthLeft','col-md-8');
+									makeState('iconButton','col-md-8');
+									makeState('settingOn','block');
+								}
+							}}
+						>
+							<Info />
+						</IconButton>	
 					</div>
 				</div>
 			</div>

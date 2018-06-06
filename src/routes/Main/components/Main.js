@@ -50,7 +50,7 @@ return (
             changeStatus={changeStatus}
           ></Account>
           <div className='row' style={{margin: '0 auto', overflowY:'scroll',height:'calc(100% - 84px)'}}>
-            <Subheader>Recent chat</Subheader>
+            <Subheader></Subheader>
             <List style={{width: '100%', padding: '0px', height: 'calc(100% - 40px)'}}>
                 {main && (main.roomlist.length > 0) ? 
                   main.roomlist.map((value, i) => {

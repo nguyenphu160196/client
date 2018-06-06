@@ -131,6 +131,7 @@ export function handleLogin() {
             api.post('/login', body)
                 .then(res => {
                     localStorage.setItem('authToken', res.data.token);
+                    res.data.user.status = true;
                     localStorage.setItem('user', JSON.stringify(res.data.user));
                     dispatch({
                         type: LOAD_SUCCESS,

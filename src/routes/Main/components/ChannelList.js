@@ -57,7 +57,8 @@ const ChannelList = ({array}) => {
                       <Avatar src={array.avatar} style={{backgroundColor: "none"}} />
                     :
                       <Avatar style={{backgroundColor: array.avatar}}
-                      >{array.name.charAt(0).toUpperCase()}</Avatar>
+                        >{array.name.charAt(0).toUpperCase()}                        
+                      </Avatar>
                     }
         rightIcon={notification}
         rightIconButton={rightIconMenu}

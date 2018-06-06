@@ -129,7 +129,7 @@ export function updateProfile() {
               localStorage.setItem('user', JSON.stringify(st));
               api({
                 method: 'get',
-                url: '/user.avatar',
+                url: '/user.avatar/'+id,
                 headers: {'x-access-token': localStorage.getItem('authToken')},
                 responseType: 'arraybuffer'
               })

@@ -36,6 +36,25 @@ export function sendMessage(message){
   }
 }
 
+export function roomStatus(){
+  return (dispatch, getState) => {
+    let state = {...getState().roomChat}
+    let userInfo = state.userInfo;
+    return new Promise((resolve, reject) => {
+      userInfo.map((val, i) => {
+        if((val._id != JSON.parse(localStorage.user)._id)){
+          if(val.status == true){
+            dispatch(makeState('status', 'Active'));
+          }else{
+            dispatch(makeState('status', 'Inactive'));
+          }
+        }
+      })
+      resolve();
+    })
+  }
+}
+
 export function creRoomInfo(){
   return (dispatch, getState) => {
     let location = {...getState().location}
@@ -56,9 +75,13 @@ export function creRoomInfo(){
               url: '/info.user/'+user[j],
               headers: {'x-access-token': localStorage.getItem('authToken')},
             })
-            .then(res => {
-              array.push(res.data.user);
+            .then(resp => {
+              array.push(resp.data.user);
               dispatch(makeState('userInfo', array));
+              if((res.data.room.direct == true) && (resp.data.user._id != JSON.parse(localStorage.user)._id)){
+                res.data.room.name = resp.data.user.name;
+                dispatch(makeState('roomInfo',res.data.room));
+              }
             })
             .catch(err => {})
         }
@@ -131,7 +154,8 @@ const initialState = {
   settingDel: 'disabled',
   name_hidden: 'hidden',
   name_show: '',
-  new_room_name: ''
+  new_room_name: '',
+  status: ''
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

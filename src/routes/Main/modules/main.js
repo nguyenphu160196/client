@@ -26,6 +26,17 @@ export function socketio(){
           st.socketID = data;
           localStorage.setItem('user', JSON.stringify(st));
         })
+        socket.emit('user-online', JSON.parse(localStorage.user).status);
+        socket.on('recieve-update-direct-room', data => {
+          st.room = data;
+          localStorage.setItem('user', JSON.stringify(st));
+          dispatch(getRoom());
+        });
+        socket.on('test', data => {
+          console.log(data);
+          let x = document.getElementById("joinRoom"); 
+          x.play();
+        })
         resolve();
     })
   }
@@ -45,43 +56,61 @@ export function dirrect(value){
               url: '/create.room',
               headers: {'x-access-token': localStorage.getItem('authToken')},
               data: {
-                  name: value.name,
-                  paticipant: [value._id,JSON.parse(localStorage.user)._id],
+                  paticipant: [value._id,JSON.parse(localStorage.user)._id]
                 }
             })
             .then(res => {
-              if(res.data.room.avatar.charAt(0) != "#"){
-                api({
-                  method: 'get',
-                  url: '/user.avatar/'+res.data.room.paticipant[0],
-                  headers: {'x-access-token': localStorage.getItem('authToken')},
-                  responseType: 'arraybuffer',
-                })
-                .then(ava => {
-                  let bytes = new Uint8Array(ava.data);
-                  let image = 'data:image/png;base64,'+ encode(bytes);
-                  res.data.room.avatar = image;
-                  array.push(res.data.room);
+              res.data.room.paticipant.map((val, i) => {
+                if(val != JSON.parse(localStorage.user)._id){
+                  api({
+                    method: 'get',
+                    url: '/info.user/'+val,
+                    headers: {'x-access-token': localStorage.getItem('authToken')},
+                  })
+                  .then(resp => {
+                    res.data.room.name = resp.data.user.name;
+                    if(resp.data.user.avatar.charAt(0) != '#'){
+                      api({
+                        method: 'get',
+                        url: '/user.avatar/'+val,
+                        headers: {'x-access-token': localStorage.getItem('authToken')},
+                        responseType: 'arraybuffer',
+                      })
+                      .then(ava => {
+                        let bytes = new Uint8Array(ava.data);
+                        let image = 'data:image/png;base64,'+ encode(bytes);
+                        res.data.room.avatar = image;       
+                        array.push(res.data.room);   
+                        dispatch(makeState('roomlist',array));          
+                      })
+                      .catch(err => {      
+                      })
+                    }else{
+                        res.data.room.avatar = resp.data.user.avatar;
+                        array.push(res.data.room);   
+                        dispatch(makeState('roomlist',array));  
+                    }                   
+                  })
+                  .catch(err => {});
+                  
+                  socket.emit("update-direct-room", val);
+
                   brray.push(res.data.room);
-                  dispatch(makeState('roomlist',array));
                   dispatch(makeState('direct_room',brray));
-                })
-                .catch(err => {      
-                })
-              }else{
-                array.push(res.data.room);
-                brray.push(res.data.room);
-                dispatch(makeState('roomlist',array));
-                dispatch(makeState('direct_room',brray));
-              }
-              let st = JSON.parse(localStorage.getItem('user'));
-              st.room.push(res.data.user);
-              localStorage.setItem('user', JSON.stringify(st));
-              browserHistory.push('/c/' + res.data.room._id);
-              dispatch(makeState('block', 'none'));
-              dispatch(makeState('searchValue', ''));
-              dispatch(makeState('searchlist', []));
-              dispatch(makeState('search', false));
+
+                  let st = JSON.parse(localStorage.getItem('user'));
+                  st.room.push(res.data.user);
+                  localStorage.setItem('user', JSON.stringify(st));
+
+                  browserHistory.push('/c/' + res.data.room._id);
+
+                  dispatch(makeState('block', 'none'));
+                  dispatch(makeState('searchValue', ''));
+                  dispatch(makeState('searchlist', []));
+                  dispatch(makeState('search', false));
+
+                }
+              })
             })
             .catch(err => {})
           }else{
@@ -147,24 +176,49 @@ export function getRoom(){
           })
           .then(res => {
             if(res.data.room.avatar.charAt(0) != '#'){
-              api({
-                method: 'get',
-                url: '/user.avatar/'+res.data.room.paticipant[0],
-                headers: {'x-access-token': localStorage.getItem('authToken')},
-                responseType: 'arraybuffer',
-              })
-              .then(ava => {
-                let bytes = new Uint8Array(ava.data);
-                let image = 'data:image/png;base64,'+ encode(bytes);
-                res.data.room.avatar = image;
-                array.push(res.data.room);
-                dispatch(makeState('roomlist',array));
-                if(res.data.room.direct == true){
-                  brray.push(res.data.room);
-                  dispatch(makeState('direct_room',brray));
-                } 
-              })
-              .catch(err => {      
+              res.data.room.paticipant.map((val, j) => {
+                if(val != JSON.parse(localStorage.user)._id){
+                  api({
+                    method: 'get',
+                    url: '/info.user/'+val,
+                    headers: {'x-access-token': localStorage.getItem('authToken')},
+                  })
+                  .then(resp => {
+                    res.data.room.name = resp.data.user.name;
+                    if(resp.data.user.avatar.charAt(0) != "#"){
+                      api({
+                        method: 'get',
+                        url: '/user.avatar/'+val,
+                        headers: {'x-access-token': localStorage.getItem('authToken')},
+                        responseType: 'arraybuffer',
+                      })
+                      .then(ava => {
+                        let bytes = new Uint8Array(ava.data);
+                        let image = 'data:image/png;base64,'+ encode(bytes);
+                        res.data.room.avatar = image;
+                        array.push(res.data.room);
+                        dispatch(makeState('roomlist',array));
+                        if(res.data.room.direct == true){
+                          brray.push(res.data.room);
+                          dispatch(makeState('direct_room',brray));
+                        }
+                      })
+                      .catch(err => {      
+                      })
+                    }else{
+                      res.data.room.avatar = resp.data.user.avatar;
+                      array.push(res.data.room);
+                      dispatch(makeState('roomlist',array));
+                      if(res.data.room.direct == true){
+                        brray.push(res.data.room);
+                        dispatch(makeState('direct_room',brray));
+                      }
+                    }
+                  })
+                  .catch(err => {
+
+                  })
+                }
               })
             }else{
               array.push(res.data.room);
@@ -349,7 +403,7 @@ export function changeStatus(status){
                 type: CHANGE_STATUS,
                 payload: true,
                 message: "You are offline now",
-                color: 'red'
+                color: '#fff'
               })
             }
           })
