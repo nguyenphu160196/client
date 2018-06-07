@@ -1,9 +1,19 @@
 import api from '../../../../src/api'
 import {browserHistory} from 'react-router'
+import socket from '../../../socketio'
 import {makeState as makeStateMain} from '../../Main/modules/main'
 
 export const GET_AVATAR = 'GET_AVATAR'
 export const MAKE_STATE_CREROOM = 'MAKE_STATE_CREROOM'
+
+export function socketio(){
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      
+      resolve();
+    })
+  }
+}
 
 export function createNR(){
   return (dispatch, getState) => {
@@ -13,9 +23,12 @@ export function createNR(){
     let list_participants = state.list_participants;
     let array = [];
     let brray = {...getState().main}.roomlist;
+    let crray = [];
+    let x = document.getElementById("joinRoom");
     return new Promise((resolve, reject) => {
       for(let i=0 ;i<list_participants.length; i++){
         array.push(list_participants[i]._id);
+        crray.push(list_participants[i]._id);
       }
       array.push(JSON.parse(localStorage.user)._id);
       api({
@@ -35,6 +48,8 @@ export function createNR(){
         brray.push(res.data.room);
         dispatch(makeStateMain('roomlist',brray));
         browserHistory.push('/c/' + res.data.room._id);
+        socket.emit("update-room", crray);
+        x.play();
         dispatch(makeStateMain('block', 'none'));
       })
       .catch(err => {})

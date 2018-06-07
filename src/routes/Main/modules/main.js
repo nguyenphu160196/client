@@ -1,8 +1,7 @@
 import {browserHistory} from 'react-router'
-import '../../../external_api'
 import api from '../../../../src/api'
 import socket from '../../../socketio'
-
+import '../../../external_api'
 
 export const MAKE_STATE_MAIN = 'MAKE_STATE_MAIN'
 export const CHANGE_STATUS = 'CHANGE_STATUS'
@@ -21,23 +20,68 @@ export const GET_AVATAR = 'GET_AVATAR'
 export function socketio(){
   return (dispatch, getState) => {
     let st = JSON.parse(localStorage.user);
+    let x = document.getElementById("joinRoom");
     return new Promise((resolve, reject) => {
+        socket.on('recieve-update-room-list', data => {
+          st.room = data;
+          localStorage.setItem('user', JSON.stringify(st));
+          dispatch(getRoom());
+        })
+        socket.emit('update-room-list', st._id)
         socket.on('update-socketid',(data) => {
           st.socketID = data;
           localStorage.setItem('user', JSON.stringify(st));
         })
-        socket.emit('user-online', JSON.parse(localStorage.user).status);
+        socket.emit('user-online', st.status);
         socket.on('recieve-update-direct-room', data => {
           st.room = data;
           localStorage.setItem('user', JSON.stringify(st));
+          x.play();
           dispatch(getRoom());
         });
-        socket.on('test', data => {
-          console.log(data);
-          let x = document.getElementById("joinRoom"); 
+        socket.on('recieve-update-room', data => {
+          st.room = data;
+          localStorage.setItem('user', JSON.stringify(st));
           x.play();
-        })
+          dispatch(getRoom());          
+        });
         resolve();
+    })
+  }
+}
+
+export function hideRoom(room){
+  return (dispatch, getState) => {
+    let st = JSON.parse(localStorage.user);
+    let state = {...getState().main};
+    return new Promise((resolve, reject) => {
+      st.room.map((val, i) => {
+        if(val == room){
+          st.room.splice(i,1);
+          st.blacklist.push(val);
+          localStorage.setItem('user', JSON.stringify(st));
+          api({
+            method: 'put',
+            url: '/room.hide',
+            headers: {'x-access-token': localStorage.getItem('authToken')},
+            data: {
+                room: room
+              }
+          })
+          .then(res => {
+            let array = state.roomlist;
+            array.map((value, j) => {
+              if(value._id == room){
+                array.splice(j,1);
+                dispatch(makeState('roomlist', array));
+              }
+            })            
+            browserHistory.push('/');
+          })
+          .catch(err => {})
+        }
+      })
+      resolve();
     })
   }
 }
@@ -47,6 +91,7 @@ export function dirrect(value){
     let state = {...getState().main}
     let array = state.roomlist;
     let brray = state.direct_room;
+    let x = document.getElementById("joinRoom");
     dispatch(makeState('block', 'flex'));
     return new Promise((resolve, reject) => {
         if(value.email){
@@ -56,7 +101,8 @@ export function dirrect(value){
               url: '/create.room',
               headers: {'x-access-token': localStorage.getItem('authToken')},
               data: {
-                  paticipant: [value._id,JSON.parse(localStorage.user)._id]
+                  paticipant: [value._id,JSON.parse(localStorage.user)._id],
+                  direct: true
                 }
             })
             .then(res => {
@@ -94,6 +140,7 @@ export function dirrect(value){
                   .catch(err => {});
                   
                   socket.emit("update-direct-room", val);
+                  x.play();
 
                   brray.push(res.data.room);
                   dispatch(makeState('direct_room',brray));
@@ -167,7 +214,7 @@ export function getRoom(){
     let array = [];
     let brray = [];
     return new Promise((resolve, reject) => {
-      if((room.length > 0) && (roomlist.length == 0)){
+      if((room.length != 0)){
         room.map((id, i) => {
           api({
             method: 'get',

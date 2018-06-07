@@ -6,7 +6,7 @@ import {makeState as makeStateMain} from '../../Main/modules/main'
 
 export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 
-export function recieveMessage(){
+export function socketio(){
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
       socket.on('recieve-message', data => {
@@ -36,25 +36,6 @@ export function sendMessage(message){
   }
 }
 
-export function roomStatus(){
-  return (dispatch, getState) => {
-    let state = {...getState().roomChat}
-    let userInfo = state.userInfo;
-    return new Promise((resolve, reject) => {
-      userInfo.map((val, i) => {
-        if((val._id != JSON.parse(localStorage.user)._id)){
-          if(val.status == true){
-            dispatch(makeState('status', 'Active'));
-          }else{
-            dispatch(makeState('status', 'Inactive'));
-          }
-        }
-      })
-      resolve();
-    })
-  }
-}
-
 export function creRoomInfo(){
   return (dispatch, getState) => {
     let location = {...getState().location}
@@ -79,8 +60,27 @@ export function creRoomInfo(){
               array.push(resp.data.user);
               dispatch(makeState('userInfo', array));
               if((res.data.room.direct == true) && (resp.data.user._id != JSON.parse(localStorage.user)._id)){
-                res.data.room.name = resp.data.user.name;
-                dispatch(makeState('roomInfo',res.data.room));
+                if(resp.data.user.avatar.charAt(0) != '#'){
+                  api({
+                    method: 'get',
+                    url: '/user.avatar/'+resp.data.user._id,
+                    headers: {'x-access-token': localStorage.getItem('authToken')},
+                    responseType: 'arraybuffer',
+                  })
+                  .then(ava => {
+                    let bytes = new Uint8Array(ava.data);
+                    let image = 'data:image/png;base64,'+ encode(bytes);
+                    res.data.room.avatar = image;
+                    res.data.room.name = resp.data.user.name;
+                    dispatch(makeState('roomInfo',res.data.room));
+                  })
+                  .catch(err => {      
+                  })
+                }else{
+                  res.data.room.avatar = resp.data.user.avatar;
+                  res.data.room.name = resp.data.user.name;
+                  dispatch(makeState('roomInfo',res.data.room));
+                }
               }
             })
             .catch(err => {})

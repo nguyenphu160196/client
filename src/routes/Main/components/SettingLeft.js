@@ -32,17 +32,17 @@ export const SettingLeft = ({main, makeState}) => {
 				 </div>
 			 </div>
 			 <MenuItem 
-					 primaryText="Preferences"
-					 leftIcon={<Preference />}
-					 onClick={(e) => {
-                     browserHistory.push('/preferences');
-					 }}
-			 />
-			 <MenuItem 
 					 primaryText="Profile"
 					 leftIcon={<Profile />}
 					 onClick={(e) => {
                      browserHistory.push('/profile');
+					 }}
+			 />
+			 <MenuItem 
+					 primaryText="Preferences"
+					 leftIcon={<Preference />}
+					 onClick={(e) => {
+                     browserHistory.push('/preferences');
 					 }}
 			 />
 		 </Drawer>

@@ -2,6 +2,7 @@
 import CoreLayout from '../layouts/PageLayout/PageLayout'
 import Main from './Main'
 import LoginRoute from './Login'
+import Page404 from './PageNotFound'
 import {browserHistory} from 'react-router'
 
 const loginReq = () => {
@@ -22,7 +23,6 @@ export const createRoutes = (store) => ({
     //require auth route
     {      
       onEnter: loginReq,
-      // indexRoute: ,
       childRoutes: [
         Main(store)
       ]
@@ -32,7 +32,8 @@ export const createRoutes = (store) => ({
       childRoutes: [
         LoginRoute(store)
       ]
-    }
+    },
+    Page404(store)
   ]
 })
 

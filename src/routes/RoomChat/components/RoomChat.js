@@ -51,7 +51,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage }) => (
 						<IconButton tooltip="Video Call" tooltipPosition="bottom-right">
 							<VideoCam />
 						</IconButton>
-						<IconButton tooltip="Participants" tooltipPosition="bottom-right">
+						<IconButton tooltip="Participants" tooltipPosition="bottom-right" disabled={roomChat.roomInfo && (roomChat.roomInfo.direct == true) ? true : false}>
 							<PersonAdd />
 						</IconButton>	
 						<IconButton tooltip="Room Info" tooltipPosition="bottom-right"

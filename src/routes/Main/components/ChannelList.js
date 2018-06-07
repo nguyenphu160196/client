@@ -10,39 +10,50 @@ import Badge from 'material-ui/Badge';
 
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import LeaveRoom from 'material-ui/svg-icons/action/input'
-import Favorite from 'material-ui/svg-icons/action/stars'
+import Visibility from 'material-ui/svg-icons/action/visibility-off'
+import BlockUser from 'material-ui/svg-icons/action/speaker-notes-off'
+
 
 import './Main.scss'
 
 
-const ChannelList = ({array}) => {
+const ChannelList = ({array, hideRoom}) => {
   const notification = (
       <Badge
-        badgeContent={0}
+        badgeContent={"!"}
         secondary={true}
         badgeStyle={{top: 0, right: 40}}
+        style={{display: 'none'}}
       >
       </Badge>
   );
   const rightIconMenu = (
     <IconMenu 
-      iconButtonElement={<IconButton tooltip="more"><MoreVertIcon /></IconButton>}
+      iconButtonElement={<IconButton tooltip="Options"><MoreVertIcon /></IconButton>}
       anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
     >
       <MenuItem 
-          primaryText="Favorite"
-          leftIcon={<Favorite />}
-          // onClick={(e) => {
-          // browserHistory.push('/setting'); 
-          // }}
+          primaryText={array && (array.direct == true) ? 'Hide Chat' : 'Hide Room'}
+          leftIcon={<Visibility/>}
+          onClick={(e) => {
+            if(array && (array.direct == true)){
+              hideRoom(array._id);
+            }else{
+              hideRoom(array._id);
+            }
+          }}
       />
-      <MenuItem 
-          primaryText="Leave room"
-          leftIcon={<LeaveRoom />}
-          // onClick={(e) => {
-          //     signOut()
-          // }}
-      />
+      {/* <MenuItem 
+          primaryText={array && (array.direct == true) ? 'Block User' : 'Leave Room'}
+          leftIcon={array && (array.direct == true) ? <BlockUser /> : <LeaveRoom />}
+          onClick={(e) => {
+            if(array && (array.direct == true)){
+              console.log('block user');
+            }else{
+              console.log('leave room');
+            } 
+          }}
+      /> */}
     </IconMenu>
   );
     return (

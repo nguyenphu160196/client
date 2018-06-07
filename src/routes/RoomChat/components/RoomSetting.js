@@ -5,6 +5,7 @@ import './RoomChat.scss'
 import IconButton from 'material-ui/IconButton';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import Clear from 'material-ui/svg-icons/content/clear'
 import Save from 'material-ui/svg-icons/content/save'
@@ -29,6 +30,8 @@ export const RoomSetting = ({ makeState, roomChat }) => (
         </div>
 
         <div className="col-md-12 d-flex justify-content-center" style={{margin: '20px 0px'}}>
+            {roomChat.roomInfo && (roomChat.roomInfo.avatar.charAt(0) == '#')
+            ?
             <div style={{
                             height: 150, width: 150, 
                             backgroundColor: roomChat.roomInfo ? roomChat.roomInfo.avatar :"unset",
@@ -38,6 +41,9 @@ export const RoomSetting = ({ makeState, roomChat }) => (
                         }}>
                 {roomChat.roomInfo ? roomChat.roomInfo.name.charAt(0).toUpperCase() : ""}
             </div>
+            :
+                <img width='150' height='150' src={roomChat.roomInfo ? roomChat.roomInfo.avatar : ''} />
+            }
         </div>
 
         <div className="col-md-12 d-flex justify-content-center" style={{margin: '20px 0px 0px'}}>
@@ -100,46 +106,39 @@ export const RoomSetting = ({ makeState, roomChat }) => (
             </div>
         </div>
 
-        <div className="col-md-12">
-            <div className='d-flex flex-wrap' style={{height: "200px", overflowX: 'hidden', overflowY: 'scroll'}}>
-                {/* <Chip style={{margin: 4}}>
-                    {localStorage.user && JSON.parse(localStorage.user).avatar.charAt(0) == '#'
-                        ? 
-                        <Avatar style={{backgroundColor: localStorage.user ? JSON.parse(localStorage.user).avatar : "unset"}}
-                        >
-                                {localStorage.user ? JSON.parse(localStorage.user).name.charAt(0).toUpperCase() : ""}
-                        </Avatar>  
-                        : 
-                        <Avatar src={createRoom ? createRoom.avatar : ''}></Avatar>  }
-                        {JSON.parse(localStorage.getItem('user')).name}
-                </Chip> */}
-                {/* {createRoom && (createRoom.list_participants.length > 0) ? createRoom.list_participants.map((value, i) => {
-                    return (
-                        <Chip
-                            key={i}
-                            onRequestDelete={() => {
-                                deleteChip(value._id)
-                                .then(() => {
-                                    act_btn();
-                                });
-                            }}
-                            style={{margin: 4}}
-                        >
-                            {value && (value.avatar.charAt(0) == '#')	
-                                ?
-                                <Avatar style={{backgroundColor: value ? value.avatar : ''}}>
-                                    {value.name.charAt(0).toUpperCase()}
-                                </Avatar>
-                                :
-                                <Avatar src={value.avatar} />
-                            }
-                                {value.name}
-                        </Chip>
-                    )
-                })
-                    :'' 
-                }	 */}
+        <div className="col-md-12" style={{marginTop: 50}}>
+            {roomChat.roomInfo && (roomChat.roomInfo.direct == true)
+            ?
+            <div>
+                <RaisedButton
+                    label="Hide Chat"
+                    secondary={true}
+                    style={{margin: 12, width: '90%'}}
+                />
+                <RaisedButton
+                    label="Block User"
+                    primary={true}
+                    style={{margin: 12, width: '90%'}}
+                />
             </div>
+            :
+            <div>
+                <RaisedButton
+                    label="Participants"
+                    style={{margin: 12, width: '90%'}}
+                />
+                <RaisedButton
+                    label="Hide Room"
+                    primary={true}
+                    style={{margin: 12, width: '90%'}}
+                />
+                <RaisedButton
+                    label="Leave Room"
+                    secondary={true}
+                    style={{margin: 12, width: '90%'}}
+                />
+            </div>
+            }
         </div>
 
     </div>

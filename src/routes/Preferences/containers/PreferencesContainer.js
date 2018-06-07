@@ -1,9 +1,11 @@
 import { connect } from 'react-redux'
-import {  } from '../modules/preferences'
+import { makeState, unLock } from '../modules/preferences'
 
 import Preferences from '../components/Preferences'
 
 const mapDispatchToProps = {
+    makeState,
+    unLock
 }
 
 const mapStateToProps = (state) => ({

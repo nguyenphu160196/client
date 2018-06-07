@@ -26,7 +26,7 @@ export const Search = ({main, makeState, search, dirrect}) => {
                     borderRight: 'none'
                   }} >{<SearchIcon />}</span>
                 </div>
-                <input type="text" className="form-control" placeholder="Search" 
+                <input type="text" className="form-control" placeholder="Search user or room" 
                   style={{
                     outline: 'none',
                     boxShadow: 'none',

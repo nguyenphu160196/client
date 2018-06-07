@@ -6,7 +6,7 @@ import Preferences from '../Preferences'
 
 export default (store) => ({
   path: '/setting',
-  indexRoute: Preferences(store),
+  indexRoute: Profile(store),
   childRoutes: [
     Profile(store),
     Preferences(store)

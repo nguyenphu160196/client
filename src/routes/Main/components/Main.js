@@ -10,19 +10,26 @@ import SettingLeft from './SettingLeft'
 import Progress from '../../../components/Common/PageLoading'
 import Snackbar from '../../../components/Common/Snackbar'
 
-import { GoogleLogout } from 'react-google-login';
 import {List} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 
-
-const logout = (response) => {
-  console.log(response);
+export class RealTime extends React.Component{
+  constructor(props) {
+    super(props);
+  }
+  componentDidMount() {
+    this.props.socketio();
+  }
+  render(){
+    return(<div></div>)
+  }
 }
 
-export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect }) => {
+export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, socketio, hideRoom }) => {
 
 return (
   <div style={{ margin: '0 auto',height: '100%' }} >
+  <RealTime socketio={socketio} />
   <Progress display={main.block}></Progress>
     <div className='row' style={{margin: '0 auto',height: '100%'}}>
 
@@ -55,7 +62,7 @@ return (
                 {main && (main.roomlist.length > 0) ? 
                   main.roomlist.map((value, i) => {
                     return (
-                      <ChannelList key={i} array={value}></ChannelList>
+                      <ChannelList key={i} array={value} hideRoom={hideRoom}></ChannelList>
                     )
                   })
                   : ''}
@@ -69,13 +76,6 @@ return (
   </div>
 )}
 
-// <GoogleLogout
-//   className="btn btn-danger"
-//   buttonText="Logout"
-//   onLogoutSuccess={logout}
-// >
-// </GoogleLogout>
-
 Main.propTypes = {
   children: PropTypes.node,
   main: PropTypes.object.isRequired,
@@ -84,7 +84,9 @@ Main.propTypes = {
   changeStatus: PropTypes.func.isRequired,
   closeSnacke: PropTypes.func.isRequired,
   search: PropTypes.func.isRequired,
-  dirrect: PropTypes.func.isRequired
+  dirrect: PropTypes.func.isRequired,
+  socketio: PropTypes.func.isRequired,
+  hideRoom: PropTypes.func.isRequired
 }
 
 export default Main
