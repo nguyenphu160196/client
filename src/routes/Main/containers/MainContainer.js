@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { signOut, makeState, changeStatus, closeSnacke, search, dirrect, socketio, hideRoom } from '../modules/main'
+import { signOut, makeState, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog } from '../modules/main'
 
 import Main from '../components/Main'
 
@@ -11,8 +11,9 @@ const mapDispatchToProps = {
   closeSnacke,
   search,
   dirrect,
-  socketio,
-  hideRoom
+  initial,
+  hideRoom,
+  closeDialog
 }
 
 const mapStateToProps = (state) => ({

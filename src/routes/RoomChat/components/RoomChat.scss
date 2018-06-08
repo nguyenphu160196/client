@@ -18,3 +18,10 @@ textarea {
 .hidden{
     display: none;
 }
+
+.main-room-list div div div:last-child{
+    max-width: 185px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; 
+}

@@ -4,6 +4,7 @@ import EmojiPicker from 'emoji-picker-react';
 import JSEMOJI from 'emoji-js';
 import './RoomChat.scss'
 import RoomSetting from './RoomSetting'
+import Participant from './Participant'
 
 import IconButton from 'material-ui/IconButton';
 
@@ -15,9 +16,22 @@ import EmojiIcon from 'material-ui/svg-icons/image/tag-faces';
 import Send from 'material-ui/svg-icons/content/send';
 
 
+export class Initial extends React.Component{
+	constructor(props) {
+	  super(props);
+	}
+	componentDidMount() {
+		this.props.initial();
+	}
+	render(){
+	  return(<div></div>)
+	}
+  }
 
-export const RoomChat = ({ roomChat, makeState, sendMessage }) => (
+
+export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser }) => (
   	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
+	  	<Initial initial={initial} />
 		<div className={roomChat.widthLeft} style={{padding: 0}}>
 			<div className="col-md-12" style={{borderBottom: '1px solid lightgrey', padding: 0}}
 				onClick={() => {
@@ -51,20 +65,22 @@ export const RoomChat = ({ roomChat, makeState, sendMessage }) => (
 						<IconButton tooltip="Video Call" tooltipPosition="bottom-right">
 							<VideoCam />
 						</IconButton>
-						<IconButton tooltip="Participants" tooltipPosition="bottom-right" disabled={roomChat.roomInfo && (roomChat.roomInfo.direct == true) ? true : false}>
+						<IconButton tooltip="Participants" tooltipPosition="bottom-right" disabled={roomChat.roomInfo && (roomChat.roomInfo.direct == true) ? true : false}
+							onClick={() => {
+									makeState('widthLeft','col-md-8');
+									makeState('iconButton','col-md-8');
+									makeState('participantOn','block');
+									makeState('settingOn','none');
+							}}
+						>
 							<PersonAdd />
 						</IconButton>	
 						<IconButton tooltip="Room Info" tooltipPosition="bottom-right"
 							onClick={() => {
-								if(roomChat.widthLeft == 'col-md-8' && roomChat.iconButton == 'col-md-8'){
-									makeState('widthLeft','col-md-12');
-									makeState('iconButton','col-md-9');
-									makeState('settingOn','none');
-								}else{
 									makeState('widthLeft','col-md-8');
 									makeState('iconButton','col-md-8');
 									makeState('settingOn','block');
-								}
+									makeState('participantOn','none');
 							}}
 						>
 							<Info />
@@ -165,15 +181,30 @@ export const RoomChat = ({ roomChat, makeState, sendMessage }) => (
 			<RoomSetting 
 				makeState={makeState}
 				roomChat={roomChat}
+				hideRoom={hideRoom}
 			/>
 		</div>
+
+		<div className="col-md-4" style={{padding: 0, margin: 0, display: roomChat.participantOn}}>
+			<Participant 
+				makeState={makeState}
+				roomChat={roomChat}
+				search={search}
+				kickUser={kickUser}
+			/>
+		</div>
+
   	</div>
 )
 
 RoomChat.propTypes = {
 	roomChat: PropTypes.object.isRequired,
 	makeState: PropTypes.func.isRequired,
-	sendMessage: PropTypes.func.isRequired
+	sendMessage: PropTypes.func.isRequired,
+	hideRoom: PropTypes.func.isRequired,
+	search: PropTypes.func.isRequired,
+	initial: PropTypes.func.isRequired,
+	kickUser: PropTypes.func.isRequired
 }
 
 export default RoomChat

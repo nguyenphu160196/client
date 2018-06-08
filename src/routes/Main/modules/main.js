@@ -2,11 +2,13 @@ import {browserHistory} from 'react-router'
 import api from '../../../../src/api'
 import socket from '../../../socketio'
 import '../../../external_api'
+import { MAKE_STATE_ROOM } from '../../RoomChat/modules/roomChat';
 
 export const MAKE_STATE_MAIN = 'MAKE_STATE_MAIN'
 export const CHANGE_STATUS = 'CHANGE_STATUS'
 export const CLOSE_SNACKE = 'CLOSE_SNACKE'
 export const GET_AVATAR = 'GET_AVATAR'
+export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 
 // var domain = "http://localhost:8080/";
 // var options = {
@@ -17,17 +19,31 @@ export const GET_AVATAR = 'GET_AVATAR'
 // }
 // var jit = new JitsiMeetExternalAPI(domain, options);
 
-export function socketio(){
+export function initial(){
   return (dispatch, getState) => {
     let st = JSON.parse(localStorage.user);
     let x = document.getElementById("joinRoom");
     return new Promise((resolve, reject) => {
-        socket.on('recieve-update-room-list', data => {
-          st.room = data;
+        dispatch(getAvatar());
+        api({
+          method: 'get',
+          url: '/user.get.room',
+          headers: {'x-access-token': localStorage.getItem('authToken')}
+        })
+        .then(res => {
+          st.room = res.data.room;
           localStorage.setItem('user', JSON.stringify(st));
           dispatch(getRoom());
         })
-        socket.emit('update-room-list', st._id)
+        .catch(err => {})
+        socket.on('recieve-kick-user', data => {
+          st.room = data.room;
+          localStorage.setItem('user', JSON.stringify(st));
+          browserHistory.push('/');
+          dispatch(makeState('dialogMess','You have kicked out of room ' + data.room.name));
+          dispatch(makeState('dialog',true));
+          dispatch(getRoom());
+        })
         socket.on('update-socketid',(data) => {
           st.socketID = data;
           localStorage.setItem('user', JSON.stringify(st));
@@ -284,6 +300,27 @@ export function getRoom(){
   }
 }
 
+function checkBlackList(room){
+    let st = JSON.parse(localStorage.user);
+    let blacklist = st.blacklist;
+    if(blacklist.length != 0){
+      let c = 0;
+      for(let i=0; i< blacklist.length; i++){
+        for(let j=0; j< room.length; j++){
+          if(blacklist[i] == room[j]){
+            c = 1;
+          }
+        }
+      }
+      if(c != 1){
+        return true;
+      }
+    }else{
+      return true;
+    }
+    
+}
+
 export function search(value){
   return (dispatch, getState) => {
     dispatch(makeState('searchlist',[]));
@@ -298,7 +335,7 @@ export function search(value){
         })
         .then(res => {
             res.data.user.map((val, i) => {
-              if(val._id != JSON.parse(localStorage.user)._id){
+              if((val._id != JSON.parse(localStorage.user)._id) && (checkBlackList(val.room) == true)){
                 if(val.avatar.charAt(0) != '#'){
                   api({
                     method: 'get',
@@ -398,9 +435,9 @@ function encode (input) {
 export function getAvatar(){
   return (dispatch, getState) => {
     let main = {...getState().main};
-    let default_avat = localStorage.user ? JSON.parse(localStorage.user).avatar.charAt(0) : '';
+    let default_avat = localStorage.user ? JSON.parse(localStorage.user).avatar : '';
     let id = localStorage.user ? JSON.parse(localStorage.user)._id : '';
-    if(main.avatar == '' && default_avat != '#'){
+    if(default_avat.charAt(0) != '#'){
       return new Promise((resolve, reject) => {
         api({
           method: 'get',
@@ -488,7 +525,12 @@ export function closeSnacke(){
   }
 }
 
-
+export function closeDialog(){
+  return{
+    type: CLOSE_DIALOG,
+    payload: false
+  }
+}
 
 const initialState = {
   direct_room: [],
@@ -496,6 +538,7 @@ const initialState = {
   searchlist: [],
   searchValue: '',
   dialog: false,
+  dialogMess: '',
   avatar: '',
   active: true,
   search: false,
@@ -515,6 +558,11 @@ const ACTION_HANDLERS = {
   [CLOSE_SNACKE]: (state, action) => {
     return Object.assign({}, state, {
       snackeOpen: action.payload
+    })
+  },
+  [CLOSE_DIALOG]: (state, action) => {
+    return Object.assign({}, state, {
+      dialog: action.payload
     })
   },
   [CHANGE_STATUS]: (state, action) => {

@@ -14,7 +14,7 @@ import Back from 'material-ui/svg-icons/hardware/keyboard-backspace'
 
 
 
-export const RoomSetting = ({ makeState, roomChat }) => (
+export const RoomSetting = ({ makeState, roomChat, hideRoom }) => (
     <div style={{height: '100%', borderLeft: '1px solid lightgrey'}}>
         <div className="col-md-12 d-flex flex-row" style={{padding: '10px 0px'}}>
             <div className="col-md-10" style={{alignSelf: 'center'}}>
@@ -114,11 +114,9 @@ export const RoomSetting = ({ makeState, roomChat }) => (
                     label="Hide Chat"
                     secondary={true}
                     style={{margin: 12, width: '90%'}}
-                />
-                <RaisedButton
-                    label="Block User"
-                    primary={true}
-                    style={{margin: 12, width: '90%'}}
+                    onClick={() => {
+                        hideRoom(roomChat.roomInfo._id);
+                    }}
                 />
             </div>
             :
@@ -126,11 +124,18 @@ export const RoomSetting = ({ makeState, roomChat }) => (
                 <RaisedButton
                     label="Participants"
                     style={{margin: 12, width: '90%'}}
+                    onClick={() => {
+                        makeState('participantOn','block');
+                        makeState('settingOn','none');
+                    }}
                 />
                 <RaisedButton
                     label="Hide Room"
                     primary={true}
                     style={{margin: 12, width: '90%'}}
+                    onClick={() => {
+                        hideRoom(roomChat.roomInfo._id);
+                    }}
                 />
                 <RaisedButton
                     label="Leave Room"

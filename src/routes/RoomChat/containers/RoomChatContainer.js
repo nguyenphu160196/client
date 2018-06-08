@@ -1,12 +1,16 @@
 import { connect } from 'react-redux'
-import { makeState, creRoomInfo, sendMessage } from '../modules/roomChat'
+import { makeState, sendMessage, search, initial, kickUser } from '../modules/roomChat'
+import { hideRoom } from '../../Main/modules/main'
 
 import RoomChat from '../components/RoomChat'
 
 const mapDispatchToProps = {
     makeState,
-    creRoomInfo,
-    sendMessage
+    sendMessage,
+    hideRoom,
+    search,
+    initial,
+    kickUser
 }
 
 const mapStateToProps = (state) => ({

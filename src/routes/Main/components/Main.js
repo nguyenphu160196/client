@@ -7,6 +7,7 @@ import Account from './Account'
 import Search from './Search'
 import SettingLeft from './SettingLeft'
 
+import DialogMessage from '../../../components/Common/DialogMessage'
 import Progress from '../../../components/Common/PageLoading'
 import Snackbar from '../../../components/Common/Snackbar'
 
@@ -18,18 +19,23 @@ export class RealTime extends React.Component{
     super(props);
   }
   componentDidMount() {
-    this.props.socketio();
+    this.props.initial();
   }
   render(){
     return(<div></div>)
   }
 }
 
-export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, socketio, hideRoom }) => {
+export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog }) => {
 
 return (
   <div style={{ margin: '0 auto',height: '100%' }} >
-  <RealTime socketio={socketio} />
+  <RealTime initial={initial} />
+  <DialogMessage 
+    dialog={main.dialog}
+    closeDialog={closeDialog}
+    message={main.dialogMess}
+  />
   <Progress display={main.block}></Progress>
     <div className='row' style={{margin: '0 auto',height: '100%'}}>
 
@@ -85,8 +91,9 @@ Main.propTypes = {
   closeSnacke: PropTypes.func.isRequired,
   search: PropTypes.func.isRequired,
   dirrect: PropTypes.func.isRequired,
-  socketio: PropTypes.func.isRequired,
-  hideRoom: PropTypes.func.isRequired
+  initial: PropTypes.func.isRequired,
+  hideRoom: PropTypes.func.isRequired,
+  closeDialog: PropTypes.func.isRequired
 }
 
 export default Main
