@@ -10,7 +10,7 @@ import Users from 'material-ui/svg-icons/action/perm-identity'
 import Kick from 'material-ui/svg-icons/action/speaker-notes-off'
 
 
-export const Participants = ({makeState, roomChat, search, kickUser}) => {
+export const Participants = ({makeState, roomChat, search, kickUser, addParticipant}) => {
     return (
         <div style={{height: '100%', margin: '0 auto', borderLeft: '1px solid lightgrey'}}>
             <div className="col-md-12 d-flex flex-row" style={{padding: '10px 0px'}}>
@@ -46,9 +46,7 @@ export const Participants = ({makeState, roomChat, search, kickUser}) => {
                         }}
                         onFocus={(e) => {
                             makeState('toogle_list_invite','block');
-                            if(roomChat.invite_input != ''){
-                                search(roomChat.invite_input);
-                            }                            
+                            search(roomChat.invite_input);                         
                         }}
                         onBlur={() => {
                             if(roomChat.invite_input == ''){
@@ -100,7 +98,7 @@ export const Participants = ({makeState, roomChat, search, kickUser}) => {
                             <ListItem 
                                 key={i}
                                 onClick={() => {
-                                    
+                                    addParticipant(value._id);
                                     makeState('toogle_list_invite','none');									
                                 }}
                                 primaryText={value.name}

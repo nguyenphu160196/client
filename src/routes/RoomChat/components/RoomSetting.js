@@ -10,11 +10,11 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Clear from 'material-ui/svg-icons/content/clear'
 import Save from 'material-ui/svg-icons/content/save'
 import Edit from 'material-ui/svg-icons/editor/border-color'
-import Back from 'material-ui/svg-icons/hardware/keyboard-backspace'
+import ClearOff from 'material-ui/svg-icons/action/highlight-off'
 
 
 
-export const RoomSetting = ({ makeState, roomChat, hideRoom }) => (
+export const RoomSetting = ({ makeState, roomChat, hideRoom, changeRoomName, leaveRoom }) => (
     <div style={{height: '100%', borderLeft: '1px solid lightgrey'}}>
         <div className="col-md-12 d-flex flex-row" style={{padding: '10px 0px'}}>
             <div className="col-md-10" style={{alignSelf: 'center'}}>
@@ -59,7 +59,7 @@ export const RoomSetting = ({ makeState, roomChat, hideRoom }) => (
                             cursor: 'pointer',
                             backgroundColor: 'unset',
                             borderRight: 'none'
-                        }} >{<Back />}</span>
+                        }} >{<ClearOff />}</span>
                 </div>
                 <input autoFocus type="text" className=' form-control'
                     onChange={(e) => {
@@ -87,9 +87,9 @@ export const RoomSetting = ({ makeState, roomChat, hideRoom }) => (
             {roomChat.roomInfo ? "# " + roomChat.roomInfo.name : "Room Name"}
             </div>
             <div className={roomChat.name_hidden}>
-                <IconButton tooltip="Change name" tooltipPosition="top-right"
+                <IconButton tooltip="Change name" tooltipPosition="top-left"
                     onClick={() => {
-                            
+                        changeRoomName();
                     }}
                 >
                     <Save />
@@ -141,6 +141,9 @@ export const RoomSetting = ({ makeState, roomChat, hideRoom }) => (
                     label="Leave Room"
                     secondary={true}
                     style={{margin: 12, width: '90%'}}
+                    onClick = {() => {
+                        leaveRoom()
+                    }}
                 />
             </div>
             }

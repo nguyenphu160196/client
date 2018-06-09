@@ -2,44 +2,34 @@ import '../../../external_api'
 import {browserHistory} from 'react-router'
 import api from '../../../../src/api'
 import socket from '../../../socketio'
-import {makeState as makeStateMain} from '../../Main/modules/main'
+import {makeState as makeStateMain, getRoom} from '../../Main/modules/main'
 
 export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 
 export function initial(){
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
+      socket.on('recieve-change-room-name', data => {
+        let roomInfo = {...getState().roomChat}.roomInfo;
+        roomInfo.name = data;
+        dispatch(makeState('roomInfo', roomInfo));
+      })
+      socket.on('recieve-add-participant', data => {
+        dispatch(creRoomInfo());
+      })
+      socket.on('recieve-update-kick-user', data => {
+        let state = {...getState().roomChat};
+        let userInfo = state.userInfo;
+        userInfo.map((val, i) => {
+          if(val._id == data.user){
+            userInfo.splice(i,1);
+            dispatch(makeState('userInfo',userInfo));
+          }
+        })
+      })
       socket.on('recieve-message', data => {
         console.log(data);
       });
-      resolve();
-    })
-  }
-}
-
-
-export function kickUser(id){
-  return (dispatch, getState) => {
-    let state = {...getState().roomChat};
-    let userInfo = state.userInfo;
-    let roomInfo = state.roomInfo;
-    return new Promise((resolve, reject) => {
-      api({
-        method: 'put',
-        url: '/kick.user/' + roomInfo._id,
-        headers: {'x-access-token': localStorage.getItem('authToken')},
-        data: { user:id }
-      })
-      .then(res => {
-        userInfo.map((val, i) => {
-          if(val._id == id){
-            userInfo.splice(i,1);
-            dispatch('userInfo', userInfo);
-          }
-        })
-        socket.emit('kick-user',{ user:id, room:roomInfo._id });
-      })
-      .catch(err => {})
       resolve();
     })
   }
@@ -59,6 +49,115 @@ export function sendMessage(message){
         }
       })
       socket.emit('client-send-message', {room: room_id, message: message, recieve: array});
+      resolve();
+    })
+  }
+}
+
+export function leaveRoom(){
+  return (dispatch, getState) => {
+    let state = {...getState().roomChat};
+    let roomInfo = state.roomInfo;
+    return new Promise((resolve, reject) => {
+      api({
+        method: 'put',
+        url: '/leave.room/' + roomInfo._id,
+        headers: {'x-access-token': localStorage.getItem('authToken')}
+      })
+      .then(res => {
+        browserHistory.push('/');
+        
+      })
+      .catch(err => {})
+      resolve();
+    })
+  }
+}
+
+export function changeRoomName(){
+  return (dispatch, getState) => {
+    let state = {...getState().roomChat};
+    let roomInfo = state.roomInfo;
+    let name = state.new_room_name;
+    return new Promise((resolve, reject) => {
+      api({
+        method: 'put',
+        url: '/room.change.name/' + roomInfo._id,
+        headers: {'x-access-token': localStorage.getItem('authToken')},
+        data: { name: name }
+      })
+      .then(res => {
+        roomInfo.name = name;
+        dispatch(makeState('roomInfo',roomInfo));
+        dispatch(makeState('name_show',''));
+        dispatch(makeState('name_hidden','hidden'));
+        dispatch(getRoom());
+        roomInfo.paticipant.map((val, i) => {
+          if(val != JSON.parse(localStorage.user)._id){
+            socket.emit('change-room-name', {id: val, name:name});
+          }
+        })
+      })
+      .catch(err => {})
+      resolve();
+    })
+  }
+}
+
+export function addParticipant(id){
+  return (dispatch, getState) => {
+    let state = {...getState().roomChat};
+    let roomInfo = state.roomInfo;
+    let userInfo = state.userInfo;
+    return new Promise((resolve, reject) => {
+      api({
+        method: 'put',
+        url: '/add.user.room/' + roomInfo._id,
+        headers: {'x-access-token': localStorage.getItem('authToken')},
+        data: { user: id }
+      })
+      .then(res => {
+        roomInfo.paticipant.map((val, i) => {
+          if(val != roomInfo.owner){
+            socket.emit('add-participant',val);
+          }
+        })
+        if(res.data.success == true){
+          dispatch(creRoomInfo());
+          socket.emit('update-room',[id]);
+        }
+      })
+      .catch(err => {})
+      resolve();
+    })
+  }
+}
+
+export function kickUser(id){
+  return (dispatch, getState) => {
+    let state = {...getState().roomChat};
+    let roomInfo = state.roomInfo;
+    return new Promise((resolve, reject) => {
+      api({
+        method: 'put',
+        url: '/kick.user/' + roomInfo._id,
+        headers: {'x-access-token': localStorage.getItem('authToken')},
+        data: { user:id }
+      })
+      .then(res => {
+        let userInfo = state.userInfo;
+        console.log(roomInfo.direct);
+        console.log(JSON.parse(localStorage.user)._id);
+        userInfo.map((val, i) => {
+          console.log(val._id);
+          if(val._id == id){
+            userInfo.splice(i,1);
+            dispatch(makeState('userInfo', userInfo));
+            socket.emit('kick-user',{ user:id, room:roomInfo._id });
+          }
+        })
+      })
+      .catch(err => {})
       resolve();
     })
   }
@@ -136,46 +235,25 @@ export function search(value){
 export function creRoomInfo(){
   return (dispatch, getState) => {
     let location = {...getState().location}
-    let id = location.pathname.split('/c/')[1];
+    let id = (new RegExp("/c/")).test(location.pathname) ? location.pathname.split('/c/')[1] : '';
     let array = []
     return new Promise((resolve, reject) => {
-      api({
-        method: 'get',
-        url: '/info.room/'+id,
-        headers: {'x-access-token': localStorage.getItem('authToken')},
-      })
-      .then(res => {
-          dispatch(makeState('roomInfo',res.data.room));
-          let user = res.data.room.paticipant;
-          for(let j=0; j<user.length; j++){
-            api({
-              method: 'get',
-              url: '/info.user/'+user[j],
-              headers: {'x-access-token': localStorage.getItem('authToken')},
-            })
-            .then(resp => {
-              if(resp.data.user.avatar.charAt(0) != '#'){
-                api({
-                  method: 'get',
-                  url: '/user.avatar/'+resp.data.user._id,
-                  headers: {'x-access-token': localStorage.getItem('authToken')},
-                  responseType: 'arraybuffer',
-                })
-                .then(ava => {
-                  let bytes = new Uint8Array(ava.data);
-                  let image = 'data:image/png;base64,'+ encode(bytes);
-                  resp.data.user.avatar = image;
-                  array.push(resp.data.user);
-                  dispatch(makeState('userInfo', array));
-                })
-                .catch(err => {      
-                })
-              }else{
-                array.push(resp.data.user);
-                dispatch(makeState('userInfo', array));
-              }
-
-              if((res.data.room.direct == true) && (resp.data.user._id != JSON.parse(localStorage.user)._id)){
+      if(id != ''){
+        api({
+          method: 'get',
+          url: '/info.room/'+id,
+          headers: {'x-access-token': localStorage.getItem('authToken')},
+        })
+        .then(res => {
+            dispatch(makeState('roomInfo',res.data.room));
+            let user = res.data.room.paticipant;
+            for(let j=0; j<user.length; j++){
+              api({
+                method: 'get',
+                url: '/info.user/'+user[j],
+                headers: {'x-access-token': localStorage.getItem('authToken')},
+              })
+              .then(resp => {
                 if(resp.data.user.avatar.charAt(0) != '#'){
                   api({
                     method: 'get',
@@ -186,24 +264,46 @@ export function creRoomInfo(){
                   .then(ava => {
                     let bytes = new Uint8Array(ava.data);
                     let image = 'data:image/png;base64,'+ encode(bytes);
-                    res.data.room.avatar = image;
-                    res.data.room.name = resp.data.user.name;
-                    dispatch(makeState('roomInfo',res.data.room));
+                    resp.data.user.avatar = image;
+                    array.push(resp.data.user);
+                    dispatch(makeState('userInfo', array));
                   })
                   .catch(err => {      
                   })
                 }else{
-                  res.data.room.avatar = resp.data.user.avatar;
-                  res.data.room.name = resp.data.user.name;
-                  dispatch(makeState('roomInfo',res.data.room));
+                  array.push(resp.data.user);
+                  dispatch(makeState('userInfo', array));
                 }
-              }
-            })
-            .catch(err => {})
-        }
-      })
-      .catch(err => {});
-
+  
+                if((res.data.room.direct == true) && (resp.data.user._id != JSON.parse(localStorage.user)._id)){
+                  if(resp.data.user.avatar.charAt(0) != '#'){
+                    api({
+                      method: 'get',
+                      url: '/user.avatar/'+resp.data.user._id,
+                      headers: {'x-access-token': localStorage.getItem('authToken')},
+                      responseType: 'arraybuffer',
+                    })
+                    .then(ava => {
+                      let bytes = new Uint8Array(ava.data);
+                      let image = 'data:image/png;base64,'+ encode(bytes);
+                      res.data.room.avatar = image;
+                      res.data.room.name = resp.data.user.name;
+                      dispatch(makeState('roomInfo',res.data.room));
+                    })
+                    .catch(err => {      
+                    })
+                  }else{
+                    res.data.room.avatar = resp.data.user.avatar;
+                    res.data.room.name = resp.data.user.name;
+                    dispatch(makeState('roomInfo',res.data.room));
+                  }
+                }
+              })
+              .catch(err => {})
+          }
+        })
+        .catch(err => {});
+      }
       resolve();
     })
   }
@@ -273,7 +373,8 @@ const initialState = {
   new_room_name: '',
   status: '',
   invite_input: '',
-  toogle_list_invite: 'none'
+  toogle_list_invite: 'none',
+  invite_list: []
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

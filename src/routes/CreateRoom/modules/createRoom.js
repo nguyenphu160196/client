@@ -76,9 +76,9 @@ export function deleteChip(id){
 
 export function addInviteList(value){
   return (dispatch, getState) => {
-    let state = {...getState().createRoom}
-    let array = state.list_participants;;
     return new Promise((resolve, reject) => {
+      let state = {...getState().createRoom};
+      let array = state.list_participants;
       if(value.avatar.charAt(0) != '#'){
         api({
           method: 'get',
@@ -92,6 +92,7 @@ export function addInviteList(value){
           value.avatar = image;
           array.push(value);
           dispatch(makeState('list_participants', array));
+          resolve();
         })
         .catch(err => {
           
@@ -99,8 +100,8 @@ export function addInviteList(value){
       }else{
         array.push(value);
         dispatch(makeState('list_participants', array));
+        resolve();
       }
-      resolve();
     })
   }
 }
@@ -111,7 +112,7 @@ export function act_btn(){
     let room_name = state.room_name;
     let list_participants = state.list_participants;
     return new Promise((resolve, reject) => {
-      if(room_name != '' && (list_participants.length > 0)){
+      if(room_name != '' && (list_participants.length != 0)){
         dispatch(makeState('cre_btn',''));
       }else{
         dispatch(makeState('cre_btn','disabled'));

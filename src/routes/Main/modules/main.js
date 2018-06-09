@@ -36,13 +36,17 @@ export function initial(){
           dispatch(getRoom());
         })
         .catch(err => {})
+        socket.on('recieve-change-room-name', data => {
+          dispatch(getRoom());
+        })
         socket.on('recieve-kick-user', data => {
-          st.room = data.room;
+          console.log(data);
+          st.room = data.user;
           localStorage.setItem('user', JSON.stringify(st));
+          dispatch(getRoom());
           browserHistory.push('/');
           dispatch(makeState('dialogMess','You have kicked out of room ' + data.room.name));
           dispatch(makeState('dialog',true));
-          dispatch(getRoom());
         })
         socket.on('update-socketid',(data) => {
           st.socketID = data;
@@ -294,6 +298,8 @@ export function getRoom(){
           })
           .catch(err => {})
         })
+      }else{
+        dispatch(makeState('roomlist',[]));
       }
       resolve();
     })

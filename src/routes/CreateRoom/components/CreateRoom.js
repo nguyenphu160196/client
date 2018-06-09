@@ -77,9 +77,7 @@ export const CreateRoom = ({ createRoom, makeState, search, act_btn, addInviteLi
 									}}
 									onFocus={(e) => {
 										makeState('toogle_list_invite','block');
-										if(createRoom.invite_input != ''){
-											search(createRoom.invite_input);
-										}
+										search(createRoom.invite_input);
 									}}
 									onBlur={() => {
 										if(createRoom.invite_input == ''){
