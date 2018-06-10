@@ -6,6 +6,8 @@ import {makeState as makeStateMain, getRoom} from '../../Main/modules/main'
 
 export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 
+
+
 export function initial(){
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
@@ -14,8 +16,23 @@ export function initial(){
         roomInfo.name = data;
         dispatch(makeState('roomInfo', roomInfo));
       })
+      socket.on('recieve-user-status-off', data => {
+        let roomInfo = {...getState().roomChat}.roomInfo;
+        if(roomInfo._id == data){
+          dispatch(creRoomInfo());
+        }
+      })
+      socket.on('recieve-user-status-on', data => {
+        let roomInfo = {...getState().roomChat}.roomInfo;
+        if(roomInfo._id == data){
+          dispatch(creRoomInfo());
+        }
+      })
       socket.on('recieve-add-participant', data => {
-        dispatch(creRoomInfo());
+        let roomInfo = {...getState().roomChat}.roomInfo;
+        if(roomInfo._id == data){
+          dispatch(creRoomInfo());
+        }
       })
       socket.on('recieve-update-kick-user', data => {
         let state = {...getState().roomChat};
@@ -54,19 +71,26 @@ export function sendMessage(message){
   }
 }
 
-export function leaveRoom(){
+export function addParticipant(id){
   return (dispatch, getState) => {
     let state = {...getState().roomChat};
     let roomInfo = state.roomInfo;
+    let userInfo = state.userInfo;
     return new Promise((resolve, reject) => {
       api({
         method: 'put',
-        url: '/leave.room/' + roomInfo._id,
-        headers: {'x-access-token': localStorage.getItem('authToken')}
+        url: '/add.user.room/' + roomInfo._id,
+        headers: {'x-access-token': localStorage.getItem('authToken')},
+        data: { user: id }
       })
       .then(res => {
-        browserHistory.push('/');
-        
+        roomInfo.paticipant.map((val, i) => {
+          if(val != JSON.parse(localStorage.user)._id){
+            socket.emit('add-participant',{user : val, room : roomInfo._id});
+          }
+        })
+        dispatch(creRoomInfo());
+        socket.emit('update-room',[id]);
       })
       .catch(err => {})
       resolve();
@@ -104,35 +128,6 @@ export function changeRoomName(){
   }
 }
 
-export function addParticipant(id){
-  return (dispatch, getState) => {
-    let state = {...getState().roomChat};
-    let roomInfo = state.roomInfo;
-    let userInfo = state.userInfo;
-    return new Promise((resolve, reject) => {
-      api({
-        method: 'put',
-        url: '/add.user.room/' + roomInfo._id,
-        headers: {'x-access-token': localStorage.getItem('authToken')},
-        data: { user: id }
-      })
-      .then(res => {
-        roomInfo.paticipant.map((val, i) => {
-          if(val != roomInfo.owner){
-            socket.emit('add-participant',val);
-          }
-        })
-        if(res.data.success == true){
-          dispatch(creRoomInfo());
-          socket.emit('update-room',[id]);
-        }
-      })
-      .catch(err => {})
-      resolve();
-    })
-  }
-}
-
 export function kickUser(id){
   return (dispatch, getState) => {
     let state = {...getState().roomChat};
@@ -146,10 +141,7 @@ export function kickUser(id){
       })
       .then(res => {
         let userInfo = state.userInfo;
-        console.log(roomInfo.direct);
-        console.log(JSON.parse(localStorage.user)._id);
         userInfo.map((val, i) => {
-          console.log(val._id);
           if(val._id == id){
             userInfo.splice(i,1);
             dispatch(makeState('userInfo', userInfo));
@@ -276,6 +268,7 @@ export function creRoomInfo(){
                 }
   
                 if((res.data.room.direct == true) && (resp.data.user._id != JSON.parse(localStorage.user)._id)){
+                  dispatch(makeState('status',resp.data.user.status == true ? "Active":"Inactive"));
                   if(resp.data.user.avatar.charAt(0) != '#'){
                     api({
                       method: 'get',
@@ -302,7 +295,9 @@ export function creRoomInfo(){
               .catch(err => {})
           }
         })
-        .catch(err => {});
+        .catch(err => {
+          browserHistory.push('/');
+        });
       }
       resolve();
     })

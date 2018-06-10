@@ -29,7 +29,7 @@ export class Initial extends React.Component{
   }
 
 
-export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, leaveRoom }) => (
+export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName }) => (
   	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
 	  	<Initial initial={initial} />
 		<div className={roomChat.widthLeft} style={{padding: 0}}>
@@ -183,7 +183,6 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				roomChat={roomChat}
 				hideRoom={hideRoom}
 				changeRoomName={changeRoomName}
-				leaveRoom={leaveRoom}
 			/>
 		</div>
 
@@ -209,8 +208,7 @@ RoomChat.propTypes = {
 	initial: PropTypes.func.isRequired,
 	kickUser: PropTypes.func.isRequired,
 	addParticipant: PropTypes.func.isRequired,
-	changeRoomName: PropTypes.func.isRequired,
-	leaveRoom: PropTypes.func.isRequired
+	changeRoomName: PropTypes.func.isRequired
 }
 
 export default RoomChat

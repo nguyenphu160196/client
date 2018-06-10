@@ -14,7 +14,7 @@ import ClearOff from 'material-ui/svg-icons/action/highlight-off'
 
 
 
-export const RoomSetting = ({ makeState, roomChat, hideRoom, changeRoomName, leaveRoom }) => (
+export const RoomSetting = ({ makeState, roomChat, hideRoom, changeRoomName }) => (
     <div style={{height: '100%', borderLeft: '1px solid lightgrey'}}>
         <div className="col-md-12 d-flex flex-row" style={{padding: '10px 0px'}}>
             <div className="col-md-10" style={{alignSelf: 'center'}}>
@@ -123,6 +123,7 @@ export const RoomSetting = ({ makeState, roomChat, hideRoom, changeRoomName, lea
             <div>
                 <RaisedButton
                     label="Participants"
+                    primary={true}
                     style={{margin: 12, width: '90%'}}
                     onClick={() => {
                         makeState('participantOn','block');
@@ -131,18 +132,10 @@ export const RoomSetting = ({ makeState, roomChat, hideRoom, changeRoomName, lea
                 />
                 <RaisedButton
                     label="Hide Room"
-                    primary={true}
+                    secondary={true}
                     style={{margin: 12, width: '90%'}}
                     onClick={() => {
                         hideRoom(roomChat.roomInfo._id);
-                    }}
-                />
-                <RaisedButton
-                    label="Leave Room"
-                    secondary={true}
-                    style={{margin: 12, width: '90%'}}
-                    onClick = {() => {
-                        leaveRoom()
                     }}
                 />
             </div>

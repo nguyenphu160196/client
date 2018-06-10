@@ -96,7 +96,7 @@ export const Participants = ({makeState, roomChat, search, kickUser, addParticip
                         roomChat.invite_list.map((value, i) => {
                         return (
                             <ListItem 
-                                key={i}
+                                key={i}                                
                                 onClick={() => {
                                     addParticipant(value._id);
                                     makeState('toogle_list_invite','none');									
@@ -131,6 +131,9 @@ export const Participants = ({makeState, roomChat, search, kickUser, addParticip
                                             >{value.name.charAt(0).toUpperCase()}                        
                                           </Avatar>
                                         }
+                            rightIcon={roomChat.userInfo && value.status && value.status == true 
+                                ? <div style={{background: "lawngreen", height: 12, width: 12, borderRadius: 100, border: '1.5px solid #fff', position: 'absolute', right: 50, top: 10}}></div>
+                                : <div style={{background: "red", height: 12, width: 12, borderRadius: 100, border: '1.5px solid #fff', position: 'absolute', right: 50, top: 10}}></div>}
                             rightIconButton={
                                 <IconButton 
                                     tooltip="kick user"

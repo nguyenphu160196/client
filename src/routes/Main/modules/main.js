@@ -40,12 +40,11 @@ export function initial(){
           dispatch(getRoom());
         })
         socket.on('recieve-kick-user', data => {
-          console.log(data);
           st.room = data.user;
           localStorage.setItem('user', JSON.stringify(st));
           dispatch(getRoom());
           browserHistory.push('/');
-          dispatch(makeState('dialogMess','You have kicked out of room ' + data.room.name));
+          dispatch(makeState('dialogMess','You have kicked out from room ' + data.room.name));
           dispatch(makeState('dialog',true));
         })
         socket.on('update-socketid',(data) => {
