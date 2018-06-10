@@ -1,5 +1,5 @@
 import { injectReducer } from '../../store/reducers'
-import  {creRoomInfo, makeState} from './modules/roomChat'
+import  {makeState, creRoomInfo} from './modules/roomChat'
 
 
 

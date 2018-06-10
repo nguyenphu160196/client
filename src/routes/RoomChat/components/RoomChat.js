@@ -7,6 +7,7 @@ import RoomSetting from './RoomSetting'
 import Participant from './Participant'
 
 import IconButton from 'material-ui/IconButton';
+import Avatar from 'material-ui/Avatar';
 
 import Info from 'material-ui/svg-icons/action/info-outline';
 import PersonAdd from 'material-ui/svg-icons/social/person-add';
@@ -27,6 +28,41 @@ export class Initial extends React.Component{
 	  return(<div></div>)
 	}
   }
+
+export class Message extends React.Component{
+	render(){
+		const MessageContent = this.props.message && this.props.message.length != 0 ? this.props.message.map((data, i) => {
+			if(data.user == JSON.parse(localStorage.user)._id){
+				return(
+					<div className="MessageContent" key={i} style={{display: 'flex', justifyContent: 'flex-end', fontFamily: 'Helvetica'}} >
+						<div className="OwnMessage">{data.text}</div>
+					</div>
+				)
+			}else{
+				return(
+					<div className="MessageContent" key={i} style={{display: 'flex', fontFamily: 'Helvetica'}}>
+						<div style={{marginRight: '10px'}}>
+							{data.avatar && data.avatar.charAt(0) != "#"
+								?
+								<Avatar src={data.avatar} style={{backgroundColor: "none"}} />
+								:
+								<Avatar style={{backgroundColor: data.avatar}}
+									>{data.name ? data.name.charAt(0).toUpperCase() : ''}                        
+								</Avatar>
+							}
+						</div>
+						<div className="friendMessage">{data.text}</div>
+					</div>
+				)
+			}
+		}) : '';
+		return(
+            <div style={{height: '100%',overflowY: 'scroll', overflowX: 'hidden'}}>                
+                {MessageContent}
+            </div>
+        );
+	}
+}
 
 
 export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName }) => (
@@ -89,14 +125,19 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				</div>
 			</div>
 			{/* message content */}
-			<div className="col-md-12" style={{height: 'calc(100vh - 132px)'}}
+			<div className="col-md-12" style={{padding: 15,height: 'calc(100vh - 132px)'}}
 				onClick={() => {
 					if(roomChat.emoji == 'block'){
 						makeState('emoji','none');
 					}
 				}}
 			>
-				
+				{roomChat && roomChat.message && roomChat.message.length != 0
+					?
+					<Message message={roomChat.message} />
+					:
+					''
+				}
 			</div>
 
 			{/* input chat */}

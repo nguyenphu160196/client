@@ -26,7 +26,7 @@ export class RealTime extends React.Component{
   }
 }
 
-export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog }) => {
+export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog, getMessage }) => {
 
 return (
   <div style={{ margin: '0 auto',height: '100%' }} >
@@ -68,7 +68,7 @@ return (
                 {main && (main.roomlist.length > 0) ? 
                   main.roomlist.map((value, i) => {
                     return (
-                      <ChannelList key={i} array={value} hideRoom={hideRoom}></ChannelList>
+                      <ChannelList key={i} array={value} hideRoom={hideRoom} getMessage={getMessage}></ChannelList>
                     )
                   })
                   : ''}
@@ -93,7 +93,8 @@ Main.propTypes = {
   dirrect: PropTypes.func.isRequired,
   initial: PropTypes.func.isRequired,
   hideRoom: PropTypes.func.isRequired,
-  closeDialog: PropTypes.func.isRequired
+  closeDialog: PropTypes.func.isRequired,
+  getMessage: PropTypes.func.isRequired
 }
 
 export default Main

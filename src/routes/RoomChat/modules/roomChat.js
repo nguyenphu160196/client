@@ -10,6 +10,8 @@ export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 
 export function initial(){
   return (dispatch, getState) => {
+    let location = {...getState().location}
+    let id = (new RegExp("/c/")).test(location.pathname) ? location.pathname.split('/c/')[1] : '';
     return new Promise((resolve, reject) => {
       socket.on('recieve-change-room-name', data => {
         let roomInfo = {...getState().roomChat}.roomInfo;
@@ -45,7 +47,10 @@ export function initial(){
         })
       })
       socket.on('recieve-message', data => {
-        console.log(data);
+        let roomInfo = {...getState().roomChat}.roomInfo;
+        if(roomInfo._id == data.room){
+          console.log(data.message);
+        }
       });
       resolve();
     })
@@ -67,6 +72,38 @@ export function sendMessage(message){
       })
       socket.emit('client-send-message', {room: room_id, message: message, recieve: array});
       resolve();
+    })
+  }
+}
+
+export function getMessage(id){
+  return (dispatch, getState) => {    
+    return new Promise((resolve, reject) => {
+      api({
+        method: 'get',
+        url: '/message.get/'+id,
+        headers: {'x-access-token': localStorage.getItem('authToken')}
+      })
+      .then(res => {
+        dispatch(makeState('message', res.data.message));
+        resolve(res.data.message);
+      })
+      .catch(err => {})
+    })
+    .then((array) => {  
+      let state = {...getState().roomChat}
+      let userInfo = state.userInfo;     
+      if(userInfo && userInfo.length != 0){
+        userInfo.map((val, i) => {
+          array.map((value, j) => {
+            if(value.user == val._id){
+              value.avatar = val.avatar;
+              value.name = val.name;
+            }
+          })
+        })
+        dispatch(makeState('message', array));
+      }
     })
   }
 }
@@ -369,7 +406,8 @@ const initialState = {
   status: '',
   invite_input: '',
   toogle_list_invite: 'none',
-  invite_list: []
+  invite_list: [],
+  message: []
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
