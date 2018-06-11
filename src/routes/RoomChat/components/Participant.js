@@ -123,7 +123,7 @@ export const Participants = ({makeState, roomChat, search, kickUser, addParticip
                             key={i}
                             className="main-room-list"
                             primaryText={value.name}
-                            leftAvatar={value.avatar.charAt(0) != "#" 
+                            leftAvatar={value && value.avatar && value.avatar.charAt(0) != "#" 
                                         ? 
                                           <Avatar src={value.avatar} style={{backgroundColor: "none"}} />
                                         :

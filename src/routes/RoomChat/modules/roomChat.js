@@ -76,38 +76,6 @@ export function sendMessage(message){
   }
 }
 
-export function getMessage(id){
-  return (dispatch, getState) => {    
-    return new Promise((resolve, reject) => {
-      api({
-        method: 'get',
-        url: '/message.get/'+id,
-        headers: {'x-access-token': localStorage.getItem('authToken')}
-      })
-      .then(res => {
-        dispatch(makeState('message', res.data.message));
-        resolve(res.data.message);
-      })
-      .catch(err => {})
-    })
-    .then((array) => {  
-      let state = {...getState().roomChat}
-      let userInfo = state.userInfo;     
-      if(userInfo && userInfo.length != 0){
-        userInfo.map((val, i) => {
-          array.map((value, j) => {
-            if(value.user == val._id){
-              value.avatar = val.avatar;
-              value.name = val.name;
-            }
-          })
-        })
-        dispatch(makeState('message', array));
-      }
-    })
-  }
-}
-
 export function addParticipant(id){
   return (dispatch, getState) => {
     let state = {...getState().roomChat};
@@ -263,49 +231,26 @@ export function search(value){
 
 export function creRoomInfo(){
   return (dispatch, getState) => {
-    let location = {...getState().location}
-    let id = (new RegExp("/c/")).test(location.pathname) ? location.pathname.split('/c/')[1] : '';
-    let array = []
+    let pathname = window.location.pathname;
+    let id = (new RegExp("/c/")).test(pathname) ? pathname.split('/c/')[1] : '';
+    let array = [];
     return new Promise((resolve, reject) => {
-      if(id != ''){
-        api({
-          method: 'get',
-          url: '/info.room/'+id,
-          headers: {'x-access-token': localStorage.getItem('authToken')},
-        })
-        .then(res => {
-            dispatch(makeState('roomInfo',res.data.room));
-            let user = res.data.room.paticipant;
-            for(let j=0; j<user.length; j++){
-              api({
-                method: 'get',
-                url: '/info.user/'+user[j],
-                headers: {'x-access-token': localStorage.getItem('authToken')},
-              })
-              .then(resp => {
-                if(resp.data.user.avatar.charAt(0) != '#'){
-                  api({
-                    method: 'get',
-                    url: '/user.avatar/'+resp.data.user._id,
-                    headers: {'x-access-token': localStorage.getItem('authToken')},
-                    responseType: 'arraybuffer',
-                  })
-                  .then(ava => {
-                    let bytes = new Uint8Array(ava.data);
-                    let image = 'data:image/png;base64,'+ encode(bytes);
-                    resp.data.user.avatar = image;
-                    array.push(resp.data.user);
-                    dispatch(makeState('userInfo', array));
-                  })
-                  .catch(err => {      
-                  })
-                }else{
-                  array.push(resp.data.user);
-                  dispatch(makeState('userInfo', array));
-                }
-  
-                if((res.data.room.direct == true) && (resp.data.user._id != JSON.parse(localStorage.user)._id)){
-                  dispatch(makeState('status',resp.data.user.status == true ? "Active":"Inactive"));
+        if(id != ''){
+          api({
+            method: 'get',
+            url: '/info.room/'+id,
+            headers: {'x-access-token': localStorage.getItem('authToken')},
+          })
+          .then(res => {
+              dispatch(makeState('roomInfo',res.data.room));
+              let user = res.data.room.paticipant;
+              for(let j=0; j<user.length; j++){
+                api({
+                  method: 'get',
+                  url: '/info.user/'+user[j],
+                  headers: {'x-access-token': localStorage.getItem('authToken')},
+                })
+                .then(resp => {
                   if(resp.data.user.avatar.charAt(0) != '#'){
                     api({
                       method: 'get',
@@ -316,27 +261,116 @@ export function creRoomInfo(){
                     .then(ava => {
                       let bytes = new Uint8Array(ava.data);
                       let image = 'data:image/png;base64,'+ encode(bytes);
-                      res.data.room.avatar = image;
-                      res.data.room.name = resp.data.user.name;
-                      dispatch(makeState('roomInfo',res.data.room));
+                      resp.data.user.avatar = image;
+                      array.push(resp.data.user);
+                      dispatch(makeState('userInfo', array));
+                      if(j == (user.length - 1)){
+                        resolve(array);
+                      }
                     })
                     .catch(err => {      
                     })
                   }else{
-                    res.data.room.avatar = resp.data.user.avatar;
-                    res.data.room.name = resp.data.user.name;
-                    dispatch(makeState('roomInfo',res.data.room));
+                    array.push(resp.data.user);
+                    dispatch(makeState('userInfo', array));
+                    if(j == (user.length - 1)){
+                      resolve(array);
+                    }
                   }
-                }
-              })
-              .catch(err => {})
-          }
+  
+                  if((res.data.room.direct == true) && (resp.data.user._id != JSON.parse(localStorage.user)._id)){
+                    dispatch(makeState('status',resp.data.user.status == true ? "Active":"Inactive"));
+                    if(resp.data.user.avatar.charAt(0) != '#'){
+                      api({
+                        method: 'get',
+                        url: '/user.avatar/'+resp.data.user._id,
+                        headers: {'x-access-token': localStorage.getItem('authToken')},
+                        responseType: 'arraybuffer',
+                      })
+                      .then(ava => {
+                        let bytes = new Uint8Array(ava.data);
+                        let image = 'data:image/png;base64,'+ encode(bytes);
+                        res.data.room.avatar = image;
+                        res.data.room.name = resp.data.user.name;
+                        dispatch(makeState('roomInfo',res.data.room));
+                      })
+                      .catch(err => {      
+                      })
+                    }else{
+                      res.data.room.avatar = resp.data.user.avatar;
+                      res.data.room.name = resp.data.user.name;
+                      dispatch(makeState('roomInfo',res.data.room));
+                    }
+                  }
+                })
+                .catch(err => {})
+              }
+          })
+          .catch(err => {
+            browserHistory.push('/');
+          });
+        }
+    })
+    .then(userInfo => {
+      return new Promise((resolve, reject) => {
+        api({
+          method: 'get',
+          url: '/message.get/'+id,
+          headers: {'x-access-token': localStorage.getItem('authToken')}
         })
-        .catch(err => {
-          browserHistory.push('/');
-        });
-      }
-      resolve();
+        .then(res => {
+          resolve(res.data.message);
+        })
+        .catch(err => {})
+      })
+      .then(message => {
+        let brray = [];
+        if(message.length !== 0){
+          message.map((val, i) => {
+            api({
+              method: 'get',
+              url: '/info.user/'+val.user,
+              headers: {'x-access-token': localStorage.getItem('authToken')},
+            })
+            .then(resp => {
+              val.name = resp.data.user.name;
+              if(resp.data.user.avatar.charAt(0) != '#'){
+                api({
+                  method: 'get',
+                  url: '/user.avatar/'+resp.data.user._id,
+                  headers: {'x-access-token': localStorage.getItem('authToken')},
+                  responseType: 'arraybuffer',
+                })
+                .then(ava => {
+                  let bytes = new Uint8Array(ava.data);
+                  let image = 'data:image/png;base64,'+ encode(bytes);
+                  val.avatar = image;
+                  brray.push(val);
+                  dispatch(makeState('message',
+                    brray.sort(function(a, b){
+                      var dateA = new Date(a.createAt),
+                          dateB = new Date(b.createAt);
+                      return dateA - dateB;
+                    })          
+                  ));   
+                })
+                .catch(err => {      
+                })
+              }else{
+                val.avatar = resp.data.user.avatar;
+                brray.push(val);
+                dispatch(makeState('message',
+                  brray.sort(function(a, b){
+                    var dateA = new Date(a.createAt),
+                        dateB = new Date(b.createAt);
+                    return dateA - dateB;
+                  })          
+                ));
+              }
+            })
+          });
+        }
+      })
     })
   }
 }
@@ -406,8 +440,7 @@ const initialState = {
   status: '',
   invite_input: '',
   toogle_list_invite: 'none',
-  invite_list: [],
-  message: []
+  invite_list: []
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

@@ -17,7 +17,7 @@ import BlockUser from 'material-ui/svg-icons/action/speaker-notes-off'
 import './Main.scss'
 
 
-const ChannelList = ({array, hideRoom, getMessage}) => {
+const ChannelList = ({array, hideRoom}) => {
   const notification = (
       <Badge
         badgeContent={"!"}
@@ -61,7 +61,6 @@ const ChannelList = ({array, hideRoom, getMessage}) => {
         className="main-room-list"
         onClick={() => {
           browserHistory.push('/c/' +  array._id);
-          getMessage(array._id);
         }}
         primaryText={array.name}
         leftAvatar={array.avatar.charAt(0) != "#" 
