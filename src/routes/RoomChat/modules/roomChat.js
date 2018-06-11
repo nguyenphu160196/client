@@ -10,8 +10,6 @@ export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 
 export function initial(){
   return (dispatch, getState) => {
-    let location = {...getState().location}
-    let id = (new RegExp("/c/")).test(location.pathname) ? location.pathname.split('/c/')[1] : '';
     return new Promise((resolve, reject) => {
       socket.on('recieve-change-room-name', data => {
         let roomInfo = {...getState().roomChat}.roomInfo;
@@ -19,15 +17,47 @@ export function initial(){
         dispatch(makeState('roomInfo', roomInfo));
       })
       socket.on('recieve-user-status-off', data => {
-        let roomInfo = {...getState().roomChat}.roomInfo;
-        if(roomInfo._id == data){
-          dispatch(creRoomInfo());
+        let state = {...getState().roomChat}
+        let roomInfo = state.roomInfo;
+        if(roomInfo._id == data.room){
+          if(roomInfo.direct == true){
+            dispatch(makeState('status',"Inactive"));
+          }else{
+            let userInfo = state.userInfo && state.userInfo.length != 0 ? state.userInfo : [];
+            let array = [];
+            userInfo.map((val, i) => {
+              if(val._id == data.user){
+                val.status = false;
+                array.push(val);
+                dispatch(makeState('userInfo', array));
+              }else{
+                array.push(val);
+                dispatch(makeState('userInfo', array));
+              }
+            })
+          }
         }
       })
       socket.on('recieve-user-status-on', data => {
-        let roomInfo = {...getState().roomChat}.roomInfo;
-        if(roomInfo._id == data){
-          dispatch(creRoomInfo());
+        let state = {...getState().roomChat}
+        let roomInfo = state.roomInfo;
+        if(roomInfo._id == data.room){
+          if(roomInfo.direct == true){
+            dispatch(makeState('status',"Active"));
+          }else{
+            let userInfo = state.userInfo && state.userInfo.length != 0 ? state.userInfo : [];
+            let array = [];
+            userInfo.map((val, i) => {
+              if(val._id == data.user){
+                val.status = true;
+                array.push(val);
+                dispatch(makeState('userInfo', array));
+              }else{
+                array.push(val);
+                dispatch(makeState('userInfo', array));
+              }              
+            })
+          }
         }
       })
       socket.on('recieve-add-participant', data => {
@@ -47,9 +77,19 @@ export function initial(){
         })
       })
       socket.on('recieve-message', data => {
-        let roomInfo = {...getState().roomChat}.roomInfo;
+        let state = {...getState().roomChat};
+        let roomInfo = state.roomInfo;
         if(roomInfo._id == data.room){
-          console.log(data.message);
+          let userInfo = state.userInfo;
+          let message = state.message;
+          userInfo.map((val, i) => {
+            if(val._id == data.message.user){
+              data.message.name = val.name;
+              data.message.avatar = val.avatar;
+              message.push(data.message);
+              dispatch(makeState('message', message));
+            }
+          })
         }
       });
       resolve();
@@ -64,6 +104,7 @@ export function sendMessage(message){
       let id = JSON.parse(localStorage.user)._id;
       let room_id = state.roomInfo._id;
       let userInfo = state.userInfo;
+      let currentMessage = state.message;
       let array = []
       userInfo.map((val, i) => {
         if(val._id != id){
@@ -71,6 +112,7 @@ export function sendMessage(message){
         }
       })
       socket.emit('client-send-message', {room: room_id, message: message, recieve: array});
+      currentMessage.push({ roomId: room_id, user: id, text: message });
       resolve();
     })
   }
@@ -327,24 +369,38 @@ export function creRoomInfo(){
         let brray = [];
         if(message.length !== 0){
           message.map((val, i) => {
-            api({
-              method: 'get',
-              url: '/info.user/'+val.user,
-              headers: {'x-access-token': localStorage.getItem('authToken')},
-            })
-            .then(resp => {
-              val.name = resp.data.user.name;
-              if(resp.data.user.avatar.charAt(0) != '#'){
-                api({
-                  method: 'get',
-                  url: '/user.avatar/'+resp.data.user._id,
-                  headers: {'x-access-token': localStorage.getItem('authToken')},
-                  responseType: 'arraybuffer',
-                })
-                .then(ava => {
-                  let bytes = new Uint8Array(ava.data);
-                  let image = 'data:image/png;base64,'+ encode(bytes);
-                  val.avatar = image;
+            if(val.user != JSON.parse(localStorage.user)._id){
+              api({
+                method: 'get',
+                url: '/info.user/'+val.user,
+                headers: {'x-access-token': localStorage.getItem('authToken')},
+              })
+              .then(resp => {
+                val.name = resp.data.user.name;
+                if(resp.data.user.avatar.charAt(0) != '#'){
+                  api({
+                    method: 'get',
+                    url: '/user.avatar/'+resp.data.user._id,
+                    headers: {'x-access-token': localStorage.getItem('authToken')},
+                    responseType: 'arraybuffer',
+                  })
+                  .then(ava => {
+                    let bytes = new Uint8Array(ava.data);
+                    let image = 'data:image/png;base64,'+ encode(bytes);
+                    val.avatar = image;
+                    brray.push(val);
+                    dispatch(makeState('message',
+                      brray.sort(function(a, b){
+                        var dateA = new Date(a.createAt),
+                            dateB = new Date(b.createAt);
+                        return dateA - dateB;
+                      })          
+                    ));   
+                  })
+                  .catch(err => {      
+                  })
+                }else{
+                  val.avatar = resp.data.user.avatar;
                   brray.push(val);
                   dispatch(makeState('message',
                     brray.sort(function(a, b){
@@ -352,22 +408,19 @@ export function creRoomInfo(){
                           dateB = new Date(b.createAt);
                       return dateA - dateB;
                     })          
-                  ));   
-                })
-                .catch(err => {      
-                })
-              }else{
-                val.avatar = resp.data.user.avatar;
-                brray.push(val);
-                dispatch(makeState('message',
-                  brray.sort(function(a, b){
-                    var dateA = new Date(a.createAt),
-                        dateB = new Date(b.createAt);
-                    return dateA - dateB;
-                  })          
-                ));
-              }
-            })
+                  ));
+                }
+              })
+            }else{
+              brray.push(val);
+              dispatch(makeState('message',
+                brray.sort(function(a, b){
+                  var dateA = new Date(a.createAt),
+                      dateB = new Date(b.createAt);
+                  return dateA - dateB;
+                })          
+              )); 
+            }
           });
         }
       })

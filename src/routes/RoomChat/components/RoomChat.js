@@ -16,6 +16,8 @@ import VideoCam from 'material-ui/svg-icons/av/videocam';
 import EmojiIcon from 'material-ui/svg-icons/image/tag-faces';
 import Send from 'material-ui/svg-icons/content/send';
 
+import $ from 'jquery'
+
 
 export class Initial extends React.Component{
 	constructor(props) {
@@ -30,6 +32,15 @@ export class Initial extends React.Component{
   }
 
 export class Message extends React.Component{
+	constructor(props) {
+        super(props);
+      }
+	componentDidMount(){ 
+        $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
+    }  
+    componentDidUpdate(){
+        $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
+    } 
 	render(){
 		const MessageContent = this.props.message && this.props.message.length != 0 ? this.props.message.map((data, i) => {
 			if(data.user == JSON.parse(localStorage.user)._id){
@@ -57,7 +68,7 @@ export class Message extends React.Component{
 			}
 		}) : '';
 		return(
-            <div style={{height: '100%',overflowY: 'scroll', overflowX: 'hidden'}}>                
+            <div className="chat-content" style={{height: '100%',overflowY: 'scroll', overflowX: 'hidden'}}>                
                 {MessageContent}
             </div>
         );

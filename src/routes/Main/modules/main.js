@@ -23,6 +23,7 @@ export function initial(){
   return (dispatch, getState) => {
     let st = JSON.parse(localStorage.user);
     let x = document.getElementById("joinRoom");
+    let y = document.getElementById("funcMessage");
     return new Promise((resolve, reject) => {
         dispatch(getAvatar());
         api({
@@ -64,6 +65,9 @@ export function initial(){
           x.play();
           dispatch(getRoom());          
         });
+        socket.on('recieve-message', data => {
+          y.play();
+        })
         resolve();
     })
   }
@@ -509,8 +513,7 @@ export function signOut() {
   return (dispatch, getState) => {
       return new Promise((resolve, reject) => {
         localStorage.clear();
-        window.location.reload();
-        browserHistory.push('/login');
+        window.location.href = '/login'
     })
   }
 }
