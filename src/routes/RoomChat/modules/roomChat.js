@@ -4,6 +4,9 @@ import api from '../../../../src/api'
 import socket from '../../../socketio'
 import {makeState as makeStateMain, getRoom} from '../../Main/modules/main'
 
+import $ from 'jquery'
+
+
 export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 
 
@@ -61,9 +64,37 @@ export function initial(){
         }
       })
       socket.on('recieve-add-participant', data => {
-        let roomInfo = {...getState().roomChat}.roomInfo;
-        if(roomInfo._id == data){
-          dispatch(creRoomInfo());
+        let state = {...getState().roomChat};
+        let userInfo = state.userInfo;
+        let roomInfo = state.roomInfo;
+        if(roomInfo._id == data.room){
+          api({
+            method: 'get',
+            url: '/info.user/'+data.user,
+            headers: {'x-access-token': localStorage.getItem('authToken')},
+          })
+          .then(resp => {
+            if(resp.data.user.avatar.charAt(0) != '#'){
+              api({
+                method: 'get',
+                url: '/user.avatar/'+resp.data.user._id,
+                headers: {'x-access-token': localStorage.getItem('authToken')},
+                responseType: 'arraybuffer',
+              })
+              .then(ava => {
+                let bytes = new Uint8Array(ava.data);
+                let image = 'data:image/png;base64,'+ encode(bytes);
+                resp.data.user.avatar = image;
+                userInfo.push(resp.data.user);
+                dispatch(makeState('userInfo', userInfo));
+              })
+              .catch(err => {      
+              })
+            }else{
+              userInfo.push(resp.data.user);
+              dispatch(makeState('userInfo', userInfo));
+            }
+          })
         }
       })
       socket.on('recieve-update-kick-user', data => {
@@ -87,9 +118,10 @@ export function initial(){
               data.message.name = val.name;
               data.message.avatar = val.avatar;
               message.push(data.message);
-              dispatch(makeState('message', message));
             }
           })
+          dispatch(makeState('message', message));
+          $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
         }
       });
       resolve();
@@ -97,23 +129,94 @@ export function initial(){
   }
 }
 
-export function sendMessage(message){
-  return (dispatch, getState) => {
+export function loadMoreMessage() {
+  return (dispatch, getState) => {    
+    dispatch(makeState('mess_loaders','block'));
+    let state = {...getState().roomChat};
+    let room = state.roomInfo._id;
+    let loadMoreMessage = state.loadMoreMessage;
+    let messagePage = state.messagePage;
     return new Promise((resolve, reject) => {
-      let state = {...getState().roomChat}
-      let id = JSON.parse(localStorage.user)._id;
-      let room_id = state.roomInfo._id;
+      if(loadMoreMessage == true){
+        let elmnt = document.getElementById("id-chat-content");
+        let y = elmnt.scrollTop;
+        if(y == 0){
+          dispatch(makeState('loadMoreMessage',false));
+          api({
+            method: 'get',
+            url: '/message.get/'+room,
+            headers: {'x-access-token': localStorage.getItem('authToken'),
+                      'message-page'  : messagePage+1
+                    }
+          })
+          .then(res => {
+            dispatch(makeState('messagePage',messagePage+1));
+            resolve(res.data.message.docs);
+          })
+          .catch(err => {})
+        }
+      }
+    })
+    .then(message => {
       let userInfo = state.userInfo;
       let currentMessage = state.message;
-      let array = []
+      if(message.length !== 0){
+        message.map((val, i) => {
+          if(val.user != JSON.parse(localStorage.user)._id){
+            userInfo.map((value, j) => {
+              if(value._id == val.user){
+                val.name = value.name;
+                val.avatar = value.avatar;
+                currentMessage.unshift(val);    
+                dispatch(makeState('message',
+                  currentMessage.sort(function(a, b){
+                    var dateA = new Date(a.createAt),
+                        dateB = new Date(b.createAt);
+                    return dateA - dateB;
+                  })          
+                ));
+              }
+            })
+          }else{
+            currentMessage.unshift(val);
+            dispatch(makeState('message',
+              currentMessage.sort(function(a, b){
+                var dateA = new Date(a.createAt),
+                    dateB = new Date(b.createAt);
+                return dateA - dateB;
+              })          
+            ));
+          }
+        });
+      }
+      dispatch(makeState('loadMoreMessage',true));
+      dispatch(makeState('mess_loaders','none'));      
+    })
+  }
+}
+
+export function sendMessage(){
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      let id =JSON.parse(localStorage.user)._id;
+      let state = {...getState().roomChat}
+      let room_id = state.roomInfo._id;
+      let userInfo = state.userInfo;
+      let message_text = state.message_text;
+      let currentMessage = state.message;
+      let array = [];
       userInfo.map((val, i) => {
         if(val._id != id){
           array.push(val._id);
         }
       })
-      socket.emit('client-send-message', {room: room_id, message: message, recieve: array});
-      currentMessage.push({ roomId: room_id, user: id, text: message });
-      resolve();
+      socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array});
+      currentMessage.push({ roomId: room_id, user: id, text: message_text });
+      dispatch(makeState('message',currentMessage))
+      resolve(currentMessage);
+    })
+    .then((currentMessage) => {
+      $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
     })
   }
 }
@@ -131,13 +234,39 @@ export function addParticipant(id){
         data: { user: id }
       })
       .then(res => {
-        roomInfo.paticipant.map((val, i) => {
-          if(val != JSON.parse(localStorage.user)._id){
-            socket.emit('add-participant',{user : val, room : roomInfo._id});
+        userInfo.map((val, i) => {
+          if(val._id != JSON.parse(localStorage.user)._id){
+            socket.emit('add-participant',{ who : val._id, room : roomInfo._id, user: id });
           }
         })
-        dispatch(creRoomInfo());
         socket.emit('update-room',[id]);
+        api({
+          method: 'get',
+          url: '/info.user/'+id,
+          headers: {'x-access-token': localStorage.getItem('authToken')},
+        })
+        .then(resp => {
+          if(resp.data.user.avatar.charAt(0) != '#'){
+            api({
+              method: 'get',
+              url: '/user.avatar/'+resp.data.user._id,
+              headers: {'x-access-token': localStorage.getItem('authToken')},
+              responseType: 'arraybuffer',
+            })
+            .then(ava => {
+              let bytes = new Uint8Array(ava.data);
+              let image = 'data:image/png;base64,'+ encode(bytes);
+              resp.data.user.avatar = image;
+              userInfo.push(resp.data.user);
+              dispatch(makeState('userInfo', userInfo));
+            })
+            .catch(err => {      
+            })
+          }else{
+            userInfo.push(resp.data.user);
+            dispatch(makeState('userInfo', userInfo));
+          }
+        })
       })
       .catch(err => {})
       resolve();
@@ -273,6 +402,7 @@ export function search(value){
 
 export function creRoomInfo(){
   return (dispatch, getState) => {
+    dispatch(makeState('mess_loaders','block'));
     let pathname = window.location.pathname;
     let id = (new RegExp("/c/")).test(pathname) ? pathname.split('/c/')[1] : '';
     let array = [];
@@ -358,10 +488,12 @@ export function creRoomInfo(){
         api({
           method: 'get',
           url: '/message.get/'+id,
-          headers: {'x-access-token': localStorage.getItem('authToken')}
+          headers: {'x-access-token': localStorage.getItem('authToken'),
+                    'message-page'  : 1
+                    }
         })
         .then(res => {
-          resolve(res.data.message);
+          resolve(res.data.message.docs);
         })
         .catch(err => {})
       })
@@ -395,7 +527,8 @@ export function creRoomInfo(){
                             dateB = new Date(b.createAt);
                         return dateA - dateB;
                       })          
-                    ));   
+                    ));  
+                    $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight); 
                   })
                   .catch(err => {      
                   })
@@ -409,6 +542,7 @@ export function creRoomInfo(){
                       return dateA - dateB;
                     })          
                   ));
+                  $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
                 }
               })
             }else{
@@ -419,10 +553,12 @@ export function creRoomInfo(){
                       dateB = new Date(b.createAt);
                   return dateA - dateB;
                 })          
-              )); 
+              ));
+              $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight); 
             }
           });
         }
+        dispatch(makeState('mess_loaders','none'));
       })
     })
   }
@@ -493,7 +629,10 @@ const initialState = {
   status: '',
   invite_input: '',
   toogle_list_invite: 'none',
-  invite_list: []
+  invite_list: [],
+  loadMoreMessage: true, 
+  messagePage: 1,
+  mess_loaders: 'none'
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

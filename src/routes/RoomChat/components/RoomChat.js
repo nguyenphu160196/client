@@ -5,9 +5,9 @@ import JSEMOJI from 'emoji-js';
 import './RoomChat.scss'
 import RoomSetting from './RoomSetting'
 import Participant from './Participant'
+import Message from './Message'
 
 import IconButton from 'material-ui/IconButton';
-import Avatar from 'material-ui/Avatar';
 
 import Info from 'material-ui/svg-icons/action/info-outline';
 import PersonAdd from 'material-ui/svg-icons/social/person-add';
@@ -16,7 +16,6 @@ import VideoCam from 'material-ui/svg-icons/av/videocam';
 import EmojiIcon from 'material-ui/svg-icons/image/tag-faces';
 import Send from 'material-ui/svg-icons/content/send';
 
-import $ from 'jquery'
 
 
 export class Initial extends React.Component{
@@ -31,52 +30,7 @@ export class Initial extends React.Component{
 	}
   }
 
-export class Message extends React.Component{
-	constructor(props) {
-        super(props);
-      }
-	componentDidMount(){ 
-        $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
-    }  
-    componentDidUpdate(){
-        $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
-    } 
-	render(){
-		const MessageContent = this.props.message && this.props.message.length != 0 ? this.props.message.map((data, i) => {
-			if(data.user == JSON.parse(localStorage.user)._id){
-				return(
-					<div className="MessageContent" key={i} style={{display: 'flex', justifyContent: 'flex-end', fontFamily: 'Helvetica'}} >
-						<div className="OwnMessage">{data.text}</div>
-					</div>
-				)
-			}else{
-				return(
-					<div className="MessageContent" key={i} style={{display: 'flex', fontFamily: 'Helvetica'}}>
-						<div style={{marginRight: '10px'}}>
-							{data.avatar && data.avatar.charAt(0) != "#"
-								?
-								<Avatar src={data.avatar} style={{backgroundColor: "none"}} />
-								:
-								<Avatar style={{backgroundColor: data.avatar}}
-									>{data.name ? data.name.charAt(0).toUpperCase() : ''}                        
-								</Avatar>
-							}
-						</div>
-						<div className="friendMessage">{data.text}</div>
-					</div>
-				)
-			}
-		}) : '';
-		return(
-            <div className="chat-content" style={{height: '100%',overflowY: 'scroll', overflowX: 'hidden'}}>                
-                {MessageContent}
-            </div>
-        );
-	}
-}
-
-
-export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName }) => (
+export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage }) => (
   	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
 	  	<Initial initial={initial} />
 		<div className={roomChat.widthLeft} style={{padding: 0}}>
@@ -136,13 +90,17 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				</div>
 			</div>
 			{/* message content */}
-			<div className="col-md-12" style={{padding: 15,height: 'calc(100vh - 132px)'}}
+			<div className="col-md-12 chat-content" id="id-chat-content" style={{padding: 15,height: 'calc(100vh - 132px)',overflowY: 'scroll', overflowX: 'hidden'}}
 				onClick={() => {
 					if(roomChat.emoji == 'block'){
 						makeState('emoji','none');
 					}
 				}}
+				onScroll={() => {
+					loadMoreMessage()
+				}}
 			>
+				<div className="mess-loaders" style={{display: roomChat.mess_loaders}}></div>
 				{roomChat && roomChat.message && roomChat.message.length != 0
 					?
 					<Message message={roomChat.message} />
@@ -200,7 +158,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						onKeyPress={(e) => {
 							if (e.charCode == 13 && !e.nativeEvent.shiftKey) {
 								if(roomChat.message_text != ''){
-									sendMessage(e.target.value);
+									sendMessage();
 									makeState('message_text','');
 									e.preventDefault();
 								}
@@ -260,7 +218,8 @@ RoomChat.propTypes = {
 	initial: PropTypes.func.isRequired,
 	kickUser: PropTypes.func.isRequired,
 	addParticipant: PropTypes.func.isRequired,
-	changeRoomName: PropTypes.func.isRequired
+	changeRoomName: PropTypes.func.isRequired,
+	loadMoreMessage: PropTypes.func.isRequired
 }
 
 export default RoomChat

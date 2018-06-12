@@ -2,8 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './Login.scss'
 import Progress from '../../../components/Common/PageLoading'
-import Signup from '../../../components/Signup/Signup'
-import LoginPop from '../../../components/Login/Login'
+import Signup from './Signup'
+import LoginForm from './LoginForm'
 
 
 export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll, closeDialog, signupClick, signupCancel, loginGoogle}) => (
@@ -26,7 +26,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll
 					</ul>
 				</div>
 				<div className='page-1 col-12'>
-					<LoginPop 
+					<LoginForm 
 						closeDialog={closeDialog} 
 						handleLogin={handleLogin}
 						message={login.message}
@@ -34,7 +34,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll
 						handleScroll={handleScroll}
 						makeState={makeState}
 						loginGoogle={loginGoogle}
-					></LoginPop>
+					></LoginForm>
 					<div className='devices-img col-7'></div>
 				</div>
 				<div className='page-2 col-12'>
