@@ -16,8 +16,10 @@ export function initial(){
     return new Promise((resolve, reject) => {
       socket.on('recieve-change-room-name', data => {
         let roomInfo = {...getState().roomChat}.roomInfo;
-        roomInfo.name = data;
-        dispatch(makeState('roomInfo', roomInfo));
+        if(roomInfo._id == data.room){
+          roomInfo.name = data.name;
+          dispatch(makeState('roomInfo', roomInfo));
+        }
       })
       socket.on('recieve-user-status-off', data => {
         let state = {...getState().roomChat}
@@ -100,12 +102,15 @@ export function initial(){
       socket.on('recieve-update-kick-user', data => {
         let state = {...getState().roomChat};
         let userInfo = state.userInfo;
-        userInfo.map((val, i) => {
-          if(val._id == data.user){
-            userInfo.splice(i,1);
-            dispatch(makeState('userInfo',userInfo));
-          }
-        })
+        let roomInfo = state.roomInfo;
+        if(roomInfo._id == data.room){
+          userInfo.map((val, i) => {
+            if(val._id == data.user){
+              userInfo.splice(i,1);
+              dispatch(makeState('userInfo',userInfo));
+            }
+          })
+        }
       })
       socket.on('recieve-message', data => {
         let state = {...getState().roomChat};
@@ -129,9 +134,30 @@ export function initial(){
   }
 }
 
+export function clearNoti(){
+  return (dispatch, getState) => {
+    let pathname = window.location.pathname;
+    let id = (new RegExp("/c/")).test(pathname) ? pathname.split('/c/')[1] : '';
+    let roomlist = {...getState().main}.roomlist;
+    let array = [];
+    return new Promise((resolve, reject) => {
+      roomlist.map((val, i) => {
+        if(val._id == id){
+          val.noti = false;
+          array.push(val);
+          dispatch(makeStateMain('roomlist', array));
+        }else{
+          array.push(val);
+          dispatch(makeStateMain('roomlist', array));
+        }
+      })
+      resolve();
+    })
+  }
+}
+
 export function loadMoreMessage() {
   return (dispatch, getState) => {    
-    dispatch(makeState('mess_loaders','block'));
     let state = {...getState().roomChat};
     let room = state.roomInfo._id;
     let loadMoreMessage = state.loadMoreMessage;
@@ -141,6 +167,7 @@ export function loadMoreMessage() {
         let elmnt = document.getElementById("id-chat-content");
         let y = elmnt.scrollTop;
         if(y == 0){
+          dispatch(makeState('mess_loaders','block'));
           dispatch(makeState('loadMoreMessage',false));
           api({
             method: 'get',
@@ -234,12 +261,8 @@ export function addParticipant(id){
         data: { user: id }
       })
       .then(res => {
-        userInfo.map((val, i) => {
-          if(val._id != JSON.parse(localStorage.user)._id){
-            socket.emit('add-participant',{ who : val._id, room : roomInfo._id, user: id });
-          }
-        })
-        socket.emit('update-room',[id]);
+        socket.emit('add-participant',{ room : roomInfo._id, user: id });
+        socket.emit('update-room',{room: roomInfo._id, user: [id]});
         api({
           method: 'get',
           url: '/info.user/'+id,
@@ -291,10 +314,22 @@ export function changeRoomName(){
         dispatch(makeState('roomInfo',roomInfo));
         dispatch(makeState('name_show',''));
         dispatch(makeState('name_hidden','hidden'));
-        dispatch(getRoom());
+        let main = {...getState().main};
+        let roomlist = main.roomlist;
+        let array = [];
+        roomlist.map((val, i) => {
+          if(val._id == roomInfo._id){
+            val.name = name;
+            array.push(val);
+             dispatch(makeStateMain('roomlist',array));
+          }else{
+            array.push(val);
+            dispatch(makeStateMain('roomlist',array));
+          }
+        })
         roomInfo.paticipant.map((val, i) => {
           if(val != JSON.parse(localStorage.user)._id){
-            socket.emit('change-room-name', {id: val, name:name});
+            socket.emit('change-room-name', {user: val, name: name, room: roomInfo._id});
           }
         })
       })
@@ -321,7 +356,7 @@ export function kickUser(id){
           if(val._id == id){
             userInfo.splice(i,1);
             dispatch(makeState('userInfo', userInfo));
-            socket.emit('kick-user',{ user:id, room:roomInfo._id });
+            socket.emit('kick-user',{ user: id, room: roomInfo._id });
           }
         })
       })
@@ -484,6 +519,7 @@ export function creRoomInfo(){
         }
     })
     .then(userInfo => {
+      dispatch(makeState('mess_loaders','none'));
       return new Promise((resolve, reject) => {
         api({
           method: 'get',
@@ -500,26 +536,40 @@ export function creRoomInfo(){
       .then(message => {
         let brray = [];
         if(message.length !== 0){
-          message.map((val, i) => {
-            if(val.user != JSON.parse(localStorage.user)._id){
-              api({
-                method: 'get',
-                url: '/info.user/'+val.user,
-                headers: {'x-access-token': localStorage.getItem('authToken')},
-              })
-              .then(resp => {
-                val.name = resp.data.user.name;
-                if(resp.data.user.avatar.charAt(0) != '#'){
-                  api({
-                    method: 'get',
-                    url: '/user.avatar/'+resp.data.user._id,
-                    headers: {'x-access-token': localStorage.getItem('authToken')},
-                    responseType: 'arraybuffer',
-                  })
-                  .then(ava => {
-                    let bytes = new Uint8Array(ava.data);
-                    let image = 'data:image/png;base64,'+ encode(bytes);
-                    val.avatar = image;
+            message.map((val, i) => {
+              if(val.user != JSON.parse(localStorage.user)._id){
+                api({
+                  method: 'get',
+                  url: '/info.user/'+val.user,
+                  headers: {'x-access-token': localStorage.getItem('authToken')},
+                })
+                .then(resp => {
+                  val.name = resp.data.user.name;
+                  if(resp.data.user.avatar.charAt(0) != '#'){
+                    api({
+                      method: 'get',
+                      url: '/user.avatar/'+resp.data.user._id,
+                      headers: {'x-access-token': localStorage.getItem('authToken')},
+                      responseType: 'arraybuffer',
+                    })
+                    .then(ava => {
+                      let bytes = new Uint8Array(ava.data);
+                      let image = 'data:image/png;base64,'+ encode(bytes);
+                      val.avatar = image;
+                      brray.push(val);
+                      dispatch(makeState('message',
+                        brray.sort(function(a, b){
+                          var dateA = new Date(a.createAt),
+                              dateB = new Date(b.createAt);
+                          return dateA - dateB;
+                        })          
+                      ));  
+                      $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
+                    })
+                    .catch(err => {      
+                    })
+                  }else{
+                    val.avatar = resp.data.user.avatar;
                     brray.push(val);
                     dispatch(makeState('message',
                       brray.sort(function(a, b){
@@ -527,38 +577,23 @@ export function creRoomInfo(){
                             dateB = new Date(b.createAt);
                         return dateA - dateB;
                       })          
-                    ));  
-                    $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight); 
-                  })
-                  .catch(err => {      
-                  })
-                }else{
-                  val.avatar = resp.data.user.avatar;
-                  brray.push(val);
-                  dispatch(makeState('message',
-                    brray.sort(function(a, b){
-                      var dateA = new Date(a.createAt),
-                          dateB = new Date(b.createAt);
-                      return dateA - dateB;
-                    })          
-                  ));
-                  $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
-                }
-              })
-            }else{
-              brray.push(val);
-              dispatch(makeState('message',
-                brray.sort(function(a, b){
-                  var dateA = new Date(a.createAt),
-                      dateB = new Date(b.createAt);
-                  return dateA - dateB;
-                })          
-              ));
-              $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight); 
-            }
-          });
+                    ));
+                    $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
+                  }
+                })
+              }else{
+                brray.push(val);
+                dispatch(makeState('message',
+                  brray.sort(function(a, b){
+                    var dateA = new Date(a.createAt),
+                        dateB = new Date(b.createAt);
+                    return dateA - dateB;
+                  })          
+                ));
+                $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
+              }              
+            });
         }
-        dispatch(makeState('mess_loaders','none'));
       })
     })
   }

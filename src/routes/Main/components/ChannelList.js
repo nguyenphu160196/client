@@ -23,7 +23,7 @@ const ChannelList = ({array, hideRoom}) => {
         badgeContent={"!"}
         secondary={true}
         badgeStyle={{top: 0, right: 40}}
-        style={{display: 'none'}}
+        style={{display: array.noti && array.noti == true ? 'block' : 'none'}}
       >
       </Badge>
   );
@@ -61,6 +61,7 @@ const ChannelList = ({array, hideRoom}) => {
         className="main-room-list"
         onClick={() => {
           browserHistory.push('/c/' +  array._id);
+          array.noti = false;
         }}
         primaryText={array.name}
         leftAvatar={array.avatar.charAt(0) != "#" 

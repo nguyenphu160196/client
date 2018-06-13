@@ -47,9 +47,11 @@ export function createNR(){
         localStorage.setItem('user', JSON.stringify(st));
         brray.push(res.data.room);
         dispatch(makeStateMain('roomlist',brray));
+        socket.emit("update-room", {room: res.data.user, user: crray});
         browserHistory.push('/c/' + res.data.room._id);
-        socket.emit("update-room", crray);
-        x.play();
+        if (x.play() !== undefined) {
+          x.play().then(_ => {}).catch(error => {});
+        }
         dispatch(makeStateMain('block', 'none'));
       })
       .catch(err => {})

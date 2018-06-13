@@ -30,7 +30,7 @@ export class Initial extends React.Component{
 	}
   }
 
-export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage }) => (
+export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti }) => (
   	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
 	  	<Initial initial={initial} />
 		<div className={roomChat.widthLeft} style={{padding: 0}}>
@@ -155,6 +155,9 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						onChange={(e) => {
 							makeState('message_text',e.target.value);
 						}}
+						onFocus={() => {
+							clearNoti();
+						}}
 						onKeyPress={(e) => {
 							if (e.charCode == 13 && !e.nativeEvent.shiftKey) {
 								if(roomChat.message_text != ''){
@@ -219,7 +222,8 @@ RoomChat.propTypes = {
 	kickUser: PropTypes.func.isRequired,
 	addParticipant: PropTypes.func.isRequired,
 	changeRoomName: PropTypes.func.isRequired,
-	loadMoreMessage: PropTypes.func.isRequired
+	loadMoreMessage: PropTypes.func.isRequired,
+	clearNoti: PropTypes.func.isRequired
 }
 
 export default RoomChat

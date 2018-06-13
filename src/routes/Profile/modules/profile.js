@@ -9,6 +9,8 @@ export const UPDATE_PROFILE = 'UPDATE_PROFILE'
 export const GET_AVATAR = 'GET_AVATAR'
 export const ERROR_DIALOG = 'ERROR_DIALOG'
 
+import { makeState as makeStateMain } from '../../Main/modules/main'
+
 export function checkPassRequire(){
   return (dispatch, getState) => {
     let requirePass = {...getState().profile}.prof_require_pass;
@@ -86,7 +88,6 @@ export function updateProfile() {
               dispatch(makeState('message', err.response.data.message));
               dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
             })
-            console.log('changed name');
             bool_name = false;
           }
           //change email
@@ -109,47 +110,50 @@ export function updateProfile() {
               dispatch(makeState('message', err.response.data.message));
               dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
             })
-            console.log('changed email');
             bool_email = false;
           }
           //change avatar
           else if(bool_avatar){
             let data = new FormData();
             data.append('file', img);
-            
-            api({
-              method: 'post',
-              url: '/avatar/' + id,
-              headers: {'x-access-token': localStorage.getItem('authToken')},
-              data: data
-            })
-            .then(res => {
-              let st = JSON.parse(localStorage.getItem('user'));
-              st.avatar = res.data.avatar;
-              localStorage.setItem('user', JSON.stringify(st));
+            if(img.size <= 1000000){
               api({
-                method: 'get',
-                url: '/user.avatar/'+id,
+                method: 'post',
+                url: '/avatar/' + id,
                 headers: {'x-access-token': localStorage.getItem('authToken')},
-                responseType: 'arraybuffer'
+                data: data
               })
               .then(res => {
-                let bytes = new Uint8Array(res.data);
-                let image = 'data:image/png;base64,'+ encode(bytes);
-                avatar_done = true;
-                dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
-                dispatch({
-                  type: GET_AVATAR,
-                  payload: image
+                let st = JSON.parse(localStorage.getItem('user'));
+                st.avatar = res.data.avatar;
+                localStorage.setItem('user', JSON.stringify(st));
+                api({
+                  method: 'get',
+                  url: '/user.avatar/'+id,
+                  headers: {'x-access-token': localStorage.getItem('authToken')},
+                  responseType: 'arraybuffer'
+                })
+                .then(res => {
+                  let bytes = new Uint8Array(res.data);
+                  let image = 'data:image/png;base64,'+ encode(bytes);
+                  avatar_done = true;
+                  dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+                  dispatch({
+                    type: GET_AVATAR,
+                    payload: image
+                  })
                 })
               })
-            })
-            .catch(err => {
-              dispatch(makeState('message', err.response.data.message));
-              dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
-            })
-            console.log('changed avatar');
-            bool_avatar = false;
+              .catch(err => {
+                dispatch(makeState('message', err.response.data.message));
+                dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+              })
+              bool_avatar = false;
+            }else{
+              dispatch(makeState('open', false));
+              dispatch(makeStateMain('snackeOpen', true));
+              dispatch(makeStateMain('snackeMess', 'The size of image too large. Your avatar had not changed!'));
+            }            
           }
           //change password
           else if(bool_pass){
@@ -167,7 +171,6 @@ export function updateProfile() {
               dispatch(makeState('message', err.response.data.message));
               dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
             })
-            console.log('changed pass');
             bool_pass = false;
           }
         }
