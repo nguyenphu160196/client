@@ -8,6 +8,7 @@ import Participant from './Participant'
 import Message from './Message'
 
 import IconButton from 'material-ui/IconButton';
+import Chip from 'material-ui/Chip';
 
 import Info from 'material-ui/svg-icons/action/info-outline';
 import PersonAdd from 'material-ui/svg-icons/social/person-add';
@@ -30,7 +31,7 @@ export class Initial extends React.Component{
 	}
   }
 
-export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti }) => (
+export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti, directVideoCall, unTyping, typing }) => (
   	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
 	  	<Initial initial={initial} />
 		<div className={roomChat.widthLeft} style={{padding: 0}}>
@@ -60,10 +61,18 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						</div>
 					</div>
 					<div style={{marginLeft: 30}}>
-						<IconButton tooltip="Audio Call" tooltipPosition="bottom-right">
+						<IconButton tooltip="Audio Call" tooltipPosition="bottom-right"
+							onClick={() => {
+
+							}}
+						>
 							<Mic />
 						</IconButton>
-						<IconButton tooltip="Video Call" tooltipPosition="bottom-right">
+						<IconButton tooltip="Video Call" tooltipPosition="bottom-right"
+							onClick={() => {
+								directVideoCall();
+							}}
+						>
 							<VideoCam />
 						</IconButton>
 						<IconButton tooltip="Participants" tooltipPosition="bottom-right" disabled={roomChat.roomInfo && (roomChat.roomInfo.direct == true) ? true : false}
@@ -90,7 +99,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				</div>
 			</div>
 			{/* message content */}
-			<div className="col-md-12 chat-content" id="id-chat-content" style={{padding: 15,height: 'calc(100vh - 132px)',overflowY: 'scroll', overflowX: 'hidden'}}
+			<div className="col-md-12 chat-content" id="id-chat-content" style={{padding: 15,height: roomChat.typing && roomChat.typing.length != 0 ? 'calc(100% - 172px)' : 'calc(100% - 132px)',overflowY: 'scroll', overflowX: 'hidden'}}
 				onClick={() => {
 					if(roomChat.emoji == 'block'){
 						makeState('emoji','none');
@@ -108,7 +117,18 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 					''
 				}
 			</div>
-
+			{/* typing */}
+			<div className="col-md-12 d-flex flex-wrap">
+				{roomChat && roomChat.typing && roomChat.typing.length != 0 ?
+				roomChat.typing.map((val, i) => {
+					return(
+						<Chip key={i} style={{margin: 4, fontStyle: 'italic'}}>{val.name + " is typing..."}</Chip>
+					)
+				})
+				:
+				''
+				}
+			</div>
 			{/* input chat */}
 			<div className="col-md-12">
 				<div style={{display: roomChat.emoji}}><EmojiPicker onEmojiClick={(e) => {
@@ -157,6 +177,10 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						}}
 						onFocus={() => {
 							clearNoti();
+							typing();
+						}}
+						onBlur={() => {
+							unTyping();
 						}}
 						onKeyPress={(e) => {
 							if (e.charCode == 13 && !e.nativeEvent.shiftKey) {
@@ -223,7 +247,10 @@ RoomChat.propTypes = {
 	addParticipant: PropTypes.func.isRequired,
 	changeRoomName: PropTypes.func.isRequired,
 	loadMoreMessage: PropTypes.func.isRequired,
-	clearNoti: PropTypes.func.isRequired
+	clearNoti: PropTypes.func.isRequired,
+	directVideoCall: PropTypes.func.isRequired,
+	typing: PropTypes.func.isRequired,
+	unTyping: PropTypes.func.isRequired
 }
 
 export default RoomChat

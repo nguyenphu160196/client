@@ -1,4 +1,3 @@
-import '../../../external_api'
 import {browserHistory} from 'react-router'
 import api from '../../../../src/api'
 import socket from '../../../socketio'
@@ -6,8 +5,9 @@ import {makeState as makeStateMain, getRoom} from '../../Main/modules/main'
 
 import $ from 'jquery'
 
-
 export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
+
+import peer from '../../../peer'
 
 
 
@@ -45,7 +45,7 @@ export function initial(){
       })
       socket.on('recieve-user-status-on', data => {
         let state = {...getState().roomChat}
-        let roomInfo = state.roomInfo;
+        let roomInfo = state.roomInfo ? state.roomInfo : '';
         if(roomInfo._id == data.room){
           if(roomInfo.direct == true){
             dispatch(makeState('status',"Active"));
@@ -70,6 +70,8 @@ export function initial(){
         let userInfo = state.userInfo;
         let roomInfo = state.roomInfo;
         if(roomInfo._id == data.room){
+          roomInfo.paticipant.push(data.user);
+          dispatch(makeState('roomInfo', roomInfo));
           api({
             method: 'get',
             url: '/info.user/'+data.user,
@@ -104,6 +106,8 @@ export function initial(){
         let userInfo = state.userInfo;
         let roomInfo = state.roomInfo;
         if(roomInfo._id == data.room){
+          roomInfo.paticipant.splice(roomInfo.paticipant.indexOf(data.user),1);
+          dispatch(makeState('roomInfo', roomInfo));
           userInfo.map((val, i) => {
             if(val._id == data.user){
               userInfo.splice(i,1);
@@ -129,8 +133,77 @@ export function initial(){
           $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
         }
       });
+      socket.on('recieve-typing', data => {
+        let state = {...getState().roomChat};
+        let roomInfo = state.roomInfo;
+        let userInfo = state.userInfo;
+        let typing = state.typing;
+        if(roomInfo._id == data.room){
+          if(typing.length == 0){
+            userInfo.map((val, i) => {
+              if(val._id == data.user){
+                  typing.push({id: data.user, name: val.name});
+                  dispatch(makeState('typing', typing));
+              }
+            })
+          }else{
+            typing.map((value, j) => {
+              if(value.id != data.user){
+                userInfo.map((val, i) => {
+                  if(val._id == data.user){
+                      typing.push({id: data.user, name: val.name});
+                      dispatch(makeState('typing', typing));
+                  }
+                })
+              }
+            })
+          }
+        }
+      })
+      socket.on('recieve-untyping', data => {
+        let state = {...getState().roomChat};
+        let roomInfo = state.roomInfo;
+        let typing = state.typing;
+        if(roomInfo._id == data.room){
+          typing.map((val, i) => {
+            if(val.id == data.user){
+              typing.splice(i,1);
+              dispatch(makeState('typing', typing));
+            }
+          })
+        }
+      })
       resolve();
     })
+  }
+}
+
+export function unTyping(){
+  return ((dispatch, getState) => {
+    let room = {...getState().roomChat}.roomInfo;
+    return new Promise((resolve, reject) => {
+      socket.emit('un-typing', {room: room._id,party: room.paticipant, user: JSON.parse(localStorage.user)._id});
+      resolve();
+    })
+  })
+}
+
+export function typing(){
+  return ((dispatch, getState) => {
+    let room = {...getState().roomChat}.roomInfo;
+    return new Promise((resolve, reject) => {
+      socket.emit('typing', {room: room._id,party: room.paticipant, user: JSON.parse(localStorage.user)._id});
+      resolve();
+    })
+  })
+}
+
+export function directVideoCall(){
+  return (dispatch, getState) => {
+    let state = {...getState().roomChat};
+    let roomInfo = state.roomInfo;
+    roomInfo.paticipant.splice(roomInfo.paticipant.indexOf(JSON.parse(localStorage.user)._id),1);
+    socket.emit('signal-video-call', {room: roomInfo._id, user: roomInfo.paticipant});
   }
 }
 
@@ -224,14 +297,15 @@ export function loadMoreMessage() {
 
 export function sendMessage(){
   return (dispatch, getState) => {
+    let id =JSON.parse(localStorage.user)._id;
+    let state = {...getState().roomChat};
+    let room_id = state.roomInfo._id;
+    let userInfo = state.userInfo;
+    let message_text = state.message_text;
+    let currentMessage = state.message;
+    let array = [];
+    let roomlist = {...getState().main}.roomlist;
     return new Promise((resolve, reject) => {
-      let id =JSON.parse(localStorage.user)._id;
-      let state = {...getState().roomChat}
-      let room_id = state.roomInfo._id;
-      let userInfo = state.userInfo;
-      let message_text = state.message_text;
-      let currentMessage = state.message;
-      let array = [];
       userInfo.map((val, i) => {
         if(val._id != id){
           array.push(val._id);
@@ -243,6 +317,17 @@ export function sendMessage(){
       resolve(currentMessage);
     })
     .then((currentMessage) => {
+      let brray = [];
+      roomlist.map((val, i) => {
+        if(val._id == room_id){
+          val.last = message_text;
+          brray.push(val);
+          dispatch(makeStateMain('roomlist', brray));
+        }else{
+          brray.push(val);
+          dispatch(makeStateMain('roomlist', brray));
+        }
+      })
       $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
     })
   }
@@ -261,6 +346,8 @@ export function addParticipant(id){
         data: { user: id }
       })
       .then(res => {
+        roomInfo.paticipant.push(id);
+        dispatch(makeState('roomInfo', roomInfo));
         socket.emit('add-participant',{ room : roomInfo._id, user: id });
         socket.emit('update-room',{room: roomInfo._id, user: [id]});
         api({
@@ -344,6 +431,8 @@ export function kickUser(id){
     let state = {...getState().roomChat};
     let roomInfo = state.roomInfo;
     return new Promise((resolve, reject) => {
+      roomInfo.paticipant.splice(roomInfo.paticipant.indexOf(id),1);
+      dispatch(makeState('roomInfo', roomInfo));
       api({
         method: 'put',
         url: '/kick.user/' + roomInfo._id,
@@ -667,7 +756,8 @@ const initialState = {
   invite_list: [],
   loadMoreMessage: true, 
   messagePage: 1,
-  mess_loaders: 'none'
+  mess_loaders: 'none',
+  typing: []
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

@@ -6,6 +6,7 @@ import ChannelList from './ChannelList'
 import Account from './Account'
 import Search from './Search'
 import SettingLeft from './SettingLeft'
+import Stream from './Stream'
 
 import DialogMessage from '../../../components/Common/DialogMessage'
 import Progress from '../../../components/Common/PageLoading'
@@ -37,6 +38,7 @@ return (
     message={main.dialogMess}
   />
   <Progress display={main.block}></Progress>
+  <Stream main={main} makeState={makeState} />
     <div className='row' style={{margin: '0 auto',height: '100%'}}>
 
         <div className='col-md-3' style={{borderRight: '1px solid lightgray', padding: '0px'}}>  

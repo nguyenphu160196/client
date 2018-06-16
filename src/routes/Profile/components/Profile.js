@@ -66,8 +66,7 @@ export const Profile = ({ profile, makeState, saveCond, checkPassRequire }) => (
 							<div className="">
 							<label className="btn btn-primary btn-file">
 									Upload <input type="file" hidden accept="image/x-png,image/gif,image/jpeg" 
-												onChange={(e) => {			
-														console.log(e.target.files[0].size);							
+												onChange={(e) => {								
 														makeState("imageURL", e.target.files[0])
 														.then(() => {
 															saveCond();

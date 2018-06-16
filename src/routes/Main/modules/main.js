@@ -1,7 +1,6 @@
 import {browserHistory} from 'react-router'
 import api from '../../../../src/api'
 import socket from '../../../socketio'
-import '../../../external_api'
 import { MAKE_STATE_ROOM } from '../../RoomChat/modules/roomChat';
 
 export const MAKE_STATE_MAIN = 'MAKE_STATE_MAIN'
@@ -10,18 +9,11 @@ export const CLOSE_SNACKE = 'CLOSE_SNACKE'
 export const GET_AVATAR = 'GET_AVATAR'
 export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 
-// var domain = "http://localhost:8080/";
-// var options = {
-//     roomName: "JitsiMeetAPIExample",
-//     width: 700,
-//     height: 700,
-//     // parentNode: document.querySelector('#meet')
-// }
-// var jit = new JitsiMeetExternalAPI(domain, options);
+import $ from "jquery"
+import peer from '../../../peer'
 
 export function initial(){
-  return (dispatch, getState) => {
-    let st = JSON.parse(localStorage.user);
+  return (dispatch, getState) => {    
     var x = document.getElementById("joinRoom");
     var y = document.getElementById("funcMessage");
     return new Promise((resolve, reject) => {
@@ -32,11 +24,13 @@ export function initial(){
           headers: {'x-access-token': localStorage.getItem('authToken')}
         })
         .then(res => {
+          let st = JSON.parse(localStorage.user);
           st.room = res.data.room;
           localStorage.setItem('user', JSON.stringify(st));
           dispatch(getRoom());
         })
         .catch(err => {})
+        socket.emit('user-online', JSON.parse(localStorage.user).status);
         socket.on('recieve-change-room-name', data => {
           let state = {...getState().main};
           let roomlist = state.roomlist;
@@ -73,11 +67,12 @@ export function initial(){
             dispatch(makeState('dialog',true));
         })
         socket.on('update-socketid',(data) => {
+          let st = JSON.parse(localStorage.user);
           st.socketID = data;
           localStorage.setItem('user', JSON.stringify(st));
         })
-        socket.emit('user-online', st.status);
         socket.on('recieve-update-direct-room', data => {
+          let st = JSON.parse(localStorage.user);
           st.room.push(data);
           localStorage.setItem('user', JSON.stringify(st));
           let array = {...getState().main}.roomlist;
@@ -133,6 +128,7 @@ export function initial(){
         });
 
         socket.on('recieve-update-room', data => {
+          let st = JSON.parse(localStorage.user);
           st.room.push(data);
           localStorage.setItem('user', JSON.stringify(st));
           let array = {...getState().main}.roomlist;
@@ -157,6 +153,7 @@ export function initial(){
           roomlist.map((val, i) => {
             if(val._id == data.room){
               val.noti = true;
+              val.last = data.last;
               array.push(val);
               dispatch(makeState('roomlist', array));
             }else{
@@ -168,9 +165,67 @@ export function initial(){
             y.play().then(_ => {}).catch(error => {});
           }
         })
+        let count = 0;
+        socket.on('recieve-signal-video-call', data => {
+          dispatch(makeState('stream','block'));
+          openStream().then(stream => {
+            playStream('localStream', stream);
+            if(data.user.length != 0){
+              data.user.map((val, i) => {          
+                count++;
+                $('.remoteClass').append('<video id="remoteStream'+count+'" width="200" style={{marginRight: 20}} ></video>');
+                let call = peer.call(val, stream);
+                call.on('stream', remoteStream => {
+                    playStream('remoteStream'+count, remoteStream);
+                })
+              })
+            }else{
+              socket.emit('give-away-done', data.room);
+            }
+          })          
+        })
+        peer.on('call', call => {
+          count++;
+          dispatch(makeState('stream','block'));
+          $('.remoteClass').append('<video id="remoteStream'+count+'" width="200" style={{marginRight: 20}} ></video>');          
+          openStream().then(stream => {
+            playStream('localStream', stream);
+            call.answer(stream);
+            call.on('stream', remoteStream => {
+                playStream('remoteStream'+count, remoteStream);
+            })        
+          })            
+        })
+        socket.on('recieve-remote-signal-video-call', data => {
+            if(data.user.length != 0 && data.user.indexOf(JSON.parse(localStorage.user)._id) == 0){
+              data.user.splice(data.user.indexOf(JSON.parse(localStorage.user)._id),1);
+              socket.emit('signal-video-call', data);
+            }
+        })
+        socket.on('recieve-give-away-done', data => {
+          
+        })
         resolve();
     })
   }
+}
+
+function openStream(){
+  return new Promise((resolve, reject) => {
+    const config = {audio: false, video: true};
+    resolve(navigator.mediaDevices.getUserMedia(config));
+  })
+};
+function playStream(idVideoTag, stream){
+  const video = document.getElementById(idVideoTag); 
+  video.srcObject = stream;
+  if (video.play() !== undefined) {
+    video.play().then(_ => {}).catch(error => {});
+  }
+}
+
+export function answerDirectVideoCall(){
+  
 }
 
 export function hideRoom(room){
@@ -650,7 +705,8 @@ const initialState = {
   snackeOpen: false,
   snackeMess: "",
   snakeColor: "#fff",
-  block: 'none'
+  block: 'none',
+  stream: 'none'
 }
 
 const ACTION_HANDLERS = {

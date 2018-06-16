@@ -14,6 +14,7 @@ export default (store) => ({
       const reducer = require('./modules/roomChat').default;
       injectReducer(store, { key: 'roomChat', reducer });
       store.dispatch(makeState('message',[]));
+      store.dispatch(makeState('typing',[]));
       store.dispatch(makeState('message_text',''));
       store.dispatch(makeState('messagePage',1));
       store.dispatch(creRoomInfo());
