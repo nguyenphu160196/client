@@ -6,10 +6,16 @@ import ReactTooltip from 'react-tooltip'
 
 export default class Message extends React.Component{
 	constructor(props) {
-        super(props);
+		super(props);
+		this.converDate = this.converDate.bind(this);
 	  } 
 	componentDidMount(){
 
+	}
+	converDate(date){
+		let newDate = new Date(date);
+		let result = String(newDate).split("GMT")[0];
+		return result;
 	}
 	render(){
 		const MessageContent = this.props.message && this.props.message.length != 0 ? this.props.message.map((data, i) => {
@@ -18,10 +24,10 @@ export default class Message extends React.Component{
 					<div className="MessageContent" key={i} style={{display: 'flex', justifyContent: 'flex-end', fontFamily: 'Helvetica'}} 
 					>
 						<div className="OwnMessage" data-tip data-for='OwnMessage'>
-							{data.text}
+							<pre style={{color: '#fff', fontFamily: 'inherit', margin: 0}}>{data.text}</pre>
 						</div>
 						<ReactTooltip id='OwnMessage' place="top" type="dark" effect="float">
-							<span>{Date(data.createAt).split("GMT")[0]}</span>
+							<span>{this.converDate(data.createAt)}</span>
 						</ReactTooltip>
 					</div>
 				)
@@ -43,9 +49,9 @@ export default class Message extends React.Component{
 							</ReactTooltip>
 						</div>
 						<div className="friendMessage" data-tip data-for='friendMessage'>
-							{data.text}
+							<pre style={{fontFamily: 'inherit', margin: 0}}>{data.text}</pre>
 							<ReactTooltip id='friendMessage' place="top" type="dark" effect="float">
-								<span>{Date(data.createAt).split("GMT")[0]}</span>
+								<span>{this.converDate(data.createAt)}</span>
 							</ReactTooltip>
 						</div>
 					</div>

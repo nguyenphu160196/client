@@ -296,41 +296,42 @@ export function loadMoreMessage() {
 }
 
 export function sendMessage(){
-  return (dispatch, getState) => {
-    let id =JSON.parse(localStorage.user)._id;
-    let state = {...getState().roomChat};
-    let room_id = state.roomInfo._id;
-    let userInfo = state.userInfo;
-    let message_text = state.message_text;
-    let currentMessage = state.message;
-    let array = [];
-    let roomlist = {...getState().main}.roomlist;
-    return new Promise((resolve, reject) => {
-      userInfo.map((val, i) => {
-        if(val._id != id){
-          array.push(val._id);
-        }
-      })
-      socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array});
-      currentMessage.push({ roomId: room_id, user: id, text: message_text });
-      dispatch(makeState('message',currentMessage))
-      resolve(currentMessage);
-    })
-    .then((currentMessage) => {
-      let brray = [];
-      roomlist.map((val, i) => {
-        if(val._id == room_id){
-          val.last = message_text;
-          brray.push(val);
-          dispatch(makeStateMain('roomlist', brray));
-        }else{
-          brray.push(val);
-          dispatch(makeStateMain('roomlist', brray));
-        }
-      })
-      $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
-    })
-  }
+  console.log(p_wrap.textContent);
+  // return (dispatch, getState) => {
+  //   let id = JSON.parse(localStorage.user)._id;
+  //   let state = {...getState().roomChat};
+  //   let room_id = state.roomInfo._id;
+  //   let userInfo = state.userInfo;
+  //   let message_text = p_wrap.textContent;
+  //   let currentMessage = state.message;
+  //   let array = [];
+  //   let roomlist = {...getState().main}.roomlist;
+  //   return new Promise((resolve, reject) => {
+  //     userInfo.map((val, i) => {
+  //       if(val._id != id){
+  //         array.push(val._id);
+  //       }
+  //     })
+  //     socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array});
+  //     currentMessage.push({ roomId: room_id, user: id, text: message_text });
+  //     dispatch(makeState('message',currentMessage))
+  //     resolve(currentMessage);
+  //   })
+  //   .then((currentMessage) => {
+  //     let brray = [];
+  //     roomlist.map((val, i) => {
+  //       if(val._id == room_id){
+  //         val.last = message_text;
+  //         brray.push(val);
+  //         dispatch(makeStateMain('roomlist', brray));
+  //       }else{
+  //         brray.push(val);
+  //         dispatch(makeStateMain('roomlist', brray));
+  //       }
+  //     })
+  //     $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
+  //   })
+  // }
 }
 
 export function addParticipant(id){

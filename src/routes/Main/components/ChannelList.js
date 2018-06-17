@@ -44,7 +44,10 @@ const ChannelList = ({array, hideRoom}) => {
           array.noti = false;
         }}
         primaryText={array.direct && array.direct == true ? 
-        <div className="d-flex">{array.name}<div style={{color: '#fff', backgroundColor: '#fff600', fontSize: 10, textAlign: 'center', width: 30, marginLeft: 10}}>User</div></div> 
+        <div className="d-flex">
+          <div style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 130}}>{array.name}</div>
+          <div style={{color: '#fff', backgroundColor: '#fff600', fontSize: 10, textAlign: 'center', width: 30, marginLeft: 10}}>User</div>
+        </div> 
         :
         <div className="d-flex">{array.name}<div style={{color: '#fff', backgroundColor: '#fff600', fontSize: 10, textAlign: 'center', width: 35, marginLeft: 10}}>Group</div></div>}
         secondaryText={array.last && array.last != '' ? <div style={{fontStyle: 'italic'}}>{array.last}</div> : ''}

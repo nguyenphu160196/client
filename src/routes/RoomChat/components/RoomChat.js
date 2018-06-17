@@ -17,6 +17,8 @@ import VideoCam from 'material-ui/svg-icons/av/videocam';
 import EmojiIcon from 'material-ui/svg-icons/image/tag-faces';
 import Send from 'material-ui/svg-icons/content/send';
 
+import $ from 'jquery'
+
 
 
 export class Initial extends React.Component{
@@ -161,7 +163,8 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 							</IconButton>
 						</span>
 					</div>
-					<textarea className="form-control" cols="40" rows="5"
+					<div className="hidden" id="p_wrap" style={{whiteSpace: 'pre-line'}}></div>
+					<textarea id="textarea" className="form-control" cols="40" rows="5"
 						style={{
 							maxHeight: 58,
 							outline: 'none',
@@ -173,7 +176,8 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						}} 
 						value={roomChat.message_text}
 						onChange={(e) => {
-							makeState('message_text',e.target.value);
+							makeState('message_text', e.target.value);
+							p_wrap.textContent = e.target.value
 						}}
 						onFocus={() => {
 							clearNoti();
@@ -187,6 +191,13 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 								if(roomChat.message_text != ''){
 									sendMessage();
 									makeState('message_text','');
+								}
+								e.preventDefault();
+							}
+							else if(e.charCode == 13 && e.nativeEvent.shiftKey){
+								if(roomChat.message_text != ''){
+									// p_wrap.textContent += <br/>;
+								}else{
 									e.preventDefault();
 								}
 							}
