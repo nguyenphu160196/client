@@ -296,42 +296,41 @@ export function loadMoreMessage() {
 }
 
 export function sendMessage(){
-  console.log(p_wrap.textContent);
-  // return (dispatch, getState) => {
-  //   let id = JSON.parse(localStorage.user)._id;
-  //   let state = {...getState().roomChat};
-  //   let room_id = state.roomInfo._id;
-  //   let userInfo = state.userInfo;
-  //   let message_text = p_wrap.textContent;
-  //   let currentMessage = state.message;
-  //   let array = [];
-  //   let roomlist = {...getState().main}.roomlist;
-  //   return new Promise((resolve, reject) => {
-  //     userInfo.map((val, i) => {
-  //       if(val._id != id){
-  //         array.push(val._id);
-  //       }
-  //     })
-  //     socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array});
-  //     currentMessage.push({ roomId: room_id, user: id, text: message_text });
-  //     dispatch(makeState('message',currentMessage))
-  //     resolve(currentMessage);
-  //   })
-  //   .then((currentMessage) => {
-  //     let brray = [];
-  //     roomlist.map((val, i) => {
-  //       if(val._id == room_id){
-  //         val.last = message_text;
-  //         brray.push(val);
-  //         dispatch(makeStateMain('roomlist', brray));
-  //       }else{
-  //         brray.push(val);
-  //         dispatch(makeStateMain('roomlist', brray));
-  //       }
-  //     })
-  //     $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
-  //   })
-  // }
+  return (dispatch, getState) => {
+    let id = JSON.parse(localStorage.user)._id;
+    let state = {...getState().roomChat};
+    let room_id = state.roomInfo._id;
+    let userInfo = state.userInfo;
+    let message_text = p_wrap.textContent;
+    let currentMessage = state.message;
+    let array = [];
+    let roomlist = {...getState().main}.roomlist;
+    return new Promise((resolve, reject) => {
+      userInfo.map((val, i) => {
+        if(val._id != id){
+          array.push(val._id);
+        }
+      })
+      socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array});
+      currentMessage.push({ roomId: room_id, user: id, text: message_text, createAt: Date() });
+      dispatch(makeState('message',currentMessage))
+      resolve(currentMessage);
+    })
+    .then((currentMessage) => {
+      let brray = [];
+      roomlist.map((val, i) => {
+        if(val._id == room_id){
+          val.last = message_text;
+          brray.push(val);
+          dispatch(makeStateMain('roomlist', brray));
+        }else{
+          brray.push(val);
+          dispatch(makeStateMain('roomlist', brray));
+        }
+      })
+      $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
+    })
+  }
 }
 
 export function addParticipant(id){
@@ -391,37 +390,39 @@ export function changeRoomName(){
     let roomInfo = state.roomInfo;
     let name = state.new_room_name;
     return new Promise((resolve, reject) => {
-      api({
-        method: 'put',
-        url: '/room.change.name/' + roomInfo._id,
-        headers: {'x-access-token': localStorage.getItem('authToken')},
-        data: { name: name }
-      })
-      .then(res => {
-        roomInfo.name = name;
-        dispatch(makeState('roomInfo',roomInfo));
-        dispatch(makeState('name_show',''));
-        dispatch(makeState('name_hidden','hidden'));
-        let main = {...getState().main};
-        let roomlist = main.roomlist;
-        let array = [];
-        roomlist.map((val, i) => {
-          if(val._id == roomInfo._id){
-            val.name = name;
-            array.push(val);
-             dispatch(makeStateMain('roomlist',array));
-          }else{
-            array.push(val);
-            dispatch(makeStateMain('roomlist',array));
-          }
+      if(name != ''){
+        api({
+          method: 'put',
+          url: '/room.change.name/' + roomInfo._id,
+          headers: {'x-access-token': localStorage.getItem('authToken')},
+          data: { name: name }
         })
-        roomInfo.paticipant.map((val, i) => {
-          if(val != JSON.parse(localStorage.user)._id){
-            socket.emit('change-room-name', {user: val, name: name, room: roomInfo._id});
-          }
+        .then(res => {
+          roomInfo.name = name;
+          dispatch(makeState('roomInfo',roomInfo));
+          dispatch(makeState('name_show',''));
+          dispatch(makeState('name_hidden','hidden'));
+          let main = {...getState().main};
+          let roomlist = main.roomlist;
+          let array = [];
+          roomlist.map((val, i) => {
+            if(val._id == roomInfo._id){
+              val.name = name;
+              array.push(val);
+               dispatch(makeStateMain('roomlist',array));
+            }else{
+              array.push(val);
+              dispatch(makeStateMain('roomlist',array));
+            }
+          })
+          roomInfo.paticipant.map((val, i) => {
+            if(val != JSON.parse(localStorage.user)._id){
+              socket.emit('change-room-name', {user: val, name: name, room: roomInfo._id});
+            }
+          })
         })
-      })
-      .catch(err => {})
+        .catch(err => {})
+      }
       resolve();
     })
   }

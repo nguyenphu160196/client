@@ -7,7 +7,7 @@ import ReactTooltip from 'react-tooltip'
 export default class Message extends React.Component{
 	constructor(props) {
 		super(props);
-		this.converDate = this.converDate.bind(this);
+		// this.converDate = this.converDate.bind(this);
 	  } 
 	componentDidMount(){
 
@@ -23,10 +23,10 @@ export default class Message extends React.Component{
 				return(
 					<div className="MessageContent" key={i} style={{display: 'flex', justifyContent: 'flex-end', fontFamily: 'Helvetica'}} 
 					>
-						<div className="OwnMessage" data-tip data-for='OwnMessage'>
-							<pre style={{color: '#fff', fontFamily: 'inherit', margin: 0}}>{data.text}</pre>
+						<div className="OwnMessage" data-tip data-for={"OwnMessage" + i}>
+							<pre style={{color: '#fff', fontFamily: 'inherit', margin: 0, wordWrap: 'break-word', whiteSpace: 'pre-wrap'}}>{data.text}</pre>
 						</div>
-						<ReactTooltip id='OwnMessage' place="top" type="dark" effect="float">
+						<ReactTooltip id={"OwnMessage" + i} place="top" type="dark" effect="float">
 							<span>{this.converDate(data.createAt)}</span>
 						</ReactTooltip>
 					</div>
@@ -38,19 +38,19 @@ export default class Message extends React.Component{
 						>
 							{data.avatar && data.avatar.charAt(0) != "#"
 								?
-								<Avatar data-tip data-for='avatarmess' src={data.avatar} style={{backgroundColor: "none"}} />
+								<Avatar data-tip data-for={'avatarmess'+i} src={data.avatar} style={{backgroundColor: "none"}} />
 								:
-								<Avatar data-tip data-for='avatarmess' style={{backgroundColor: data.avatar}}
+								<Avatar data-tip data-for={'avatarmess'+i} style={{backgroundColor: data.avatar}}
 									>{data.name ? data.name.charAt(0).toUpperCase() : ''}                        
 								</Avatar>
 							}
-							<ReactTooltip id='avatarmess' place="top" type="dark" effect="float">
+							<ReactTooltip id={'avatarmess'+i} place="top" type="dark" effect="float">
 								<span>{data.name}</span>
 							</ReactTooltip>
 						</div>
-						<div className="friendMessage" data-tip data-for='friendMessage'>
-							<pre style={{fontFamily: 'inherit', margin: 0}}>{data.text}</pre>
-							<ReactTooltip id='friendMessage' place="top" type="dark" effect="float">
+						<div className="friendMessage" data-tip data-for={'friendMessage'+i}>
+							<pre style={{fontFamily: 'inherit', margin: 0, wordWrap: 'break-word', whiteSpace: 'pre-wrap'}}>{data.text}</pre>
+							<ReactTooltip id={'friendMessage'+i} place="top" type="dark" effect="float">
 								<span>{this.converDate(data.createAt)}</span>
 							</ReactTooltip>
 						</div>

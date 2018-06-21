@@ -17,6 +17,11 @@ export function initial(){
     var x = document.getElementById("joinRoom");
     var y = document.getElementById("funcMessage");
     return new Promise((resolve, reject) => {
+        socket.on('update-jwt', data => {
+          let st = localStorage.authToken;
+          st = data;
+          localStorage.setItem('authToken', st);
+        })
         dispatch(getAvatar());
         api({
           method: 'get',
@@ -156,14 +161,14 @@ export function initial(){
               val.last = data.last;
               array.push(val);
               dispatch(makeState('roomlist', array));
+              if (y.play() !== undefined) {
+                y.play().then(_ => {}).catch(error => {});
+              }
             }else{
               array.push(val);
               dispatch(makeState('roomlist', array));
             }
           })
-          if (y.play() !== undefined) {
-            y.play().then(_ => {}).catch(error => {});
-          }
         })
         let count = 0;
         socket.on('recieve-signal-video-call', data => {

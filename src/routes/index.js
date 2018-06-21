@@ -3,17 +3,26 @@ import CoreLayout from '../layouts/PageLayout/PageLayout'
 import Main from './Main'
 import LoginRoute from './Login'
 import Page404 from './PageNotFound'
+import ResetPassword from './ResetPassword'
+
 import {browserHistory} from 'react-router'
+import socket from '../socketio'
 
 const loginReq = () => {
-  if(!localStorage.authToken) {
-    browserHistory.push('/login');
-  } 
+  let exp = localStorage.authToken ? JSON.parse(atob(localStorage['authToken'].split('.')[1])).exp : '';
+  if(!(exp >= Date.now()/1000)) {
+      localStorage.clear();
+      browserHistory.push('/login');
+  } else{
+    socket.emit('request-new-jwt','');
+  }
 }
-const homeRedirect = (store) => {
-  if(localStorage.authToken) {
+const homeRedirect = (store) => { 
+  let exp = localStorage.authToken ? JSON.parse(atob(localStorage['authToken'].split('.')[1])).exp : '';
+  if(exp >= Date.now()/1000) {
+    socket.emit('request-new-jwt','');
     browserHistory.push('/');
-  } 
+  }
 }
 
 export const createRoutes = (store) => ({
@@ -30,7 +39,8 @@ export const createRoutes = (store) => ({
     {
       onEnter: homeRedirect,
       childRoutes: [
-        LoginRoute(store)
+        LoginRoute(store),
+        ResetPassword(store)
       ]
     },
     Page404(store)

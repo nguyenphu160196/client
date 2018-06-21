@@ -11,6 +11,32 @@ export const SIGNUP_CANCEL = 'SIGNUP_CANCEL'
 export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 export const LOAD_SUCCESS = 'LOAD_SUCCESS'
 
+
+
+export function passwordForgotten(){
+    return (dispatch, getState) => {
+        dispatch(makeState('progressRE', true));
+        let email = {...getState().login}.login_require_email;
+        return new Promise((resolve, reject) => {
+            api.post('/password.fogotten', {email: email})
+            .then(res => {
+                dispatch({
+                    type: LOGIN_FALSE,
+                    payload: true,
+                    message: "We just sent an email to "+email+". Click the link we sent to reset your password. If you didn’t recieve any email, please check your spam."
+                });
+                dispatch(makeState('openRE', false));
+                dispatch(makeState('progressRE', false));
+                dispatch(makeState('messageRE', ""));
+            }, err => {
+                dispatch(makeState('progressRE', false));
+                dispatch(makeState('messageRE', err.response.data.message));
+            })
+            resolve();
+        })
+    }
+}
+
 export function loginGoogle(data){
     return (dispatch, getState) => {
         return new Promise((resolve, reject) => {
@@ -140,11 +166,19 @@ export function handleLogin() {
                     window.location.href = '/'
                 })
                 .catch(err => {
-                    dispatch({
-                        type: LOGIN_FALSE,
-                        payload: true,
-                        message: err.response.data.message
-                    })
+                    if(err.response.data.message){
+                        dispatch({
+                            type: LOGIN_FALSE,
+                            payload: true,
+                            message: err.response.data.message
+                        })
+                    }else{
+                        dispatch({
+                            type: LOGIN_FALSE,
+                            payload: true,
+                            message: "An Error Occurred!"
+                        })
+                    }
                 })
 			resolve();
     });
@@ -190,6 +224,10 @@ export function makeState(key, text){
     email: '',
     password: '',
     password2: '',
+    openRE: false,
+    login_require_email: '',
+    messageRE: '',
+    progressRE: false
 }
 
 

@@ -4,9 +4,10 @@ import './Login.scss'
 import Progress from '../../../components/Common/PageLoading'
 import Signup from './Signup'
 import LoginForm from './LoginForm'
+import RequireEmail from './RequireEmail'
 
 
-export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll, closeDialog, signupClick, signupCancel, loginGoogle}) => (
+export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll, closeDialog, signupClick, signupCancel, loginGoogle, passwordForgotten}) => (
   <div style={{margin: '0px!important', padding: '0px!important'}} >
     
         <Progress display={login.block}></Progress>
@@ -17,11 +18,16 @@ export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll
 					makeState={makeState}
 					login={login}
 				></Signup>
+				<RequireEmail 
+					login={login}
+					makeState={makeState}
+					passwordForgotten={passwordForgotten}
+				/>
 				<div className="nav-bar col-12">
 					<ul>
 						<li><a className="activex" onClick={signupClick}>Sign Up</a></li>
 						{/* <li><a href='/feature' target='_blank'>Feature</a></li> */}
-						<li><a className='mess' style={{display: login.icon}} href="#">"Cut Air"</a></li>
+						<li><a className='mess' style={{display: login.icon}} href="#">"kltn14110901"</a></li>
 						<li><a className='mess-icon' style={{display: login.icon}} href="#"></a></li>
 					</ul>
 				</div>
@@ -40,7 +46,7 @@ export const Login = ({ login, handleLogin, makeState, handleSignup,handleScroll
 				<div className='page-2 col-12'>
 					<div className='page-2-img col-3'></div>
 					<div className='page-2-txt col-3'>
-						<h1>Introducing video calling in "Cut Air".</h1>
+						<h1>Introducing video calling in "kltn14110901".</h1>
 						<p>Now you can have face-to-face conversations with friends and family. It’s fast and easy to make video calls anywhere in the world.</p>
 						<a className='btn_learnMore' href='#'>LERN MORE</a>
 					</div>
@@ -104,7 +110,8 @@ Login.propTypes = {
   closeDialog: PropTypes.func.isRequired, 
   signupClick: PropTypes.func.isRequired, 
   signupCancel: PropTypes.func.isRequired,
-  loginGoogle: PropTypes.func.isRequired
+  loginGoogle: PropTypes.func.isRequired,
+  passwordForgotten: PropTypes.func.isRequired
 }
 
 export default Login
