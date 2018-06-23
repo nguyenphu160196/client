@@ -178,6 +178,46 @@ export function initial(){
   }
 }
 
+export function removeAttachFile(i){
+  return (dispatch, getState) => {
+    let state = {...getState().roomChat};
+    let attachArray = state.attachArray;
+    return new Promise((resolve, reject) => {
+      attachArray.splice(i,1);
+      dispatch(makeState('attachArray', attachArray));
+      if(attachArray.length == 0){
+        dispatch(makeState('attachHeight', '15px'));
+      }
+      resolve();
+    })
+  }
+}
+
+export function repareAttachFile(){
+  return (dispatch, getState) => {
+    let state = {...getState().roomChat};
+    let attachFile = state.attachFile;
+    let attachArray = state.attachArray;
+    let reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      if(attachFile.name){
+        if(attachFile.type.indexOf('image') == -1){
+          attachArray.push(attachFile);
+          dispatch(makeState('attachArray', attachArray));
+        }else{
+          reader.onload = function(e) {
+            attachFile.imagebase64 = e.target.result;
+            attachArray.push(attachFile);
+            dispatch(makeState('attachArray', attachArray));
+          }
+          reader.readAsDataURL(attachFile);
+        }
+        resolve();
+      }
+    })
+  }
+}
+
 export function unTyping(){
   return ((dispatch, getState) => {
     let room = {...getState().roomChat}.roomInfo;
@@ -302,16 +342,32 @@ export function sendMessage(){
     let room_id = state.roomInfo._id;
     let userInfo = state.userInfo;
     let message_text = p_wrap.textContent;
+    let attachArray = state.attachArray;
     let currentMessage = state.message;
     let array = [];
-    let roomlist = {...getState().main}.roomlist;
+    let roomlist = {...getState().main}.roomlist;    
+    let dataFile = new FormData();    
     return new Promise((resolve, reject) => {
       userInfo.map((val, i) => {
         if(val._id != id){
           array.push(val._id);
         }
-      })
-      socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array});
+      })   
+      if(attachArray.length != 0){
+        attachArray.map((val, i) => {
+          dataFile.append('attach', val);
+        }); 
+        api({
+          method: 'post',
+          url: '/message.attach',
+          data: dataFile
+        })
+        .then(res => {
+          socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array, file: res.data.file});
+        })
+      }else{
+        socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array, file: []});
+      }
       currentMessage.push({ roomId: room_id, user: id, text: message_text, createAt: Date() });
       dispatch(makeState('message',currentMessage))
       resolve(currentMessage);
@@ -745,7 +801,7 @@ const initialState = {
   displayRight: 'none',
   iconButton: 'col-md-9',
   emoji: 'none',
-  sendDisable: true,
+  // sendDisable: true,
   message_text:'',
   settingOn: 'none',
   participantOn: 'none',
@@ -759,7 +815,10 @@ const initialState = {
   loadMoreMessage: true, 
   messagePage: 1,
   mess_loaders: 'none',
-  typing: []
+  typing: [],
+  attachFile: {},
+  attachArray: [],
+  attachHeight: "15px"
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

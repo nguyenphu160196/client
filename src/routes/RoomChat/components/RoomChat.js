@@ -9,6 +9,7 @@ import Message from './Message'
 
 import IconButton from 'material-ui/IconButton';
 import Chip from 'material-ui/Chip';
+import Avatar from 'material-ui/Avatar';
 
 import Info from 'material-ui/svg-icons/action/info-outline';
 import PersonAdd from 'material-ui/svg-icons/social/person-add';
@@ -16,9 +17,11 @@ import Mic from 'material-ui/svg-icons/av/mic';
 import VideoCam from 'material-ui/svg-icons/av/videocam';
 import EmojiIcon from 'material-ui/svg-icons/image/tag-faces';
 import Send from 'material-ui/svg-icons/content/send';
+import Attach from 'material-ui/svg-icons/editor/attach-file';
+import AddImage from 'material-ui/svg-icons/image/photo';
+
 
 import $ from 'jquery'
-
 
 
 export class Initial extends React.Component{
@@ -33,7 +36,7 @@ export class Initial extends React.Component{
 	}
   }
 
-export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti, directVideoCall, unTyping, typing }) => (
+export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti, directVideoCall, unTyping, typing, repareAttachFile, removeAttachFile }) => (
   	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
 	  	<Initial initial={initial} />
 		<div className={roomChat.widthLeft} style={{padding: 0}}>
@@ -101,7 +104,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				</div>
 			</div>
 			{/* message content */}
-			<div className="col-md-12 chat-content" id="id-chat-content" style={{padding: 15,height: roomChat.typing && roomChat.typing.length != 0 ? 'calc(100% - 172px)' : 'calc(100% - 132px)',overflowY: 'scroll', overflowX: 'hidden'}}
+			<div className="col-md-12 chat-content" id="id-chat-content" style={{padding: 15,height: roomChat.typing && roomChat.typing.length != 0 ? `calc(100% - 172px - ${roomChat.attachHeight ? roomChat.attachHeight :'15px'})` : `calc(100% - 132px - ${roomChat.attachHeight ? roomChat.attachHeight :'15px'})`,overflowY: 'scroll', overflowX: 'hidden'}}
 				onClick={() => {
 					if(roomChat.emoji == 'block'){
 						makeState('emoji','none');
@@ -120,11 +123,39 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				}
 			</div>
 			{/* typing */}
-			<div className="col-md-12 d-flex flex-wrap">
+			<div className="col-md-12 d-flex">
 				{roomChat && roomChat.typing && roomChat.typing.length != 0 ?
 				roomChat.typing.map((val, i) => {
 					return(
 						<Chip key={i} style={{margin: 4, fontStyle: 'italic'}}>{val.name + " is typing..."}</Chip>
+					)
+				})
+				:
+				''
+				}
+			</div>
+			{/* attach file */}
+			<div className="col-md-12 d-flex" style={{overflowX: 'scroll', overflowY: 'hidden'}}>
+				{roomChat && roomChat.attachArray && roomChat.attachArray.length != 0 ?
+				roomChat.attachArray.map((val, i) => {
+					return(
+						<Chip 
+							onRequestDelete={() => {
+								removeAttachFile(i);
+							}}
+							key={i} 
+							style={{margin: 4}}	
+							labelStyle={{overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px'}}	
+						>
+						{val.type && val.type.indexOf("image") == -1
+							?
+							<Avatar style={{color: 'black', fontSize: '12px'}}>{val.name.split('.')[1]}</Avatar>
+							:
+							<img src={val.imagebase64} style={{borderRadius: '50%', marginRight: '10px'}} width="32px" height="32px" />
+
+						}
+							{val.type && val.type.indexOf("image") == -1 ? val.name : ''}						
+						</Chip>
 					)
 				})
 				:
@@ -143,7 +174,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						}
 					}}
 				>
-					<div className="input-group-append">
+					<div className="input-group-append hidden">
 						<span className="input-group-text" 
 						style={{
 							maxHeight: 58,
@@ -170,8 +201,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 							outline: 'none',
 							boxShadow: 'none',
 							border: '1px solid #ccc',
-							borderLeft: 'none',
-							paddingLeft: '0px',
+							paddingLeft: '15px',
 							borderRight: 'none'
 						}} 
 						value={roomChat.message_text}
@@ -188,7 +218,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						}}
 						onKeyPress={(e) => {
 							if (e.charCode == 13 && !e.nativeEvent.shiftKey) {
-								if(roomChat.message_text != ''){
+								if(roomChat.message_text != '' || roomChat.attachArray){
 									sendMessage();
 									makeState('message_text','');
 								}
@@ -208,15 +238,45 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						style={{
 							maxHeight: 58,
 							backgroundColor: 'unset',
+							borderLeft: 'none',
+							borderRight: 'none'
+						}} >
+							<IconButton tooltip="Image" tooltipPosition="top-left"
+								onClick={() => {
+									document.getElementById('imageChat').click();
+								}}
+							>
+								<AddImage />
+								<input type="file" id="imageChat" hidden accept="image/x-png,image/gif,image/jpeg" 
+									onChange={(e) => {				
+											makeState('attachHeight','55px');	
+											makeState('attachFile', e.target.files[0]);
+											repareAttachFile();		
+										}
+									} />
+							</IconButton>
+						</span>
+					</div>
+					<div className="input-group-append">
+						<span className="input-group-text" 
+						style={{
+							maxHeight: 58,
+							backgroundColor: 'unset',
 							borderLeft: 'none'
 						}} >
-							<IconButton tooltip="Send message" tooltipPosition="top-left"
+							<IconButton tooltip="Attach" tooltipPosition="top-left"
 								onClick={() => {
-									
+									document.getElementById('attachChat').click();
 								}}
-								disabled={roomChat.sendDisable}
 							>
-								<Send />
+								<Attach />
+								<input type="file" id="attachChat" hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.html,.js"
+									onChange={(e) => {
+											makeState('attachHeight','55px');	
+											makeState('attachFile', e.target.files[0]);
+											repareAttachFile();						
+										}
+									} />
 							</IconButton>
 						</span>
 					</div>
@@ -261,7 +321,9 @@ RoomChat.propTypes = {
 	clearNoti: PropTypes.func.isRequired,
 	directVideoCall: PropTypes.func.isRequired,
 	typing: PropTypes.func.isRequired,
-	unTyping: PropTypes.func.isRequired
+	unTyping: PropTypes.func.isRequired,
+	repareAttachFile: PropTypes.func.isRequired,
+	removeAttachFile: PropTypes.func.isRequired
 }
 
 export default RoomChat
