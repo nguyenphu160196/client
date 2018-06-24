@@ -1,4 +1,4 @@
-import api from '../../../../src/api'
+import { api } from '../../../config'
 import {browserHistory} from 'react-router'
 
 export const PROGRESS = 'PROGRESS'

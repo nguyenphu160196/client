@@ -1,6 +1,5 @@
 import {browserHistory} from 'react-router'
-import api from '../../../../src/api'
-import socket from '../../../socketio'
+import { api } from '../../../../src/config'
 
 export const MAKE_STATE_PROF = 'MAKE_STATE_PROF'
 export const CHANGE_PROFILE = 'CHANGE_PROFILE'
@@ -116,7 +115,7 @@ export function updateProfile() {
           else if(bool_avatar){
             let data = new FormData();
             data.append('file', img);
-            if(img.size <= 1000000){
+            if(img.size <= 25000000){
               api({
                 method: 'post',
                 url: '/avatar/' + id,

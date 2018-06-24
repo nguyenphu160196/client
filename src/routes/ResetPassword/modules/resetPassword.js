@@ -1,4 +1,4 @@
-import api from '../../../api'
+import {api} from '../../../config'
 
 export const MAKE_STATE_RSP = 'MAKE_STATE_RSP'
 export const CLOSE_DIALOG = "CLOSE_DIALOG"

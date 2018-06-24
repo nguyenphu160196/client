@@ -248,8 +248,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 							>
 								<AddImage />
 								<input type="file" id="imageChat" hidden accept="image/x-png,image/gif,image/jpeg" 
-									onChange={(e) => {				
-											makeState('attachHeight','55px');	
+									onChange={(e) => {					
 											makeState('attachFile', e.target.files[0]);
 											repareAttachFile();		
 										}
@@ -271,8 +270,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 							>
 								<Attach />
 								<input type="file" id="attachChat" hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.html,.js"
-									onChange={(e) => {
-											makeState('attachHeight','55px');	
+									onChange={(e) => {	
 											makeState('attachFile', e.target.files[0]);
 											repareAttachFile();						
 										}

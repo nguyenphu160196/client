@@ -1,6 +1,5 @@
-import api from '../../../../src/api'
+import { api, socket } from '../../../config'
 import {browserHistory} from 'react-router'
-import socket from '../../../socketio'
 import {makeState as makeStateMain} from '../../Main/modules/main'
 
 export const GET_AVATAR = 'GET_AVATAR'

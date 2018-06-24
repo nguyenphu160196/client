@@ -1,7 +1,5 @@
 import {browserHistory} from 'react-router'
-import api from '../../../../src/api'
-import socket from '../../../socketio'
-import { MAKE_STATE_ROOM } from '../../RoomChat/modules/roomChat';
+import  { api, socket, peer }  from '../../../config'
 
 export const MAKE_STATE_MAIN = 'MAKE_STATE_MAIN'
 export const CHANGE_STATUS = 'CHANGE_STATUS'
@@ -10,7 +8,7 @@ export const GET_AVATAR = 'GET_AVATAR'
 export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 
 import $ from "jquery"
-import peer from '../../../peer'
+
 
 export function initial(){
   return (dispatch, getState) => {    
@@ -157,13 +155,17 @@ export function initial(){
           let array = [];
           roomlist.map((val, i) => {
             if(val._id == data.room){
-              val.noti = true;
-              val.last = data.last;
+              if(data.message.user != JSON.parse(localStorage.user)._id){
+                val.noti = true;
+                if (y.play() !== undefined) {
+                  y.play().then(_ => {}).catch(error => {});
+                }
+              }
+              if(data.last != ''){
+                val.last = data.last;
+              }
               array.push(val);
               dispatch(makeState('roomlist', array));
-              if (y.play() !== undefined) {
-                y.play().then(_ => {}).catch(error => {});
-              }
             }else{
               array.push(val);
               dispatch(makeState('roomlist', array));

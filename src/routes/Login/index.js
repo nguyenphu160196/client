@@ -1,6 +1,6 @@
 import { injectReducer } from '../../store/reducers'
 // import {handleLogin} from './modules/login'
-import api from '../../../src/api'
+import { api } from '../../config'
 
 export default (store) => ({
   path : 'login',

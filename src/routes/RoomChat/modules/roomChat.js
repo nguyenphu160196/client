@@ -1,14 +1,10 @@
 import {browserHistory} from 'react-router'
-import api from '../../../../src/api'
-import socket from '../../../socketio'
+import { api, socket, peer } from '../../../config'
 import {makeState as makeStateMain, getRoom} from '../../Main/modules/main'
 
 import $ from 'jquery'
 
 export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
-
-import peer from '../../../peer'
-
 
 
 export function initial(){
@@ -23,7 +19,7 @@ export function initial(){
       })
       socket.on('recieve-user-status-off', data => {
         let state = {...getState().roomChat}
-        let roomInfo = state.roomInfo;
+        let roomInfo = state.roomInfo ? state.roomInfo : '';
         if(roomInfo._id == data.room){
           if(roomInfo.direct == true){
             dispatch(makeState('status',"Inactive"));
@@ -200,7 +196,8 @@ export function repareAttachFile(){
     let attachArray = state.attachArray;
     let reader = new FileReader();
     return new Promise((resolve, reject) => {
-      if(attachFile.name){
+      if(attachFile.name && attachFile.size <= 25000000){
+        dispatch(makeState('attachHeight','55px'));
         if(attachFile.type.indexOf('image') == -1){
           attachArray.push(attachFile);
           dispatch(makeState('attachArray', attachArray));
@@ -213,6 +210,9 @@ export function repareAttachFile(){
           reader.readAsDataURL(attachFile);
         }
         resolve();
+      }else{
+        dispatch(makeStateMain('snackeOpen', true));
+        dispatch(makeStateMain('snackeMess', 'File is too large. (Less than 25MB)'));
       }
     })
   }
@@ -346,20 +346,22 @@ export function sendMessage(){
     let currentMessage = state.message;
     let array = [];
     let roomlist = {...getState().main}.roomlist;    
-    let dataFile = new FormData();    
+    let dataFile = new FormData();  
     return new Promise((resolve, reject) => {
       userInfo.map((val, i) => {
-        if(val._id != id){
-          array.push(val._id);
-        }
+          if(val._id != id){
+            array.push(val._id);
+          }
       })   
       if(attachArray.length != 0){
+        let crray = [];
         attachArray.map((val, i) => {
           dataFile.append('attach', val);
         }); 
         api({
           method: 'post',
           url: '/message.attach',
+          headers: {'x-access-token': localStorage.getItem('authToken')},
           data: dataFile
         })
         .then(res => {
@@ -368,14 +370,14 @@ export function sendMessage(){
       }else{
         socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array, file: []});
       }
-      currentMessage.push({ roomId: room_id, user: id, text: message_text, createAt: Date() });
-      dispatch(makeState('message',currentMessage))
-      resolve(currentMessage);
+      resolve();
     })
-    .then((currentMessage) => {
+    .then(() => {
+      dispatch(makeState('attachArray', []));
+      dispatch(makeState('attachHeight','15px'));
       let brray = [];
       roomlist.map((val, i) => {
-        if(val._id == room_id){
+        if(val._id == room_id && message_text != ''){
           val.last = message_text;
           brray.push(val);
           dispatch(makeStateMain('roomlist', brray));

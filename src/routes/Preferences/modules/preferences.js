@@ -1,5 +1,5 @@
-import api from '../../../../src/api'
-import socket from '../../../socketio'
+import {api} from '../../../config'
+
 import {makeState as makeStateMain, getRoom} from '../../Main/modules/main'
 
 export const MAKE_STATE_PREF = 'MAKE_STATE_PREF'

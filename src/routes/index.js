@@ -6,7 +6,7 @@ import Page404 from './PageNotFound'
 import ResetPassword from './ResetPassword'
 
 import {browserHistory} from 'react-router'
-import socket from '../socketio'
+import { socket } from '../config'
 
 const loginReq = () => {
   let exp = localStorage.authToken ? JSON.parse(atob(localStorage['authToken'].split('.')[1])).exp : '';
