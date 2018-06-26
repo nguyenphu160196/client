@@ -1,5 +1,6 @@
 import React from 'react'
 import {browserHistory} from 'react-router'
+import { imagesURL } from '../../../config'
 
 import IconMenu from 'material-ui/IconMenu';
 import IconButton from 'material-ui/IconButton';
@@ -24,7 +25,7 @@ const Account = ({main, signOut, makeState, changeStatus}) => {
                         {localStorage.user ? JSON.parse(localStorage.user).name.charAt(0).toUpperCase() : ""}
                     </Avatar>  
                     : 
-                    <Avatar src={main ? main.avatar : ''} style={{margin: '5px'}}></Avatar>  }
+                    <Avatar src={imagesURL + JSON.parse(localStorage.user).avatar.split('/avatars/')[1]} style={{margin: '5px'}}></Avatar>  }
                     {localStorage.user && JSON.parse(localStorage.user).status == true ? <div style={{background: "lawngreen", left: 49, height: 12, width: 12, borderRadius: 100, bottom: 6, border: '1.5px solid #fff', position: 'absolute'}}></div> : <div style={{background: "red", left: 49, height: 12, width: 12, borderRadius: 100, bottom: 6, border: '1.5px solid #fff', position: 'absolute'}}></div>}
             </div>
             <div className="col-sm-2" style={{display: 'flex', justifyContent:'center',alignItems:'center'}}>

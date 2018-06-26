@@ -5,15 +5,6 @@ import {makeState as makeStateMain} from '../../Main/modules/main'
 export const GET_AVATAR = 'GET_AVATAR'
 export const MAKE_STATE_CREROOM = 'MAKE_STATE_CREROOM'
 
-export function socketio(){
-  return (dispatch, getState) => {
-    return new Promise((resolve, reject) => {
-      
-      resolve();
-    })
-  }
-}
-
 export function createNR(){
   return (dispatch, getState) => {
     dispatch(makeStateMain('block', 'flex'));
@@ -80,29 +71,9 @@ export function addInviteList(value){
     return new Promise((resolve, reject) => {
       let state = {...getState().createRoom};
       let array = state.list_participants;
-      if(value.avatar.charAt(0) != '#'){
-        api({
-          method: 'get',
-          url: '/user.avatar/'+value._id,
-          headers: {'x-access-token': localStorage.getItem('authToken')},
-          responseType: 'arraybuffer',
-        })
-        .then(res => {
-          let bytes = new Uint8Array(res.data);
-          let image = 'data:image/png;base64,'+ encode(bytes);
-          value.avatar = image;
-          array.push(value);
-          dispatch(makeState('list_participants', array));
-          resolve();
-        })
-        .catch(err => {
-          
-        })
-      }else{
-        array.push(value);
-        dispatch(makeState('list_participants', array));
-        resolve();
-      }
+      array.push(value);
+      dispatch(makeState('list_participants', array));
+      resolve();
     })
   }
 }
@@ -158,27 +129,8 @@ export function search(value){
         .then(res => {
             res.data.user.map((val, i) => {
               if(val._id != JSON.parse(localStorage.user)._id && (dispatch(checkList(val._id)) == true)){
-                if(val.avatar.charAt(0) != '#'){
-                  api({
-                    method: 'get',
-                    url: '/user.avatar/'+val._id,
-                    headers: {'x-access-token': localStorage.getItem('authToken')},
-                    responseType: 'arraybuffer',
-                  })
-                  .then(ava => {
-                    let bytes = new Uint8Array(ava.data);
-                    let image = 'data:image/png;base64,'+ encode(bytes);
-                    val.avatar = image;
-                    array.push(val);
-                    dispatch(makeState('invite_list',array));
-                  })
-                  .catch(err => {      
-                  })
-                }
-                else{
-                  array.push(val);
-                  dispatch(makeState('invite_list',array));
-                }
+                array.push(val);
+                dispatch(makeState('invite_list',array));
               }
             })
         })

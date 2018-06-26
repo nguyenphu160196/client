@@ -7,6 +7,7 @@ import Account from './Account'
 import Search from './Search'
 import SettingLeft from './SettingLeft'
 import Stream from './Stream'
+import CallComing from './CallComing'
 
 import DialogMessage from '../../../components/Common/DialogMessage'
 import Progress from '../../../components/Common/PageLoading'
@@ -27,7 +28,7 @@ export class RealTime extends React.Component{
   }
 }
 
-export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog }) => {
+export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog, answerDirectVideoCall}) => {
 
 return (
   <div style={{ margin: '0 auto',height: '100%' }} >
@@ -37,6 +38,7 @@ return (
     closeDialog={closeDialog}
     message={main.dialogMess}
   />
+  <CallComing main={main} closeDialog={closeDialog} answerDirectVideoCall={answerDirectVideoCall} />
   <Progress display={main.block}></Progress>
   <Stream main={main} makeState={makeState} />
     <div className='row' style={{margin: '0 auto',height: '100%'}}>
@@ -70,7 +72,7 @@ return (
                 {main && (main.roomlist.length > 0) ? 
                   main.roomlist.map((value, i) => {
                     return (
-                      <ChannelList key={i} array={value} hideRoom={hideRoom}></ChannelList>
+                      <ChannelList key={i} array={value} hideRoom={hideRoom} ></ChannelList>
                     )
                   })
                   : ''}
@@ -95,7 +97,8 @@ Main.propTypes = {
   dirrect: PropTypes.func.isRequired,
   initial: PropTypes.func.isRequired,
   hideRoom: PropTypes.func.isRequired,
-  closeDialog: PropTypes.func.isRequired
+  closeDialog: PropTypes.func.isRequired,
+  answerDirectVideoCall: PropTypes.func.isRequired
 }
 
 export default Main

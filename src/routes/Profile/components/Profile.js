@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { imagesURL } from '../../../config'
 import './Profile.scss'
 
 import RequirePass from './RequirePass'
@@ -60,7 +61,7 @@ export const Profile = ({ profile, makeState, saveCond, checkPassRequire }) => (
 										{localStorage.user ? JSON.parse(localStorage.user).name.charAt(0).toUpperCase() : ""}
 									</div>  
 									: 
-									<img src={profile.prof_avat} id="imgURL" width="150" height="150" />
+									<img src={imagesURL + (JSON.parse(localStorage.user).avatar).split('/avatars/')[1]} id="imgURL" width="150" height="150" />
 								}
 							</div>
 							<div className="">

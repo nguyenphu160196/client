@@ -1,5 +1,6 @@
 import React from 'react'
 import {browserHistory} from 'react-router'
+import { imagesURL } from '../../../config'
 
 import {ListItem} from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
@@ -53,7 +54,7 @@ const ChannelList = ({array, hideRoom}) => {
         secondaryText={array.last && array.last != '' ? <div style={{fontStyle: 'italic'}}>{array.last}</div> : ''}
         leftAvatar={array.avatar.charAt(0) != "#" 
                     ? 
-                      <Avatar src={array.avatar} style={{backgroundColor: "none"}} />
+                      <Avatar src={imagesURL + array.avatar.split('/avatars/')[1]} style={{backgroundColor: "none"}} />
                     :
                       <Avatar style={{backgroundColor: array.avatar}}
                         >{array.name.charAt(0).toUpperCase()}                        

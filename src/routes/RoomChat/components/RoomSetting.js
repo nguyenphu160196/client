@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { imagesURL } from '../../../config'
 import './RoomChat.scss'
 
 import IconButton from 'material-ui/IconButton';
@@ -42,7 +43,7 @@ export const RoomSetting = ({ makeState, roomChat, hideRoom, changeRoomName }) =
                 {roomChat.roomInfo ? roomChat.roomInfo.name.charAt(0).toUpperCase() : ""}
             </div>
             :
-                <img width='150' height='150' src={roomChat.roomInfo ? roomChat.roomInfo.avatar : ''} />
+                <img width='150' height='150' src={roomChat.roomInfo ?  imagesURL + roomChat.roomInfo.avatar.split('/avatars/')[1] : ''} />
             }
         </div>
 

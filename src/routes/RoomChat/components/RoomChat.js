@@ -117,7 +117,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				<div className="mess-loaders" style={{display: roomChat.mess_loaders}}></div>
 				{roomChat && roomChat.message && roomChat.message.length != 0
 					?
-					<Message message={roomChat.message} />
+					<Message message={roomChat.message} userInfo={roomChat.userInfo} />
 					:
 					''
 				}
@@ -218,7 +218,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						}}
 						onKeyPress={(e) => {
 							if (e.charCode == 13 && !e.nativeEvent.shiftKey) {
-								if(roomChat.message_text != '' || roomChat.attachArray){
+								if(roomChat.message_text != '' || roomChat.attachArray.length != 0){
 									sendMessage();
 									makeState('message_text','');
 								}

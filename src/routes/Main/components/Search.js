@@ -1,4 +1,5 @@
 import React from 'react'
+import { imagesURL } from '../../../config'
 import { IndexLink, Link } from 'react-router'
 
 import Avatar from 'material-ui/Avatar';
@@ -68,7 +69,7 @@ export const Search = ({main, makeState, search, dirrect}) => {
                                 ? 
                                 <Avatar style={{backgroundColor: value.avatar}}>{value.name.charAt(0).toUpperCase()}</Avatar>
                                 :
-                                <Avatar src={value.avatar}></Avatar>
+                                <Avatar src={imagesURL + value.avatar.split('/avatars/')[1]}></Avatar>
                               }
                               onClick={() => {
                                 dirrect(value);

@@ -20,7 +20,6 @@ export function initial(){
           st = data;
           localStorage.setItem('authToken', st);
         })
-        dispatch(getAvatar());
         api({
           method: 'get',
           url: '/user.get.room',
@@ -85,7 +84,6 @@ export function initial(){
             headers: {'x-access-token': localStorage.getItem('authToken')},
           })
           .then(res => {
-            if(res.data.room.avatar.charAt(0) != '#'){
               res.data.room.paticipant.map((val, j) => {
                 if(val != JSON.parse(localStorage.user)._id){
                   api({
@@ -95,35 +93,13 @@ export function initial(){
                   })
                   .then(resp => {
                     res.data.room.name = resp.data.user.name;
-                    if(resp.data.user.avatar.charAt(0) != "#"){
-                      api({
-                        method: 'get',
-                        url: '/user.avatar/'+val,
-                        headers: {'x-access-token': localStorage.getItem('authToken')},
-                        responseType: 'arraybuffer',
-                      })
-                      .then(ava => {
-                        let bytes = new Uint8Array(ava.data);
-                        let image = 'data:image/png;base64,'+ encode(bytes);
-                        res.data.room.avatar = image;
-                        array.push(res.data.room);
-                        dispatch(makeState('roomlist',array));
-                      })
-                      .catch(err => {      
-                      })
-                    }else{
-                      res.data.room.avatar = resp.data.user.avatar;
-                      array.push(res.data.room);
-                      dispatch(makeState('roomlist',array));
-                    }
+                    res.data.room.avatar = resp.data.user.avatar;
+                    array.push(res.data.room);
+                    dispatch(makeState('roomlist',array));
                   })
                   .catch(err => {})
                 }
               })
-            }else{
-              array.push(res.data.room);
-              dispatch(makeState('roomlist',array));
-            }
           }).catch(err => {})
           if (x.play() !== undefined) {
             x.play().then(_ => {}).catch(error => {});
@@ -173,48 +149,34 @@ export function initial(){
           })
         })
         let count = 0;
-        socket.on('recieve-signal-video-call', data => {
-          dispatch(makeState('stream','block'));
-          openStream().then(stream => {
-            playStream('localStream', stream);
-            if(data.user.length != 0){
-              data.user.map((val, i) => {          
-                count++;
-                $('.remoteClass').append('<video id="remoteStream'+count+'" width="200" style={{marginRight: 20}} ></video>');
-                let call = peer.call(val, stream);
-                call.on('stream', remoteStream => {
-                    playStream('remoteStream'+count, remoteStream);
-                })
-              })
-            }else{
-              socket.emit('give-away-done', data.room);
-            }
-          })          
-        })
         peer.on('call', call => {
-          count++;
-          dispatch(makeState('stream','block'));
-          $('.remoteClass').append('<video id="remoteStream'+count+'" width="200" style={{marginRight: 20}} ></video>');          
-          openStream().then(stream => {
-            playStream('localStream', stream);
-            call.answer(stream);
-            call.on('stream', remoteStream => {
-                playStream('remoteStream'+count, remoteStream);
-            })        
-          })            
-        })
-        socket.on('recieve-remote-signal-video-call', data => {
-            if(data.user.length != 0 && data.user.indexOf(JSON.parse(localStorage.user)._id) == 0){
-              data.user.splice(data.user.indexOf(JSON.parse(localStorage.user)._id),1);
-              socket.emit('signal-video-call', data);
+            count++;
+            dispatch(makeState('stream','block'));
+            $('.remoteClass').append('<video id="remoteStream'+count+'" width="200" style={{marginRight: 20}} ></video>');          
+            openStream().then(stream => {
+              playStream('localStream', stream);
+              call.answer(stream);
+              call.on('stream', remoteStream => {
+                  playStream('remoteStream'+count, remoteStream);
+              })        
+            })            
+          }) 
+        socket.on('recieve-signal-video-call', data => {
+            return (dispatch, getState) => {
+              dispatch(makeState('VDdialog', true)); 
             }
-        })
-        socket.on('recieve-give-away-done', data => {
-          
+            // if(data.user.length != 0 && data.user.indexOf(JSON.parse(localStorage.user)._id) == 0){
+            //   data.user.splice(data.user.indexOf(JSON.parse(localStorage.user)._id),1);
+            //   socket.emit('signal-video-call', data);
+            // }
         })
         resolve();
     })
   }
+}
+
+export function answerDirectVideoCall(){
+  
 }
 
 function openStream(){
@@ -224,15 +186,16 @@ function openStream(){
   })
 };
 function playStream(idVideoTag, stream){
-  const video = document.getElementById(idVideoTag); 
+  let video = document.getElementById(idVideoTag); 
   video.srcObject = stream;
-  if (video.play() !== undefined) {
-    video.play().then(_ => {}).catch(error => {});
-  }
-}
+  let videoplay = video.play();
+  if (videoplay !== undefined) {
+    videoplay.then(_ => {
 
-export function answerDirectVideoCall(){
-  
+    }).catch(error => {
+
+    });
+  }
 }
 
 export function hideRoom(room){
@@ -282,65 +245,59 @@ export function dirrect(value){
         if(value.email){
           if(dispatch(checkDirect(value.room)) == true){
             api({
-              method: 'post',
-              url: '/create.room',
-              headers: {'x-access-token': localStorage.getItem('authToken')},
-              data: {
-                  paticipant: [value._id,JSON.parse(localStorage.user)._id],
-                  direct: true
-                }
+              method: 'get',
+              url: '/check.exist.direct/'+value._id,
+              headers: {'x-access-token': localStorage.getItem('authToken')}
             })
-            .then(res => {
-              res.data.room.paticipant.map((val, i) => {
-                if(val != JSON.parse(localStorage.user)._id){
-                  api({
-                    method: 'get',
-                    url: '/info.user/'+val,
-                    headers: {'x-access-token': localStorage.getItem('authToken')},
-                  })
-                  .then(resp => {
-                    res.data.room.name = resp.data.user.name;
-                    if(resp.data.user.avatar.charAt(0) != '#'){
-                      api({
-                        method: 'get',
-                        url: '/user.avatar/'+val,
-                        headers: {'x-access-token': localStorage.getItem('authToken')},
-                        responseType: 'arraybuffer',
-                      })
-                      .then(ava => {
-                        let bytes = new Uint8Array(ava.data);
-                        let image = 'data:image/png;base64,'+ encode(bytes);
-                        res.data.room.avatar = image;       
-                        array.push(res.data.room);   
-                        dispatch(makeState('roomlist',array));          
-                      })
-                      .catch(err => {      
-                      })
-                    }else{
-                        res.data.room.avatar = resp.data.user.avatar;
-                        array.push(res.data.room);   
-                        dispatch(makeState('roomlist',array));  
-                    }                   
-                  })
-                  .catch(err => {});                  
-                  socket.emit("update-direct-room", {room: res.data.room._id, user: val});
-                  if (x.play() !== undefined) {
-                    x.play().then(_ => {}).catch(error => {});
+            .then(_ => {
+              api({
+                method: 'post',
+                url: '/create.room',
+                headers: {'x-access-token': localStorage.getItem('authToken')},
+                data: {
+                    paticipant: [value._id,JSON.parse(localStorage.user)._id],
+                    direct: true
                   }
-                  brray.push(res.data.room);
-                  dispatch(makeState('direct_room',brray));
-                  let st = JSON.parse(localStorage.getItem('user'));
-                  st.room.push(res.data.user);
-                  localStorage.setItem('user', JSON.stringify(st));
-                  browserHistory.push('/c/' + res.data.room._id);
-                  dispatch(makeState('block', 'none'));
-                  dispatch(makeState('searchValue', ''));
-                  dispatch(makeState('searchlist', []));
-                  dispatch(makeState('search', false));
-                }
               })
+              .then(res => {
+                res.data.room.paticipant.map((val, i) => {
+                  if(val != JSON.parse(localStorage.user)._id){
+                    api({
+                      method: 'get',
+                      url: '/info.user/'+val,
+                      headers: {'x-access-token': localStorage.getItem('authToken')},
+                    })
+                    .then(resp => {
+                      res.data.room.name = resp.data.user.name;
+                      res.data.room.avatar = resp.data.user.avatar;
+                      array.push(res.data.room);   
+                      dispatch(makeState('roomlist',array));                 
+                    })
+                    .catch(err => {});                  
+                    socket.emit("update-direct-room", {room: res.data.room._id, user: val});
+                    if (x.play() !== undefined) {
+                      x.play().then(_ => {}).catch(error => {});
+                    }
+                    brray.push(res.data.room);
+                    dispatch(makeState('direct_room',brray));
+                    let st = JSON.parse(localStorage.getItem('user'));
+                    st.room.push(res.data.user);
+                    localStorage.setItem('user', JSON.stringify(st));
+                    browserHistory.push('/c/' + res.data.room._id);
+                    dispatch(makeState('block', 'none'));
+                    dispatch(makeState('searchValue', ''));
+                    dispatch(makeState('searchlist', []));
+                    dispatch(makeState('search', false));
+                  }
+                })
+              })
+              .catch(err => {})
             })
-            .catch(err => {})
+            .catch(respone => {
+              dispatch(makeState('snackeMess','User have blocked. To unblock go Setting->Preferences->Choose user or room'));
+              dispatch(makeState('snackeOpen',true));
+              dispatch(makeState('block', 'none'));
+            })
           }else{
               for(let i=0; i< brray.length; i++){
                 for(let j=0; j< value.room.length; j++){
@@ -413,34 +370,12 @@ export function getRoom(){
                   })
                   .then(resp => {
                     res.data.room.name = resp.data.user.name;
-                    if(resp.data.user.avatar.charAt(0) != "#"){
-                      api({
-                        method: 'get',
-                        url: '/user.avatar/'+val,
-                        headers: {'x-access-token': localStorage.getItem('authToken')},
-                        responseType: 'arraybuffer',
-                      })
-                      .then(ava => {
-                        let bytes = new Uint8Array(ava.data);
-                        let image = 'data:image/png;base64,'+ encode(bytes);
-                        res.data.room.avatar = image;
-                        array.push(res.data.room);
-                        dispatch(makeState('roomlist',array));
-                        if(res.data.room.direct == true){
-                          brray.push(res.data.room);
-                          dispatch(makeState('direct_room',brray));
-                        }
-                      })
-                      .catch(err => {      
-                      })
-                    }else{
-                      res.data.room.avatar = resp.data.user.avatar;
-                      array.push(res.data.room);
-                      dispatch(makeState('roomlist',array));
-                      if(res.data.room.direct == true){
-                        brray.push(res.data.room);
-                        dispatch(makeState('direct_room',brray));
-                      }
+                    res.data.room.avatar = resp.data.user.avatar;
+                    array.push(res.data.room);
+                    dispatch(makeState('roomlist',array));
+                    if(res.data.room.direct == true){
+                      brray.push(res.data.room);
+                      dispatch(makeState('direct_room',brray));
                     }
                   })
                   .catch(err => {
@@ -467,26 +402,27 @@ export function getRoom(){
   }
 }
 
-function checkBlackList(room){
-    let st = JSON.parse(localStorage.user);
-    let blacklist = st.blacklist;
-    if(blacklist.length != 0){
-      let c = 0;
-      for(let i=0; i< blacklist.length; i++){
-        for(let j=0; j< room.length; j++){
-          if(blacklist[i] == room[j]){
-            c = 1;
-          }
-        }
-      }
-      if(c != 1){
-        return true;
-      }
-    }else{
-      return true;
-    }
+// function checkBlackList(room){
+//     let st = JSON.parse(localStorage.user);
+//     let blacklist = st.blacklist;
+//     if(blacklist.length != 0){
+//       let c = 0;
+//       for(let i=0; i< blacklist.length; i++){
+//         for(let j=0; j< room.length; j++){
+//           if(blacklist[i] == room[j]){
+//             c = 1;
+//             console.log(1);
+//           }
+//         }
+//       }
+//       if(c != 1){
+//         return true;
+//       }
+//     }else{
+//       return true;
+//     }
     
-}
+// }
 
 export function search(value){
   return (dispatch, getState) => {
@@ -502,28 +438,10 @@ export function search(value){
         })
         .then(res => {
             res.data.user.map((val, i) => {
-              if((val._id != JSON.parse(localStorage.user)._id) && (checkBlackList(val.room) == true)){
-                if(val.avatar.charAt(0) != '#'){
-                  api({
-                    method: 'get',
-                    url: '/user.avatar/'+val._id,
-                    headers: {'x-access-token': localStorage.getItem('authToken')},
-                    responseType: 'arraybuffer',
-                  })
-                  .then(ava => {
-                    let bytes = new Uint8Array(ava.data);
-                    let image = 'data:image/png;base64,'+ encode(bytes);
-                    val.avatar = image;
-                    array.push(val);
-                    dispatch(makeState('searchlist',array));
-                  })
-                  .catch(err => {      
-                  })
-                }
-                else{
-                  array.push(val);
-                  dispatch(makeState('searchlist',array));
-                }
+              if(val._id != JSON.parse(localStorage.user)._id){
+                // if(val._id != JSON.parse(localStorage.user)._id && checkBlackList(val.room) == true){
+                array.push(val);
+                dispatch(makeState('searchlist',array));
               }
             })
         })
@@ -713,7 +631,9 @@ const initialState = {
   snackeMess: "",
   snakeColor: "#fff",
   block: 'none',
-  stream: 'none'
+  stream: 'none',
+  VDdialog: false,
+  caller: ''
 }
 
 const ACTION_HANDLERS = {
@@ -729,7 +649,8 @@ const ACTION_HANDLERS = {
   },
   [CLOSE_DIALOG]: (state, action) => {
     return Object.assign({}, state, {
-      dialog: action.payload
+      dialog: action.payload,
+      VDdialog: action.payload
     })
   },
   [CHANGE_STATUS]: (state, action) => {

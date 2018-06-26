@@ -1,4 +1,5 @@
 import React from 'react'
+import { imagesURL } from '../../../config'
 
 import IconButton from 'material-ui/IconButton';
 import Avatar from 'material-ui/Avatar';
@@ -106,7 +107,7 @@ export const Participants = ({makeState, roomChat, search, kickUser, addParticip
                                 ? 
                                 <Avatar style={{backgroundColor: value.avatar}}>{value.name.charAt(0).toUpperCase()}</Avatar>
                                 :
-                                <Avatar src={value.avatar}></Avatar>}
+                                <Avatar src={imagesURL + value.avatar.split('/avatars/')[1]}></Avatar>}
                             ></ListItem>
                         )
                         })
@@ -125,7 +126,7 @@ export const Participants = ({makeState, roomChat, search, kickUser, addParticip
                             primaryText={value.name}
                             leftAvatar={value && value.avatar && value.avatar.charAt(0) != "#" 
                                         ? 
-                                          <Avatar src={value.avatar} style={{backgroundColor: "none"}} />
+                                          <Avatar src={imagesURL + value.avatar.split('/avatars/')[1]} style={{backgroundColor: "none"}} />
                                         :
                                           <Avatar style={{backgroundColor: value.avatar}}
                                             >{value.name.charAt(0).toUpperCase()}                        

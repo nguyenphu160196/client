@@ -1,6 +1,6 @@
 import React from 'react'
 import Avatar from 'material-ui/Avatar';
-import { baseURL } from '../../../config'
+import { baseURL, imagesURL } from '../../../config'
 
 import ReactTooltip from 'react-tooltip'
 import IconButton from 'material-ui/IconButton';
@@ -67,17 +67,30 @@ export default class Message extends React.Component{
 						<div className="MessageContent" key={i} style={{display: 'flex', fontFamily: 'Helvetica'}}>
 							<div className="" style={{marginRight: '10px'}}
 							>
-								{data.avatar && data.avatar.charAt(0) != "#"
-									?
-									<Avatar data-tip data-for={'avatarmess'+i} src={data.avatar} style={{backgroundColor: "none"}} />
-									:
-									<Avatar data-tip data-for={'avatarmess'+i} style={{backgroundColor: data.avatar}}
-										>{data.name ? data.name.charAt(0).toUpperCase() : ''}                        
-									</Avatar>
-								}
-								<ReactTooltip id={'avatarmess'+i} place="top" type="dark" effect="float">
-									<span>{data.name}</span>
-								</ReactTooltip>
+								{this.props.userInfo && this.props.userInfo.length != 0 ? this.props.userInfo.map((user, t) => {
+									if(data.user == user._id){
+										if(user.avatar.charAt(0) != '#'){
+											return (
+												<div key={t}><Avatar data-tip data-for={'avatarmess'+i} 
+													src={imagesURL + user.avatar.split('/avatars/')[1]} 
+													style={{backgroundColor: "none"}} 
+												/>
+												<ReactTooltip id={'avatarmess'+i} place="top" type="dark" effect="float">
+													<span>{user.name}</span>
+												</ReactTooltip></div>
+											)
+										}else{
+											return (
+												<div key={t}><Avatar data-tip data-for={'avatarmess'+i} style={{backgroundColor: user.avatar}}
+													>{user.name ? user.name.charAt(0).toUpperCase() : ''}                        
+												</Avatar>
+												<ReactTooltip id={'avatarmess'+i} place="top" type="dark" effect="float">
+													<span>{user.name}</span>
+												</ReactTooltip></div>
+											)
+										}
+									}
+								}) : ''}
 							</div>
 							<div className="friendMessage" data-tip data-for={'friendMessage'+i}>
 								<pre style={{fontFamily: 'inherit', margin: 0, wordWrap: 'break-word', whiteSpace: 'pre-wrap'}}>{data.text}</pre>
@@ -92,17 +105,27 @@ export default class Message extends React.Component{
 						<div className="MessageContent" key={i} style={{display: 'flex', fontFamily: 'Helvetica'}}>
 							<div className="" style={{marginRight: '10px'}}
 							>
-								{data.avatar && data.avatar.charAt(0) != "#"
-									?
-									<Avatar data-tip data-for={'avatarmess'+i} src={data.avatar} style={{backgroundColor: "none"}} />
-									:
-									<Avatar data-tip data-for={'avatarmess'+i} style={{backgroundColor: data.avatar}}
-										>{data.name ? data.name.charAt(0).toUpperCase() : ''}                        
-									</Avatar>
-								}
-								<ReactTooltip id={'avatarmess'+i} place="top" type="dark" effect="float">
-									<span>{data.name}</span>
-								</ReactTooltip>
+								{this.props.userInfo && this.props.userInfo.length != 0 ? this.props.userInfo.map((user, t) => {
+									if(data.user == user._id){
+										if(user.avatar.charAt(0) != '#'){
+											return (
+												<div key={t}><Avatar data-tip data-for={'avatarmess'+i} src={imagesURL + user.avatar.split('/avatars/')[1]} style={{backgroundColor: "none"}} />
+												<ReactTooltip id={'avatarmess'+i} place="top" type="dark" effect="float">
+													<span>{user.name}</span>
+												</ReactTooltip></div>
+											)
+										}else{
+											return (
+												<div key={t}><Avatar key={t} data-tip data-for={'avatarmess'+i} style={{backgroundColor: data.avatar}}
+													>{data.name ? data.name.charAt(0).toUpperCase() : ''}                        
+												</Avatar>
+												<ReactTooltip id={'avatarmess'+i} place="top" type="dark" effect="float">
+													<span>{user.name}</span>
+												</ReactTooltip></div>
+											)
+										}
+									}									
+								}):''}
 							</div>
 							<div className="friendMessage" data-tip data-for={'friendMessage'+i}>
 								<pre style={{fontFamily: 'inherit', margin: 0, wordWrap: 'break-word', whiteSpace: 'pre-wrap'}}>{data.text != '' ? <div>{data.text}<br/></div> : ''}

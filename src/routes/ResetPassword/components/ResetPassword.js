@@ -40,7 +40,7 @@ export const ResetPassword = ({ resetpass, makeState, closeDialog, resetPass }) 
 						>Reset Password</div>
 					</form>
 				</div>
-				<div className="footer col-md-12"><p style={{textAlign: 'center', marginTop: 16}}>The Facebook Messenger logo is trademarks of their respective owners.</p></div>
+				<div className="footerRSP col-md-12"><p style={{textAlign: 'center', marginTop: 16}}>The Facebook Messenger logo is trademarks of their respective owners.</p></div>
   	</div>
 )
 

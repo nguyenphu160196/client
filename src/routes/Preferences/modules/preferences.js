@@ -82,26 +82,9 @@ export function getHidden(){
                   })
                   .then(resp => {
                     res.data.room.name = resp.data.user.name;
-                    if(resp.data.user.avatar.charAt(0) != '#'){
-                      api({
-                        method: 'get',
-                        url: '/user.avatar/'+resp.data.user._id,
-                        headers: {'x-access-token': localStorage.getItem('authToken')},
-                        responseType: 'arraybuffer',
-                      })
-                      .then(ava => {
-                        let bytes = new Uint8Array(ava.data);
-                        let image = 'data:image/png;base64,'+ encode(bytes);
-                        res.data.room.avatar = image;
-                        brray.push(res.data.room);
-                        dispatch(makeState('hide_user',brray)); 
-                      })
-                      .catch(err => {})
-                    }else{
-                      res.data.room.avatar = resp.data.user.avatar;
-                      brray.push(res.data.room);
-                      dispatch(makeState('hide_user',brray));        
-                    }
+                    res.data.room.avatar = resp.data.user.avatar;
+                    brray.push(res.data.room);
+                    dispatch(makeState('hide_user',brray));  
                   })
                   .catch(err => {})      
                 }

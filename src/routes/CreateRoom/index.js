@@ -13,7 +13,7 @@ export default (store) => ({
       const CreateRoom = require('./containers/CreateRoomContainer').default;
       const reducer = require('./modules/createRoom').default;
       injectReducer(store, { key: 'createRoom', reducer });
-      store.dispatch(getAvatar());
+      // store.dispatch(getAvatar());
       cb(null, CreateRoom);
     }, 'createRoom')
   }

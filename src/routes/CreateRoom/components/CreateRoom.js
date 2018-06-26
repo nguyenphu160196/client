@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { imagesURL } from '../../../config'
 
 import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
@@ -141,7 +142,7 @@ export const CreateRoom = ({ createRoom, makeState, search, act_btn, addInviteLi
 											? 
 											<Avatar style={{backgroundColor: value.avatar}}>{value.name.charAt(0).toUpperCase()}</Avatar>
 											:
-											<Avatar src={value.avatar}></Avatar>}
+											<Avatar src={imagesURL + value.avatar.split('/avatars/')[1]}></Avatar>}
 										></ListItem>
 									)
 									})
@@ -158,7 +159,7 @@ export const CreateRoom = ({ createRoom, makeState, search, act_btn, addInviteLi
 											{localStorage.user ? JSON.parse(localStorage.user).name.charAt(0).toUpperCase() : ""}
 									</Avatar>  
 									: 
-									<Avatar src={createRoom ? createRoom.avatar : ''}></Avatar>  }
+									<Avatar src={imagesURL + JSON.parse(localStorage.user).avatar.split('/avatars/')[1]}></Avatar>  }
 									{JSON.parse(localStorage.getItem('user')).name}
 							</Chip>
 							{createRoom && (createRoom.list_participants.length > 0) ? createRoom.list_participants.map((value, i) => {
@@ -179,7 +180,7 @@ export const CreateRoom = ({ createRoom, makeState, search, act_btn, addInviteLi
 												{value.name.charAt(0).toUpperCase()}
 											</Avatar>
 											:
-											<Avatar src={value.avatar} />
+											<Avatar src={imagesURL + value.avatar.split('/avatars/')[1]} />
 										}
 											{value.name}
 									</Chip>

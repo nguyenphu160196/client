@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { imagesURL } from '../../../config'
 
 import Avatar from 'material-ui/Avatar';
 import Divider from 'material-ui/Divider';
@@ -55,7 +56,7 @@ export const Preferences = ({ preferences, makeState, unLock }) => (
 													{value.name.charAt(0).toUpperCase()}
 												</Avatar>
 												:
-												<Avatar src={value.avatar} />
+												<Avatar src={imagesURL + value.avatar.split('/avatars/')[1]} />
 											}
 												{value.name}
 										</Chip>

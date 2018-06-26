@@ -19,7 +19,7 @@ export default (store) => ({
       store.dispatch(makeState('prof_pass', ''));
       store.dispatch(makeState('prof_name', localStorage.user ? JSON.parse(localStorage.user).name : ''));
       store.dispatch(makeState('prof_email', localStorage.user ? JSON.parse(localStorage.user).email : ''));
-      store.dispatch(getAvatar());
+      // store.dispatch(getAvatar());
       store.dispatch(sett_prof());
       cb(null, Profile);
     }, 'profile')

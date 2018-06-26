@@ -126,22 +126,22 @@ export function updateProfile() {
                 let st = JSON.parse(localStorage.getItem('user'));
                 st.avatar = res.data.avatar;
                 localStorage.setItem('user', JSON.stringify(st));
-                api({
-                  method: 'get',
-                  url: '/user.avatar/'+id,
-                  headers: {'x-access-token': localStorage.getItem('authToken')},
-                  responseType: 'arraybuffer'
-                })
-                .then(res => {
-                  let bytes = new Uint8Array(res.data);
-                  let image = 'data:image/png;base64,'+ encode(bytes);
-                  avatar_done = true;
-                  dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
-                  dispatch({
-                    type: GET_AVATAR,
-                    payload: image
-                  })
-                })
+                avatar_done = true;
+                dispatch(progressCallback(name_done,email_done,pass_done,avatar_done));
+                // api({
+                //   method: 'get',
+                //   url: '/user.avatar/'+id,
+                //   headers: {'x-access-token': localStorage.getItem('authToken')},
+                //   responseType: 'arraybuffer'
+                // })
+                // .then(res => {
+                //   let bytes = new Uint8Array(res.data);
+                //   let image = 'data:image/png;base64,'+ encode(bytes);
+                //   dispatch({
+                //     type: GET_AVATAR,
+                //     payload: image
+                //   })
+                // })
               })
               .catch(err => {
                 dispatch(makeState('message', err.response.data.message));
