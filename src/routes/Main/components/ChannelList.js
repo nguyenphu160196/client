@@ -50,7 +50,10 @@ const ChannelList = ({array, hideRoom}) => {
           <div style={{color: '#fff', backgroundColor: '#0084ff', fontSize: 10, textAlign: 'center', width: 30, marginLeft: 10, fontWeight: 'bold'}}>User</div>
         </div> 
         :
-        <div className="d-flex">{array.name}<div style={{color: '#fff', backgroundColor: 'red', fontSize: 10, textAlign: 'center', width: 35, marginLeft: 10, fontWeight: 'bold'}}>Group</div></div>}
+        <div className="d-flex">
+        <div style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 130}}>{array.name}</div>
+        <div style={{color: '#fff', backgroundColor: 'red', fontSize: 10, textAlign: 'center', width: 35, marginLeft: 10,     fontWeight: 'bold'}}>Group</div>
+        </div>}
         secondaryText={array.last && array.last != '' ? <div style={{fontStyle: 'italic'}}>{array.last}</div> : ''}
         leftAvatar={array.avatar.charAt(0) != "#" 
                     ? 

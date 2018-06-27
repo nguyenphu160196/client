@@ -64,7 +64,16 @@ export const Search = ({main, makeState, search, dirrect}) => {
                       return (
                           <ListItem 
                               key={i}
-                              primaryText={value.name}
+                              primaryText={value.email ? 
+                                <div className="d-flex">
+                                  <div style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 170}}>{value.name}</div>
+                                  <div style={{color: '#fff', backgroundColor: '#0084ff', fontSize: 10, textAlign: 'center', width: 30, marginLeft: 10, fontWeight: 'bold'}}>User</div>
+                                </div> 
+                                :
+                                <div className="d-flex">
+                                  <div style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 170}}>{value.name}</div>
+                                  <div style={{color: '#fff', backgroundColor: 'red', fontSize: 10, textAlign: 'center', width: 35, marginLeft: 10,     fontWeight: 'bold'}}>Group</div>
+                                </div>}
                               leftAvatar={value.avatar.charAt(0) == '#' 
                                 ? 
                                 <Avatar style={{backgroundColor: value.avatar}}>{value.name.charAt(0).toUpperCase()}</Avatar>

@@ -9,12 +9,73 @@ export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 
 import $ from "jquery"
 
+function connectPeer(id){
+  makeState('stream', 'block');
+  openStream(false, true).then(stream => {
+    playStream('localStream', stream);         
+        $('.remoteClass').append('<video id="remoteStream'+id+'" width="200" style={{marginRight: 20}} ></video>');
+        let call = peer.call(id, stream);
+        call.on('stream', remoteStream => {
+            playStream('remoteStream'+id, remoteStream);
+        })
+    })
+}
+function openStream(){
+  return new Promise((resolve, reject) => {
+    const config = {audio: false, video: true};
+    resolve(navigator.mediaDevices.getUserMedia(config));
+  })
+};
+
+function playStream(idVideoTag, stream){
+  let video = document.getElementById(idVideoTag); 
+  video.srcObject = stream;
+  let videoplay = video.play();
+  if (videoplay !== undefined) {
+      videoplay.then(_ => {
+  
+      }).catch(error => {
+  
+      });
+  }
+}
 
 export function initial(){
   return (dispatch, getState) => {    
     var x = document.getElementById("joinRoom");
     var y = document.getElementById("funcMessage");
     return new Promise((resolve, reject) => {
+        //reciever
+        socket.on('recieve-connect-to-anothers', data => {
+          if(data.members.length != 0 && data.members.indexOf(JSON.parse(localStorage.user)._id) == 0){
+              data.members.splice(0, 1);
+              if(data.members.length != 0){
+                  if(data.callstack.length != 0){
+                      data.callstack.map((value, t) => {
+                          data.members.map((val, i) => {
+                              if((value.from == val && value.to == JSON.parse(localStorage.user)._id) || (value.from == JSON.parse(localStorage.user)._id && value.to == val)){
+
+                              }else{
+                                  connectPeer(val);
+                                  data.callstack.push({from: JSON.parse(localStorage.user)._id, to: val});
+                              }
+                          })
+                      })
+                      socket.emit('update-callstack', data);
+                      socket.emit('transfer-to-next', data);
+                  }else{
+                      data.members.map((val, i) => {
+                          connectPeer(val);
+                          data.callstack.push({from: JSON.parse(localStorage.user)._id, to: val});
+                      })
+                      socket.emit('update-callstack', data);
+                      socket.emit('transfer-to-next', data);
+                  }
+              }
+          }
+      })
+
+        socket.emit('clear-call-stack', 'clear-all');
         socket.on('update-jwt', data => {
           let st = localStorage.authToken;
           st = data;
@@ -148,53 +209,19 @@ export function initial(){
             }
           })
         })
-        let count = 0;
-        peer.on('call', call => {
-            count++;
-            dispatch(makeState('stream','block'));
-            $('.remoteClass').append('<video id="remoteStream'+count+'" width="200" style={{marginRight: 20}} ></video>');          
-            openStream().then(stream => {
-              playStream('localStream', stream);
-              call.answer(stream);
-              call.on('stream', remoteStream => {
-                  playStream('remoteStream'+count, remoteStream);
-              })        
-            })            
-          }) 
+        
         socket.on('recieve-signal-video-call', data => {
-            return (dispatch, getState) => {
-              dispatch(makeState('VDdialog', true)); 
-            }
-            // if(data.user.length != 0 && data.user.indexOf(JSON.parse(localStorage.user)._id) == 0){
-            //   data.user.splice(data.user.indexOf(JSON.parse(localStorage.user)._id),1);
-            //   socket.emit('signal-video-call', data);
-            // }
+            let busy = {...getState().main}.busy;
+            if(busy == false){
+              dispatch(makeState('VDdialog', true));
+              dispatch(makeState('busy', true));
+              dispatch(makeState('caller', data));
+            }else{
+              socket.emit('reject-call-busy', data.caller);
+            }            
         })
         resolve();
     })
-  }
-}
-
-export function answerDirectVideoCall(){
-  
-}
-
-function openStream(){
-  return new Promise((resolve, reject) => {
-    const config = {audio: false, video: true};
-    resolve(navigator.mediaDevices.getUserMedia(config));
-  })
-};
-function playStream(idVideoTag, stream){
-  let video = document.getElementById(idVideoTag); 
-  video.srcObject = stream;
-  let videoplay = video.play();
-  if (videoplay !== undefined) {
-    videoplay.then(_ => {
-
-    }).catch(error => {
-
-    });
   }
 }
 
@@ -633,7 +660,8 @@ const initialState = {
   block: 'none',
   stream: 'none',
   VDdialog: false,
-  caller: ''
+  caller: '',
+  busy: false,
 }
 
 const ACTION_HANDLERS = {

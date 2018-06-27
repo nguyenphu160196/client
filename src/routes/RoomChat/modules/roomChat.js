@@ -8,54 +8,22 @@ export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 
 
 
-
 export function directVideoCall(){
   return (dispatch, getState) => {
     let state = {...getState().roomChat};
     let roomInfo = state.roomInfo;
-    let count = 0;
-    roomInfo.paticipant.splice(roomInfo.paticipant.indexOf(JSON.parse(localStorage.user)._id),1);
-    socket.emit('signal-video-call', {room: roomInfo._id, user: roomInfo.paticipant});
-    openStream().then(stream => {
-      playStream('localStream', stream);
-      if(roomInfo.paticipant.length != 0){
-        roomInfo.paticipant.map((val, i) => {          
-          count++;
-          $('.remoteClass').append('<video id="remoteStream'+count+'" width="200" style={{marginRight: 20}} ></video>');
-          let call = peer.call(val, stream);
-          call.on('stream', remoteStream => {
-              playStream('remoteStream'+count, remoteStream);
-          })
-        })
-      }
-    })  
+    if(roomInfo.direct == false){
+      socket.emit('signal-video-call', {room: roomInfo._id, roomName: roomInfo.name, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name});
+    }else{
+      socket.emit('signal-video-call', {room: roomInfo._id, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name});
+    }
   }
 }
-
-function openStream(){
-  return new Promise((resolve, reject) => {
-    const config = {audio: false, video: true};
-    resolve(navigator.mediaDevices.getUserMedia(config));
-  })
-};
-function playStream(idVideoTag, stream){
-  let video = document.getElementById(idVideoTag); 
-  video.srcObject = stream;
-  let videoplay = video.play();
-  if (videoplay !== undefined) {
-    videoplay.then(_ => {
-
-    }).catch(error => {
-
-    });
-  }
-}
-
 
 
 export function initial(){
   return (dispatch, getState) => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {      
       socket.on('recieve-change-room-name', data => {
         let roomInfo = {...getState().roomChat}.roomInfo;
         if(roomInfo._id == data.room){

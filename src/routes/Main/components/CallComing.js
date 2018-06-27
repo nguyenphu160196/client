@@ -8,26 +8,6 @@ import { socket, peer } from '../../../config'
 class CallComing extends React.Component{
     constructor(props) {
         super(props);
-        this.openStream = this.openStream.bind(this);
-        this.playStream = this.playStream.bind(this);
-      }
-      openStream(){
-        return new Promise((resolve, reject) => {
-          const config = {audio: false, video: true};
-          resolve(navigator.mediaDevices.getUserMedia(config));
-        })
-      };
-      playStream(idVideoTag, stream){
-        let video = document.getElementById(idVideoTag); 
-        video.srcObject = stream;
-        let videoplay = video.play();
-        if (videoplay !== undefined) {
-          videoplay.then(_ => {
-      
-          }).catch(error => {
-      
-          });
-        }
       }
     componentDidMount() {
                
@@ -39,6 +19,9 @@ class CallComing extends React.Component{
                 primary={true}
                 onClick={() => {
                     this.props.closeDialog();
+                    socket.emit('accept-call', this.props.main.caller);
+                    this.props.makeState('VDdialog', false);
+                    this.props.makeState('stream','block');
                 }}
 			/>,
             <FlatButton
@@ -46,6 +29,9 @@ class CallComing extends React.Component{
                 primary={true}
                 onClick={() => {
                     this.props.closeDialog();
+                    socket.emit('decline-call', this.props.main.caller);
+                    this.props.makeState('busy', false);
+                    this.props.makeState('VDdialog', false);
                 }}
             />
 		];
@@ -58,7 +44,7 @@ class CallComing extends React.Component{
 					onRequestClose={this.props.closeDialog}
 					contentStyle={{width: '40%'}}
 				>
-					{this.props.main.caller + " want to make video call to you..."}
+					{this.props.main.caller.roomName ? <div className="d-flex"><b>{this.props.main.caller.callerName}</b><pre> calling you from room </pre><b>{this.props.main.caller.roomName}</b></div> : <div className="d-flex"><b>{this.props.main.caller.callerName}</b><pre> calling you... </pre></div>}
 				</Dialog>
             </div>
         )

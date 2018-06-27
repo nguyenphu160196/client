@@ -1,4 +1,5 @@
 import React from "react";
+import { socket, peer } from '../../../config'
 
 import IconButton from 'material-ui/IconButton';
 
@@ -12,10 +13,61 @@ import CallEnd from 'material-ui/svg-icons/communication/call-end';
 class Stream extends React.Component{
 	constructor(props) {
         super(props);
-        this.state = {camera: true, audio: true, time:"00:00:00"}
+        this.state = {camera: true, audio: true, time:"00:00:00", members: [], callstack: []}
+        this.openStream = this.openStream.bind(this);
+        this.playStream = this.playStream.bind(this);
+        this.connectPeer = this.connectPeer.bind(this);
       }
 	componentDidMount(){
-        var seconds = -6, minutes = 0, hours = 0,
+        peer.on('call', call => {
+              $('.remoteClass').append('<video id="remoteStream'+call.peer+'" width="200" style={{marginRight: 20}} ></video>');          
+              this.openStream(false, true).then(stream => {
+                this.playStream('localStream', stream);
+                call.answer(stream);
+                call.on('stream', remoteStream => {
+                    this.playStream('remoteStream'+call.peer, remoteStream);
+                })        
+              })          
+              //video call timer
+            let seconds = 0, minutes = 0, hours = 0,
+            t;                
+            setInterval(() => {
+                seconds++;
+                if (seconds >= 60) {
+                    seconds = 0;
+                    minutes++;
+                    if (minutes >= 60) {
+                        minutes = 0;
+                        hours++;
+                    }
+                }                    
+                this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });        
+            }, 1000);  
+        }) 
+        //caller
+        socket.on('recieve-accept-call', data => {
+            this.connectPeer(data);
+            let members = this.state.members;
+            members.push(data);
+            this.setState({members: members});
+            socket.emit('connect-to-anothers', {caller: JSON.parse(localStorage.user)._id, members: members, callstack: this.state.callstack });
+        })
+        socket.on('recieve-update-callstack', data => {
+            this.setState({callstack: data.callstack});
+        })
+    }
+    connectPeer(id){
+        this.props.makeState('stream', 'block');
+        this.openStream(false, true).then(stream => {
+          this.playStream('localStream', stream);         
+              $('.remoteClass').append('<video id="remoteStream'+id+'" width="200" style={{marginRight: 20}} ></video>');
+              let call = peer.call(id, stream);
+              call.on('stream', remoteStream => {
+                  this.playStream('remoteStream'+id, remoteStream);
+              })
+          })
+          //video call timer
+        let seconds = 0, minutes = 0, hours = 0,
         t;                
         setInterval(() => {
             seconds++;
@@ -29,6 +81,24 @@ class Stream extends React.Component{
             }                    
             this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });        
         }, 1000);
+    }
+    openStream(){
+        return new Promise((resolve, reject) => {
+          const config = {audio: false, video: true};
+          resolve(navigator.mediaDevices.getUserMedia(config));
+        })
+      };
+    playStream(idVideoTag, stream){
+        let video = document.getElementById(idVideoTag); 
+        video.srcObject = stream;
+        let videoplay = video.play();
+        if (videoplay !== undefined) {
+            videoplay.then(_ => {
+        
+            }).catch(error => {
+        
+            });
+        }
     }
 	
 	render(){
