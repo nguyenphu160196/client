@@ -685,6 +685,8 @@ const initialState = {
   VDdialog: false,
   caller: '',
   busy: false,
+  fullscreen: false,
+  VDTimer: "00:00:00"
 }
 
 const ACTION_HANDLERS = {

@@ -8,6 +8,8 @@ import VideoOn from 'material-ui/svg-icons/av/videocam';
 import MicOff from 'material-ui/svg-icons/av/mic-off';
 import VideoOff from 'material-ui/svg-icons/av/videocam-off';
 import CallEnd from 'material-ui/svg-icons/communication/call-end';
+import FullscreenExit from 'material-ui/svg-icons/navigation/fullscreen-exit';
+
 
 var myVar, mediaConnection = [];
 
@@ -45,7 +47,8 @@ class Stream extends React.Component{
                             hours++;
                         }
                     }                    
-                    this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });        
+                    this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });
+                    this.props.makeState("VDTimer",(hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));       
                 }, 1000);
             }  
         }) 
@@ -96,7 +99,8 @@ class Stream extends React.Component{
                         hours++;
                     }
                 }                    
-                this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });        
+                this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });  
+                this.props.makeState("VDTimer",(hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));      
             }, 1000);
         }
     }
@@ -161,7 +165,7 @@ class Stream extends React.Component{
                     >
                         {this.state.audio == true ? <MicOn /> : <MicOff/>}
                     </IconButton>
-                    <IconButton
+                    <IconButton id="stopVideoCall"
                         onClick={() => {
                             socket.emit('clear-call-stack', '');
                             socket.emit('end-call', '');
@@ -178,9 +182,17 @@ class Stream extends React.Component{
                             }
                         }}
                     >
-                        <CallEnd />
+                        <CallEnd color="red" />
                     </IconButton>
-                    <div style={{margin: '0px 20px 0px 10px'}}>--{this.state.time}--</div>
+                    <div id="VDTimerId" style={{margin: '0px 10px'}}>--{this.state.time}--</div>
+                    <IconButton
+                        onClick={() => {
+                            this.props.makeState('stream','none');
+                            this.props.makeState('fullscreen', true);
+                        }}
+                    >
+                        <FullscreenExit />
+                    </IconButton>
                 </div>
             </div>
         </div>

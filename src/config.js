@@ -20,5 +20,5 @@ let token = localStorage.getItem('authToken');
 export const socket = io({query: {token: token}});
  
 const id = localStorage.user ? JSON.parse(localStorage.user)._id : '';
-// export const peer = new Peer(id, {host: '192.168.1.2', port: 9090, path: '/api/v1/'});
+// export const peer = new Peer(id, {host: 'localhost', port: 9090, path: '/api/v1/'});
 export const peer = new Peer(id, {host: '35.240.237.51', port: 9090 , path: '/api/v1/'});

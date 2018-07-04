@@ -11,36 +11,39 @@ export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 export function directVideoCall(){
   return (dispatch, getState) => {
     let state = {...getState().roomChat};
+    let busy = {...getState().main}.busy;
     let roomInfo = state.roomInfo;
-    let z = document.getElementById('waitCall'); 
-    let videoplay = z.play();
-    if (videoplay !== undefined) {
-        videoplay.then(_ => {
-    
-        }).catch(error => {
-    
-        });
-    }
-    dispatch(makeState('VDWdialog', true));
-    dispatch(makeStateMain('busy', true));
-    setTimeout(_ => { 
-      socket.emit('end-call', '');
-      dispatch(makeState('VDWdialog', false));
-      dispatch(makeStateMain('busy', false));
-      let z = document.getElementById('waitCall');
-      let videopause = z.pause();
-      if (videopause !== undefined) {
-          videopause.then(_ => {
+    if(busy != true){
+      let z = document.getElementById('waitCall'); 
+      let videoplay = z.play();
+      if (videoplay !== undefined) {
+          videoplay.then(_ => {
       
           }).catch(error => {
       
           });
       }
-     }, 9000);
-    if(roomInfo.direct == false){
-      socket.emit('signal-video-call', {room: roomInfo._id, roomName: roomInfo.name, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name});
-    }else{
-      socket.emit('signal-video-call', {room: roomInfo._id, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name});
+      dispatch(makeState('VDWdialog', true));
+      dispatch(makeStateMain('busy', true));
+      setTimeout(_ => { 
+        socket.emit('end-call', '');
+        dispatch(makeState('VDWdialog', false));
+        dispatch(makeStateMain('busy', false));
+        let z = document.getElementById('waitCall');
+        let videopause = z.pause();
+        if (videopause !== undefined) {
+            videopause.then(_ => {
+        
+            }).catch(error => {
+        
+            });
+        }
+      }, 9000);
+      if(roomInfo.direct == false){
+        socket.emit('signal-video-call', {room: roomInfo._id, roomName: roomInfo.name, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name});
+      }else{
+        socket.emit('signal-video-call', {room: roomInfo._id, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name});
+      } 
     }
   }
 }
