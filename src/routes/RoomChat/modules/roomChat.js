@@ -5,13 +5,38 @@ import {makeState as makeStateMain, getRoom} from '../../Main/modules/main'
 import $ from 'jquery'
 
 export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
-
+export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 
 
 export function directVideoCall(){
   return (dispatch, getState) => {
     let state = {...getState().roomChat};
     let roomInfo = state.roomInfo;
+    let z = document.getElementById('waitCall'); 
+    let videoplay = z.play();
+    if (videoplay !== undefined) {
+        videoplay.then(_ => {
+    
+        }).catch(error => {
+    
+        });
+    }
+    dispatch(makeState('VDWdialog', true));
+    dispatch(makeStateMain('busy', true));
+    setTimeout(_ => { 
+      socket.emit('end-call', '');
+      dispatch(makeState('VDWdialog', false));
+      dispatch(makeStateMain('busy', false));
+      let z = document.getElementById('waitCall');
+      let videopause = z.pause();
+      if (videopause !== undefined) {
+          videopause.then(_ => {
+      
+          }).catch(error => {
+      
+          });
+      }
+     }, 9000);
     if(roomInfo.direct == false){
       socket.emit('signal-video-call', {room: roomInfo._id, roomName: roomInfo.name, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name});
     }else{
@@ -623,6 +648,13 @@ export function makeState(key, text){
   }  
 }
 
+export function closeDialog(){
+  return{
+    type: CLOSE_DIALOG,
+    payload: false
+  }
+}
+
 
 const ACTION_HANDLERS = {
   [MAKE_STATE_ROOM]: (state, action) => {
@@ -654,7 +686,8 @@ const initialState = {
   typing: [],
   attachFile: {},
   attachArray: [],
-  attachHeight: "15px"
+  attachHeight: "15px",
+  VDWdialog: false
 }
 export default function reducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

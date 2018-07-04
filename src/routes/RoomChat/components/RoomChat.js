@@ -6,6 +6,7 @@ import './RoomChat.scss'
 import RoomSetting from './RoomSetting'
 import Participant from './Participant'
 import Message from './Message'
+import  CallWaiting from './CallWaiting'
 
 import IconButton from 'material-ui/IconButton';
 import Chip from 'material-ui/Chip';
@@ -36,9 +37,10 @@ export class Initial extends React.Component{
 	}
   }
 
-export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti, directVideoCall, unTyping, typing, repareAttachFile, removeAttachFile }) => (
+export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti, directVideoCall, unTyping, typing, repareAttachFile, removeAttachFile, closeDialog, makeStateMain }) => (
   	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
 	  	<Initial initial={initial} />
+		<CallWaiting roomChat={roomChat} makeState={makeState} closeDialog={closeDialog} makeStateMain={makeStateMain} />
 		<div className={roomChat.widthLeft} style={{padding: 0}}>
 			<div className="col-md-12" style={{borderBottom: '1px solid lightgrey', padding: 0}}
 				onClick={() => {
@@ -321,7 +323,9 @@ RoomChat.propTypes = {
 	typing: PropTypes.func.isRequired,
 	unTyping: PropTypes.func.isRequired,
 	repareAttachFile: PropTypes.func.isRequired,
-	removeAttachFile: PropTypes.func.isRequired
+	removeAttachFile: PropTypes.func.isRequired,
+	closeDialog: PropTypes.func.isRequired,
+	makeStateMain: PropTypes.func.isRequired
 }
 
 export default RoomChat

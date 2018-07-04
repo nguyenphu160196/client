@@ -9,6 +9,7 @@ import MicOff from 'material-ui/svg-icons/av/mic-off';
 import VideoOff from 'material-ui/svg-icons/av/videocam-off';
 import CallEnd from 'material-ui/svg-icons/communication/call-end';
 
+var myVar, mediaConnection = [];
 
 class Stream extends React.Component{
 	constructor(props) {
@@ -17,35 +18,50 @@ class Stream extends React.Component{
         this.openStream = this.openStream.bind(this);
         this.playStream = this.playStream.bind(this);
         this.connectPeer = this.connectPeer.bind(this);
+        this.stopStreamedVideo = this.stopStreamedVideo.bind(this);
       }
 	componentDidMount(){
         peer.on('call', call => {
-              $('.remoteClass').append('<video id="remoteStream'+call.peer+'" width="200" style={{marginRight: 20}} ></video>');          
+              $('.remoteClass').append('<video class="remoteStreamX" id="remoteStream'+call.peer+'" width="200" style={{marginRight: 20}} ></video>');          
               this.openStream(false, true).then(stream => {
                 this.playStream('localStream', stream);
+                mediaConnection.push(call);
                 call.answer(stream);
                 call.on('stream', remoteStream => {
                     this.playStream('remoteStream'+call.peer, remoteStream);
                 })        
               })          
               //video call timer
-            let seconds = 0, minutes = 0, hours = 0,
-            t;                
-            setInterval(() => {
-                seconds++;
-                if (seconds >= 60) {
-                    seconds = 0;
-                    minutes++;
-                    if (minutes >= 60) {
-                        minutes = 0;
-                        hours++;
-                    }
-                }                    
-                this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });        
-            }, 1000);  
+            if(this.state.time == "00:00:00"){
+                let seconds = 0, minutes = 0, hours = 0,
+                t;                
+                myVar = setInterval(() => {
+                    seconds++;
+                    if (seconds >= 60) {
+                        seconds = 0;
+                        minutes++;
+                        if (minutes >= 60) {
+                            minutes = 0;
+                            hours++;
+                        }
+                    }                    
+                    this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });        
+                }, 1000);
+            }  
         }) 
         //caller
         socket.on('recieve-accept-call', data => {
+            this.props.makeStateRoom('VDWdialog', false);
+            let z = document.getElementById('waitCall'); 
+            let videoplay = z.pause();
+            if (videoplay !== undefined) {
+                videoplay.then(_ => {
+            
+                }).catch(error => {
+            
+                });
+            }
+
             this.connectPeer(data);
             let members = this.state.members;
             members.push(data);
@@ -60,27 +76,29 @@ class Stream extends React.Component{
         this.props.makeState('stream', 'block');
         this.openStream(false, true).then(stream => {
           this.playStream('localStream', stream);         
-              $('.remoteClass').append('<video id="remoteStream'+id+'" width="200" style={{marginRight: 20}} ></video>');
+              $('.remoteClass').append('<video class="remoteStreamX" id="remoteStream'+id+'" width="200" style={{marginRight: 20}} ></video>');
               let call = peer.call(id, stream);
               call.on('stream', remoteStream => {
                   this.playStream('remoteStream'+id, remoteStream);
               })
           })
           //video call timer
-        let seconds = 0, minutes = 0, hours = 0,
-        t;                
-        setInterval(() => {
-            seconds++;
-            if (seconds >= 60) {
-                seconds = 0;
-                minutes++;
-                if (minutes >= 60) {
-                    minutes = 0;
-                    hours++;
-                }
-            }                    
-            this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });        
-        }, 1000);
+        if(this.state.time == "00:00:00"){
+            let seconds = 0, minutes = 0, hours = 0,
+            t;                
+            myVar = setInterval(() => {
+                seconds++;
+                if (seconds >= 60) {
+                    seconds = 0;
+                    minutes++;
+                    if (minutes >= 60) {
+                        minutes = 0;
+                        hours++;
+                    }
+                }                    
+                this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });        
+            }, 1000);
+        }
     }
     openStream(){
         return new Promise((resolve, reject) => {
@@ -100,6 +118,17 @@ class Stream extends React.Component{
             });
         }
     }
+    stopStreamedVideo(id) {
+        let videoElem = document.getElementById(id);
+        let stream = videoElem.srcObject;
+        let tracks = stream.getTracks();
+      
+        tracks.forEach(function(track) {
+          track.stop();
+        });
+      
+        videoElem.srcObject = null;
+      }
 	
 	render(){
 		return(
@@ -134,7 +163,19 @@ class Stream extends React.Component{
                     </IconButton>
                     <IconButton
                         onClick={() => {
+                            socket.emit('clear-call-stack', '');
+                            socket.emit('end-call', '');
+                            this.stopStreamedVideo('localStream');
+                            $(".remoteStreamX").remove();
+                            this.setState({camera: true, audio: true, time:"00:00:00", members: [], callstack: []});
                             this.props.makeState('stream','none');
+                            this.props.makeState('busy', false);
+                            clearInterval(myVar);
+                            if(mediaConnection.length != 0){
+                                mediaConnection.map((val, i) => {
+                                    val.close();
+                                })
+                            }
                         }}
                     >
                         <CallEnd />

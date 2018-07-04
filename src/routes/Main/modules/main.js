@@ -13,7 +13,7 @@ function connectPeer(id){
   makeState('stream', 'block');
   openStream(false, true).then(stream => {
     playStream('localStream', stream);         
-        $('.remoteClass').append('<video id="remoteStream'+id+'" width="200" style={{marginRight: 20}} ></video>');
+        $('.remoteClass').append('<video class="remoteStreamX" id="remoteStream'+id+'" width="200" style={{marginRight: 20}} ></video>');
         let call = peer.call(id, stream);
         call.on('stream', remoteStream => {
             playStream('remoteStream'+id, remoteStream);
@@ -43,7 +43,7 @@ function playStream(idVideoTag, stream){
 export function initial(){
   return (dispatch, getState) => {    
     var x = document.getElementById("joinRoom");
-    var y = document.getElementById("funcMessage");
+    var y = document.getElementById("funcMessage"); 
     return new Promise((resolve, reject) => {
         //reciever
         socket.on('recieve-connect-to-anothers', data => {
@@ -74,6 +74,40 @@ export function initial(){
               }
           }
       })
+
+      socket.on('recieve-end-call', data => {
+        dispatch(makeState('busy', data));
+        dispatch(makeState('VDdialog', data));
+        let vdz = document.getElementById('funcCall');
+        let videopause = vdz.pause();
+        if (videopause !== undefined) {
+          videopause.then(_ => {
+        
+            }).catch(error => {
+        
+            });
+        }
+      })
+
+      socket.on('recieve-signal-video-call', data => {
+        let busy = {...getState().main}.busy;
+        let vdz = document.getElementById('funcCall');
+        if(busy == false){
+          let videoplay = vdz.play();
+          if (videoplay !== undefined) {
+            videoplay.then(_ => {
+              console.log('playing funcCall');
+            }).catch(error => {
+              console.log(error);
+            });
+          }
+          dispatch(makeState('VDdialog', true));
+          dispatch(makeState('busy', true));
+          dispatch(makeState('caller', data));
+        }else{
+          socket.emit('reject-call-busy', data.caller);
+        }            
+    })
 
         socket.emit('clear-call-stack', 'clear-all');
         socket.on('update-jwt', data => {
@@ -208,17 +242,6 @@ export function initial(){
               dispatch(makeState('roomlist', array));
             }
           })
-        })
-        
-        socket.on('recieve-signal-video-call', data => {
-            let busy = {...getState().main}.busy;
-            if(busy == false){
-              dispatch(makeState('VDdialog', true));
-              dispatch(makeState('busy', true));
-              dispatch(makeState('caller', data));
-            }else{
-              socket.emit('reject-call-busy', data.caller);
-            }            
         })
         resolve();
     })

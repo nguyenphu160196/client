@@ -10,7 +10,7 @@ class CallComing extends React.Component{
         super(props);
       }
     componentDidMount() {
-               
+          
     }
     render(){
         const actions = [
@@ -22,12 +22,30 @@ class CallComing extends React.Component{
                     socket.emit('accept-call', this.props.main.caller);
                     this.props.makeState('VDdialog', false);
                     this.props.makeState('stream','block');
+                    let vdz = document.getElementById('funcCall'); 
+                    let videoplay = vdz.pause();
+                    if (videoplay !== undefined) {
+                        videoplay.then(_ => {
+                    
+                        }).catch(error => {
+                    
+                        });
+                    }
                 }}
 			/>,
             <FlatButton
                 label="Decline"
                 primary={true}
                 onClick={() => {
+                    let vdz = document.getElementById('funcCall'); 
+                    let videopause = vdz.pause();
+                    if (videopause !== undefined) {
+                        videopause.then(_ => {
+                    
+                        }).catch(error => {
+                    
+                        });
+                    }
                     this.props.closeDialog();
                     socket.emit('decline-call', this.props.main.caller);
                     this.props.makeState('busy', false);

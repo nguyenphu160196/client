@@ -28,7 +28,7 @@ export class RealTime extends React.Component{
   }
 }
 
-export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog}) => {
+export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog, makeStateRoom}) => {
 
 return (
   <div style={{ margin: '0 auto',height: '100%' }} >
@@ -40,7 +40,7 @@ return (
   />
   <CallComing main={main} closeDialog={closeDialog} makeState={makeState} />
   <Progress display={main.block}></Progress>
-  <Stream main={main} makeState={makeState} />
+  <Stream main={main} makeState={makeState} makeStateRoom={makeStateRoom}/>
     <div className='row' style={{margin: '0 auto',height: '100%'}}>
 
         <div className='col-md-3' style={{borderRight: '1px solid lightgray', padding: '0px'}}>  
@@ -97,7 +97,8 @@ Main.propTypes = {
   dirrect: PropTypes.func.isRequired,
   initial: PropTypes.func.isRequired,
   hideRoom: PropTypes.func.isRequired,
-  closeDialog: PropTypes.func.isRequired
+  closeDialog: PropTypes.func.isRequired,
+  makeStateRoom: PropTypes.func.isRequired
 }
 
 export default Main

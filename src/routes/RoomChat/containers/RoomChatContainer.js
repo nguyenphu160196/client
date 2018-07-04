@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
-import { makeState, sendMessage, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti, directVideoCall, unTyping, typing, repareAttachFile, removeAttachFile } from '../modules/roomChat'
-import { hideRoom } from '../../Main/modules/main'
+import { makeState, sendMessage, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti, directVideoCall, unTyping, typing, repareAttachFile, removeAttachFile, closeDialog } from '../modules/roomChat'
+import { hideRoom, makeState as makeStateMain } from '../../Main/modules/main'
 
 import RoomChat from '../components/RoomChat'
 
@@ -19,7 +19,9 @@ const mapDispatchToProps = {
     unTyping, 
     typing,
     repareAttachFile,
-    removeAttachFile
+    removeAttachFile,
+    closeDialog,
+    makeStateMain
 }
 
 const mapStateToProps = (state) => ({
