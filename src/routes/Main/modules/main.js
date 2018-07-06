@@ -21,9 +21,10 @@ function connectPeer(id){
     })
 }
 function openStream(){
+  let getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
   return new Promise((resolve, reject) => {
     const config = {audio: false, video: true};
-    resolve(navigator.mediaDevices.getUserMedia(config));
+    resolve(getUserMedia(config));
   })
 };
 

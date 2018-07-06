@@ -107,7 +107,7 @@ class Stream extends React.Component{
     openStream(){
         return new Promise((resolve, reject) => {
           const config = {audio: false, video: true};
-          resolve(navigator.mediaDevices.getUserMedia(config));
+          resolve(navigator.mediaDevices.getUserMedia(config) || navigator.mediaDevices.webkitGetUserMedia(config) || navigator.mediaDevices.mozGetUserMedia(config));
         })
       };
     playStream(idVideoTag, stream){
