@@ -4,6 +4,7 @@ import Peer from 'peerjs';
 
 // const httphost = "http://35.240.162.216:9090";
 const httphost = "http://localhost:9090";
+// const httphost = "https://kltn0901.herokuapp.com";
 
 export const baseURL = httphost+"/api/v1";
 export const filesURL = httphost+"/files/";

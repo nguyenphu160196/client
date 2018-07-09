@@ -31,6 +31,8 @@ class CallWaiting extends React.Component{
                     socket.emit('end-call', '');
                     this.props.makeStateMain('busy', false);
                     this.props.makeState('VDWdialog', false);
+                    this.props.myStopFunction();
+                    this.props.makeStateMain('caller', '');
                 }}
             />
 		];

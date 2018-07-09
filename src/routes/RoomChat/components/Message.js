@@ -116,8 +116,8 @@ export default class Message extends React.Component{
 											)
 										}else{
 											return (
-												<div key={t}><Avatar key={t} data-tip data-for={'avatarmess'+i} style={{backgroundColor: data.avatar}}
-													>{data.name ? data.name.charAt(0).toUpperCase() : ''}                        
+												<div key={t}><Avatar key={t} data-tip data-for={'avatarmess'+i} style={{backgroundColor: user.avatar}}
+													>{user.name ? user.name.charAt(0).toUpperCase() : ''}                        
 												</Avatar>
 												<ReactTooltip id={'avatarmess'+i} place="top" type="dark" effect="float">
 													<span>{user.name}</span>

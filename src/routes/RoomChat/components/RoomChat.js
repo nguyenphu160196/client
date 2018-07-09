@@ -37,19 +37,19 @@ export class Initial extends React.Component{
 	}
   }
 
-export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti, directVideoCall, unTyping, typing, repareAttachFile, removeAttachFile, closeDialog, makeStateMain }) => (
+export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, initial, kickUser, addParticipant, changeRoomName, loadMoreMessage, clearNoti, directVideoCall, unTyping, typing, repareAttachFile, removeAttachFile, closeDialog, makeStateMain, audioCall, myStopFunction }) => (
   	<div className='row d-flex flex-row' style={{height: '100%', margin: 0, padding: 0}}>
 	  	<Initial initial={initial} />
-		<CallWaiting roomChat={roomChat} makeState={makeState} closeDialog={closeDialog} makeStateMain={makeStateMain} />
+		<CallWaiting roomChat={roomChat} makeState={makeState} closeDialog={closeDialog} makeStateMain={makeStateMain} myStopFunction={myStopFunction} />
 		<div className={roomChat.widthLeft} style={{padding: 0}}>
-			<div className="col-md-12" style={{borderBottom: '1px solid lightgrey', padding: 0}}
+			<div className="col-12" style={{borderBottom: '1px solid lightgrey', padding: 0}}
 				onClick={() => {
 					if(roomChat.emoji == 'block'){
 						makeState('emoji','none');
 					}
 				}}
 			>
-				<div className="col-md-12 d-flex flex-row" style={{padding: '9px 0px'}}>
+				<div className="col-12 d-flex flex-row" style={{padding: '9px 0px'}}>
 					<div className={roomChat.iconButton} style={{
 						alignSelf: 'center',
 						textAlign: 'center',
@@ -70,7 +70,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 					<div style={{marginLeft: 30}}>
 						<IconButton tooltip="Audio Call" tooltipPosition="bottom-right"
 							onClick={() => {
-
+								audioCall();
 							}}
 						>
 							<Mic />
@@ -84,8 +84,8 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						</IconButton>
 						<IconButton tooltip="Participants" tooltipPosition="bottom-right" disabled={roomChat.roomInfo && (roomChat.roomInfo.direct == true) ? true : false}
 							onClick={() => {
-									makeState('widthLeft','col-md-8');
-									makeState('iconButton','col-md-8');
+									makeState('widthLeft','col-8');
+									makeState('iconButton','col-8');
 									makeState('participantOn','block');
 									makeState('settingOn','none');
 							}}
@@ -94,8 +94,8 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 						</IconButton>	
 						<IconButton tooltip="Room Info" tooltipPosition="bottom-right"
 							onClick={() => {
-									makeState('widthLeft','col-md-8');
-									makeState('iconButton','col-md-8');
+									makeState('widthLeft','col-8');
+									makeState('iconButton','col-8');
 									makeState('settingOn','block');
 									makeState('participantOn','none');
 							}}
@@ -106,7 +106,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				</div>
 			</div>
 			{/* message content */}
-			<div className="col-md-12 chat-content" id="id-chat-content" style={{padding: 15,height: roomChat.typing && roomChat.typing.length != 0 ? `calc(100% - 172px - ${roomChat.attachHeight ? roomChat.attachHeight :'15px'})` : `calc(100% - 132px - ${roomChat.attachHeight ? roomChat.attachHeight :'15px'})`,overflowY: 'scroll', overflowX: 'hidden'}}
+			<div className="col-12 chat-content" id="id-chat-content" style={{padding: 15,height: roomChat.typing && roomChat.typing.length != 0 ? `calc(100% - 172px - ${roomChat.attachHeight ? roomChat.attachHeight :'15px'})` : `calc(100% - 132px - ${roomChat.attachHeight ? roomChat.attachHeight :'15px'})`,overflowY: 'scroll', overflowX: 'hidden'}}
 				onClick={() => {
 					if(roomChat.emoji == 'block'){
 						makeState('emoji','none');
@@ -125,7 +125,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				}
 			</div>
 			{/* typing */}
-			<div className="col-md-12 d-flex">
+			<div className="col-12 d-flex">
 				{roomChat && roomChat.typing && roomChat.typing.length != 0 ?
 				roomChat.typing.map((val, i) => {
 					return(
@@ -137,7 +137,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				}
 			</div>
 			{/* attach file */}
-			<div className="col-md-12 d-flex" style={{overflowX: 'scroll', overflowY: 'hidden'}}>
+			<div className="col-12 d-flex" style={{overflowX: 'scroll', overflowY: 'hidden'}}>
 				{roomChat && roomChat.attachArray && roomChat.attachArray.length != 0 ?
 				roomChat.attachArray.map((val, i) => {
 					return(
@@ -165,7 +165,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 				}
 			</div>
 			{/* input chat */}
-			<div className="col-md-12">
+			<div className="col-12">
 				<div style={{display: roomChat.emoji}}><EmojiPicker onEmojiClick={(e) => {
 					console.log(e);
 				}}/></div>
@@ -285,7 +285,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 
 		</div>
 		
-		<div className="col-md-4" style={{padding: 0, margin: 0, display: roomChat.settingOn}}>
+		<div className="col-4" style={{padding: 0, margin: 0, display: roomChat.settingOn}}>
 			<RoomSetting 
 				makeState={makeState}
 				roomChat={roomChat}
@@ -294,7 +294,7 @@ export const RoomChat = ({ roomChat, makeState, sendMessage, hideRoom, search, i
 			/>
 		</div>
 
-		<div className="col-md-4" style={{padding: 0, margin: 0, display: roomChat.participantOn}}>
+		<div className="col-4" style={{padding: 0, margin: 0, display: roomChat.participantOn}}>
 			<Participant 
 				makeState={makeState}
 				roomChat={roomChat}
@@ -325,7 +325,9 @@ RoomChat.propTypes = {
 	repareAttachFile: PropTypes.func.isRequired,
 	removeAttachFile: PropTypes.func.isRequired,
 	closeDialog: PropTypes.func.isRequired,
-	makeStateMain: PropTypes.func.isRequired
+	makeStateMain: PropTypes.func.isRequired,
+	audioCall: PropTypes.func.isRequired,
+	myStopFunction: PropTypes.func.isRequired
 }
 
 export default RoomChat

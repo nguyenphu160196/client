@@ -23,12 +23,12 @@ export const Profile = ({ profile, makeState, saveCond, checkPassRequire }) => (
 		   updateProfile={checkPassRequire}
 		   makeState={makeState}
 	   />
-  		<div className="col-md-12" style={{borderBottom: '1px solid lightgrey'}}>
-				<div className="col-md-12 d-flex flex-row" style={{padding: '14px 16px'}}>
-					<div className="col-md-10" style={{
+  		<div className="col-12" style={{borderBottom: '1px solid lightgrey'}}>
+				<div className="col-12 d-flex flex-row" style={{padding: '14px 16px'}}>
+					<div className="col-10" style={{
 						alignSelf: 'center'
 					}}>Profile</div>
-					<div className="col-md-2">
+					<div className="col-2">
 						<button className="btn btn-primary" disabled={profile.save_btn}
 								onClick={() => {
 									makeState('open', true);
@@ -37,16 +37,16 @@ export const Profile = ({ profile, makeState, saveCond, checkPassRequire }) => (
 					</div>
 				</div>
 			</div>
-			<div className="col-md-12">
-				<div className="col-md-12" style={{padding: '20px 200px'}}>
-					<div className="col-md-12" style={{marginBottom: 10}}>
+			<div className="col-12">
+				<div className="col-12" style={{padding: '20px 200px'}}>
+					<div className="col-12" style={{marginBottom: 10}}>
 							<p style={{fontSize: 18}}>Profile Details</p>
 					</div>
-					<div className="col-md-12">
+					<div className="col-12">
 							<p>Profile Picture</p>
 					</div>
-					<div className="col-md-12 d-flex flex-row">
-							<div className="col-md-4">
+					<div className="col-12 d-flex flex-row">
+							<div className="col-4">
 								{localStorage.user && (JSON.parse(localStorage.user).avatar.charAt(0) == '#')
 													&& profile.imageURL == ''
 									? 
@@ -78,7 +78,7 @@ export const Profile = ({ profile, makeState, saveCond, checkPassRequire }) => (
 							</label>
 							</div>
 					</div>
-					<div className="col-md-6" style={{marginTop: 20}}>
+					<div className="col-6" style={{marginTop: 20}}>
 						<div className="" style={{marginTop: 20}}>
 							<div>Name</div>
 							<input type='text' className="form-control" 

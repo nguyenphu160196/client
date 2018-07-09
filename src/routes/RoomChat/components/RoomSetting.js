@@ -17,20 +17,20 @@ import ClearOff from 'material-ui/svg-icons/action/highlight-off'
 
 export const RoomSetting = ({ makeState, roomChat, hideRoom, changeRoomName }) => (
     <div style={{height: '100%', borderLeft: '1px solid lightgrey'}}>
-        <div className="col-md-12 d-flex flex-row" style={{padding: '10px 0px'}}>
-            <div className="col-md-10" style={{alignSelf: 'center'}}>
+        <div className="col-12 d-flex flex-row" style={{padding: '10px 0px'}}>
+            <div className="col-10" style={{alignSelf: 'center'}}>
                 {roomChat.roomInfo && roomChat.roomInfo.direct == true ? "User Info" : "Room Info"}
             </div>
             <IconButton
                 onClick={() => {
-                    makeState('widthLeft','col-md-12');
-                    makeState('iconButton','col-md-9');
+                    makeState('widthLeft','col-12');
+                    makeState('iconButton','col-9');
                     makeState('settingOn','none');
                 }}
             ><Clear /></IconButton>
         </div>
 
-        <div className="col-md-12 d-flex justify-content-center" style={{margin: '20px 0px'}}>
+        <div className="col-12 d-flex justify-content-center" style={{margin: '20px 0px'}}>
             {roomChat.roomInfo && (roomChat.roomInfo.avatar.charAt(0) == '#')
             ?
             <div style={{
@@ -47,7 +47,7 @@ export const RoomSetting = ({ makeState, roomChat, hideRoom, changeRoomName }) =
             }
         </div>
 
-        <div className="col-md-12 d-flex justify-content-center" style={{margin: '20px 0px 0px'}}>
+        <div className="col-12 d-flex justify-content-center" style={{margin: '20px 0px 0px'}}>
             <div className={roomChat.name_hidden + " input-group"} style={{alignSelf: 'center', width: '75%', height: '40px'}}>
                 <div className="input-group-append">
                     <span className="input-group-text" id="basic-addon1" 
@@ -107,7 +107,7 @@ export const RoomSetting = ({ makeState, roomChat, hideRoom, changeRoomName }) =
             </div>
         </div>
 
-        <div className="col-md-12" style={{marginTop: 50}}>
+        <div className="col-12" style={{marginTop: 50}}>
             {roomChat.roomInfo && (roomChat.roomInfo.direct == true)
             ?
             <div>

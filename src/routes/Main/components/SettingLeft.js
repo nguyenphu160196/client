@@ -17,10 +17,10 @@ export const SettingLeft = ({main, makeState}) => {
 			 width="25%"
 		 >
 			 <div className="row">
-				 <div className="col-sm-9" style={{display:"flex", alignItems: 'center', textIndent: '20px'}}>
+				 <div className="col-9" style={{display:"flex", alignItems: 'center', textIndent: '20px'}}>
 					 My Account
 				 </div>
-				 <div className="col-sm-2">
+				 <div className="col-2">
 					 <IconButton
 						 onClick={() => {
                               browserHistory.push('/');

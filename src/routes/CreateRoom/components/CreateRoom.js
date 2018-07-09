@@ -14,12 +14,12 @@ import Clear from 'material-ui/svg-icons/content/clear'
 export const CreateRoom = ({ createRoom, makeState, search, act_btn, addInviteList, deleteChip, createNR }) => (
   	<div className='row d-flex justify-content-center' style={{margin: 0, padding: 0}}>
 
-				<div className="col-md-12" style={{borderBottom: '1px solid lightgrey'}}>
-					<div className="col-md-12 d-flex flex-row" style={{padding: '14px 16px'}}>
-						<div className="col-md-10" style={{
+				<div className="col-12" style={{borderBottom: '1px solid lightgrey'}}>
+					<div className="col-12 d-flex flex-row" style={{padding: '14px 16px'}}>
+						<div className="col-10" style={{
 							alignSelf: 'center'
 						}}>Create a New Room</div>
-						<div className="col-md-2">
+						<div className="col-2">
 							<button className="btn btn-primary" disabled={createRoom.cre_btn}
 									onClick={() => {
 										createNR();
@@ -29,7 +29,7 @@ export const CreateRoom = ({ createRoom, makeState, search, act_btn, addInviteLi
 					</div>
 				</div>
 
-				<div className='col-md-5'>
+				<div className='col-5'>
 						<div style={{marginTop: 20}}>
 							<div>Room Name</div>
 							<div className="input-group" >

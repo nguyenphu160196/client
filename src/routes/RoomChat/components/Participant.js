@@ -14,20 +14,20 @@ import Kick from 'material-ui/svg-icons/action/speaker-notes-off'
 export const Participants = ({makeState, roomChat, search, kickUser, addParticipant}) => {
     return (
         <div style={{height: '100%', margin: '0 auto', borderLeft: '1px solid lightgrey'}}>
-            <div className="col-md-12 d-flex flex-row" style={{padding: '10px 0px'}}>
-                <div className="col-md-10" style={{alignSelf: 'center'}}>
+            <div className="col-12 d-flex flex-row" style={{padding: '10px 0px'}}>
+                <div className="col-10" style={{alignSelf: 'center'}}>
                     Participants
                 </div>
                 <IconButton
                     onClick={() => {
-                        makeState('widthLeft','col-md-12');
-                        makeState('iconButton','col-md-9');
+                        makeState('widthLeft','col-12');
+                        makeState('iconButton','col-9');
                         makeState('participantOn','none');
                     }}
                 ><Clear /></IconButton>
             </div>
 
-            <div className="col-md-12" style={{marginTop: 20}}>
+            <div className="col-12" style={{marginTop: 20}}>
                 <div>Invite Users</div>
                 <div className="input-group" >
                     <div className="input-group-append">

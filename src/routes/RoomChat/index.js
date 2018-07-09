@@ -16,8 +16,8 @@ export default (store) => ({
       store.dispatch(makeState('typing',[]));
       store.dispatch(makeState('message_text',''));
       store.dispatch(creRoomInfo());
-      store.dispatch(makeState('widthLeft','col-md-12'));
-      store.dispatch(makeState('iconButton','col-md-9'));
+      store.dispatch(makeState('widthLeft','col-12'));
+      store.dispatch(makeState('iconButton','col-9'));
       store.dispatch(makeState('settingOn','none'));
       store.dispatch(makeState('participantOn','none'));
       store.dispatch(makeState('name_hidden','hidden'));

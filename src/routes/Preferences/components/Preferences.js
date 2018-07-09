@@ -10,11 +10,11 @@ import Subheader from 'material-ui/Subheader';
 
 export const Preferences = ({ preferences, makeState, unLock }) => (
 	<div className="row" style={{margin: '0 auto', height: '100%', padding: 0}}>
-		<div className="col-md-12">
-			<div className="col-md-12">
+		<div className="col-12">
+			<div className="col-12">
 				<Subheader>Hidden Room</Subheader>
 				<Divider/>
-				<div className="col-md-12 d-flex flex-row" style={{marginTop: 10}}>{preferences.hide_room && (preferences.hide_room.length != 0)
+				<div className="col-12 d-flex flex-row" style={{marginTop: 10}}>{preferences.hide_room && (preferences.hide_room.length != 0)
 					?
 					preferences.hide_room.map((val, i) => {
 						return(
@@ -36,10 +36,10 @@ export const Preferences = ({ preferences, makeState, unLock }) => (
 					''
 				}</div>
 			</div>
-			<div className="col-md-12" style={{marginTop: 20}}>
+			<div className="col-12" style={{marginTop: 20}}>
 				<Subheader>Hidden User</Subheader>
 				<Divider/>
-							<div className="col-md-12 d-flex flex-row" style={{marginTop: 10}}>{preferences.hide_user && (preferences.hide_user.length != 0)
+							<div className="col-12 d-flex flex-row" style={{marginTop: 10}}>{preferences.hide_user && (preferences.hide_user.length != 0)
 								?
 								preferences.hide_user.map((value, i) => {
 									return(

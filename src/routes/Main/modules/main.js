@@ -1,5 +1,6 @@
 import {browserHistory} from 'react-router'
 import  { api, socket, peer }  from '../../../config'
+import { imagesURL } from '../../../config'
 
 export const MAKE_STATE_MAIN = 'MAKE_STATE_MAIN'
 export const CHANGE_STATUS = 'CHANGE_STATUS'
@@ -9,69 +10,76 @@ export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 
 import $ from "jquery"
 
-function connectPeer(id){
-  makeState('stream', 'block');
-  openStream(false, true).then(stream => {
-    playStream('localStream', stream);         
-        $('.remoteClass').append('<video class="remoteStreamX" id="remoteStream'+id+'" width="200" style={{marginRight: 20}} ></video>');
-        let call = peer.call(id, stream);
-        call.on('stream', remoteStream => {
-            playStream('remoteStream'+id, remoteStream);
-        })
-    })
-}
-function openStream(){
-  let getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-  return new Promise((resolve, reject) => {
-    const config = {audio: false, video: true};
-    resolve(getUserMedia(config));
+function connectPeer(id, stream){
+  console.log(stream);
+  let localVideo = document.querySelector('#localStream'); 
+  localVideo.srcObject = stream;
+  localVideo.onloadedmetadata = function(e) {
+      localVideo.play();
+  };         
+  $('.remoteClass').append('<div style="margin-right: 20px" class="" id="'+id+'"><video class="remoteStreamX" id="remoteStream'+id+'" width="200"></video></div>');
+  let call = peer.call(id, stream);
+  call.on('stream', remoteStream => {
+      let remoteVideo = document.querySelector('#remoteStream'+id); 
+        remoteVideo.srcObject = remoteStream;
+        remoteVideo.onloadedmetadata = function(e) {
+          remoteVideo.play();
+        };
   })
-};
-
-function playStream(idVideoTag, stream){
-  let video = document.getElementById(idVideoTag); 
-  video.srcObject = stream;
-  let videoplay = video.play();
-  if (videoplay !== undefined) {
-      videoplay.then(_ => {
-  
-      }).catch(error => {
-  
-      });
-  }
 }
+
 
 export function initial(){
   return (dispatch, getState) => {    
     var x = document.getElementById("joinRoom");
     var y = document.getElementById("funcMessage"); 
     return new Promise((resolve, reject) => {
+        socket.on("recieve-offwebcam", data => {
+          $("#remoteStream"+data.remote).addClass("hidden");
+          if(data.path.charAt(0) != "#"){
+            $("#"+data.remote).append('<img id="ava'+data.remote+'" width="150" height="150" src="'+imagesURL+data.path.split("/avatars/")[1]+'" />');
+          }else{
+            $("#"+data.remote).append('<div id="ava'+data.remote+'" style="height: 150px; width: 150px; color: white;font-size: 90px; text-align: center; background-color:'+data.path+'">'+data.name.charAt(0).toUpperCase()+'</div>');
+          }
+        })
+        socket.on("recieve-onwebcam", data => {
+          $("#remoteStream"+data.remote).removeClass("hidden");
+          $("#ava"+data.remote).remove();
+        })
         //reciever
         socket.on('recieve-connect-to-anothers', data => {
           if(data.members.length != 0 && data.members.indexOf(JSON.parse(localStorage.user)._id) == 0){
               data.members.splice(0, 1);
               if(data.members.length != 0){
+                makeState('stream', 'block');
+                let constraints = { audio: true, video: true }; 
+                navigator.mediaDevices.getUserMedia(constraints)
+                .then(function(stream) {
                   if(data.callstack.length != 0){
-                      data.callstack.map((value, t) => {
-                          data.members.map((val, i) => {
-                              if((value.from == val && value.to == JSON.parse(localStorage.user)._id) || (value.from == JSON.parse(localStorage.user)._id && value.to == val)){
+                    data.callstack.map((value, t) => {
+                      data.members.map((val, i) => {
+                        if((value.from == val && value.to == JSON.parse(localStorage.user)._id) || (value.from == JSON.parse(localStorage.user)._id && value.to == val)){
 
-                              }else{
-                                  connectPeer(val);
-                                  data.callstack.push({from: JSON.parse(localStorage.user)._id, to: val});
-                              }
-                          })
+                        }else{
+                            connectPeer(val, stream);
+                            data.callstack.push({from: JSON.parse(localStorage.user)._id, to: val});
+                        }
                       })
-                      socket.emit('update-callstack', data);
-                      socket.emit('transfer-to-next', data);
+                    })
+                    socket.emit('update-callstack', data);
+                    socket.emit('transfer-to-next', data);
                   }else{
                       data.members.map((val, i) => {
-                          connectPeer(val);
+                          connectPeer(val, stream);
                           data.callstack.push({from: JSON.parse(localStorage.user)._id, to: val});
                       })
                       socket.emit('update-callstack', data);
                       socket.emit('transfer-to-next', data);
                   }
+                })
+                .catch(function(err) {
+                  console.log(err);
+                });
               }
           }
       })
@@ -197,8 +205,9 @@ export function initial(){
                 }
               })
           }).catch(err => {})
-          if (x.play() !== undefined) {
-            x.play().then(_ => {}).catch(error => {});
+          let xplay = x.play();
+          if (xplay !== undefined) {
+            xplay.then(_ => {}).catch(error => {});
           }
         });
 
@@ -216,9 +225,10 @@ export function initial(){
             array.push(res.data.room);
             dispatch(makeState('roomlist',array));
           }).catch(err => {})
-          if (x.play() !== undefined) {
-            x.play().then(_ => {}).catch(error => {});
-          }       
+          let xplay = x.play();
+          if (xplay !== undefined) {
+            xplay.then(_ => {}).catch(error => {});
+          }     
         });
 
         socket.on('recieve-message', data => {
@@ -229,8 +239,9 @@ export function initial(){
             if(val._id == data.room){
               if(data.message.user != JSON.parse(localStorage.user)._id){
                 val.noti = true;
-                if (y.play() !== undefined) {
-                  y.play().then(_ => {}).catch(error => {});
+                let yplay = y.play();
+                if (yplay !== undefined) {
+                  yplay.then(_ => {}).catch(error => {});
                 }
               }
               if(data.last != ''){
@@ -326,8 +337,9 @@ export function dirrect(value){
                     })
                     .catch(err => {});                  
                     socket.emit("update-direct-room", {room: res.data.room._id, user: val});
-                    if (x.play() !== undefined) {
-                      x.play().then(_ => {}).catch(error => {});
+                    let xplay = x.play();
+                    if (xplay !== undefined) {
+                      xplay.then(_ => {}).catch(error => {});
                     }
                     brray.push(res.data.room);
                     dispatch(makeState('direct_room',brray));

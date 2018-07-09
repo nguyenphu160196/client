@@ -8,7 +8,7 @@ export const ResetPassword = ({ resetpass, makeState, closeDialog, resetPass }) 
   	<div style={{height: '100%', margin: '0 auto'}}>
 			<Progress display={resetpass.block}></Progress>
 			<DialogMessage dialog={resetpass.dialog} message={resetpass.message} closeDialog={closeDialog} />
-				<div className="col-md-12 d-flex justify-content-between" style={{padding: '15px 20px'}}>
+				<div className="col-12 d-flex justify-content-between" style={{padding: '15px 20px'}}>
 					<div style={{fontFamily: 'Arial', fontSize: 20}} className="d-flex"><div className="icon"></div><div style={{fontStyle: 'italic', color: 'grey', marginLeft: 10, alignSelf: 'center'}}>kltn14110901</div></div>
 					<a className="btn btn-primary" style={{color: '#fff'}} href="http://localhost:8080">Back to Login</a>
 				</div>
@@ -40,7 +40,7 @@ export const ResetPassword = ({ resetpass, makeState, closeDialog, resetPass }) 
 						>Reset Password</div>
 					</form>
 				</div>
-				<div className="footerRSP col-md-12"><p style={{textAlign: 'center', marginTop: 16}}>The Facebook Messenger logo is trademarks of their respective owners.</p></div>
+				<div className="footerRSP col-12"><p style={{textAlign: 'center', marginTop: 16}}>The Facebook Messenger logo is trademarks of their respective owners.</p></div>
   	</div>
 )
 

@@ -18,7 +18,7 @@ export const Search = ({main, makeState, search, dirrect}) => {
         width='25%'
        >
        <div className="row" style={{display:"flex", alignItems: 'center', justifyContent: 'center', padding:'15px 0px'}}>
-                   <div className="col-sm-11">
+                   <div className="col-11">
               <div className="input-group" style={{height: '40px'}}>
                 <div className="input-group-append">
                   <span className="input-group-text" id="basic-addon1" 
@@ -58,7 +58,7 @@ export const Search = ({main, makeState, search, dirrect}) => {
                    </div>
                </div>
          <div className="row">
-            <div className="col-md-12">
+            <div className="col-12">
                   {main.searchlist && (main.searchlist.length>0) ? 
                     main.searchlist.map((value, i) => {
                       return (

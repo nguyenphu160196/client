@@ -8,6 +8,60 @@ export const MAKE_STATE_ROOM = 'MAKE_STATE_ROOM'
 export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 
 
+export function audioCall(){
+  return (dispatch, getState) => {
+    let state = {...getState().roomChat};
+    let busy = {...getState().main}.busy;
+    let roomInfo = state.roomInfo;
+    if(busy != true){
+      let z = document.getElementById('waitCall'); 
+      let videoplay = z.play();
+      if (videoplay !== undefined) {
+          videoplay.then(_ => {
+      
+          }).catch(error => {
+      
+          });
+      }
+      dispatch(makeState('VDWdialog', true));
+      dispatch(makeStateMain('busy', true));
+      dispatch(makeStateMain('caller', {audioCall: true}));
+
+      myVar = setTimeout(function() { 
+        socket.emit('end-call', '');
+        dispatch(makeState('VDWdialog', false));
+        dispatch(makeStateMain('busy', false));
+        dispatch(makeStateMain('caller', ''));
+        let z = document.getElementById('waitCall');
+        let videopause = z.pause();
+        if (videopause !== undefined) {
+            videopause.then(_ => {
+        
+            }).catch(error => {
+        
+            });
+        }
+      }, 9000);
+      if(roomInfo.direct == false){
+        socket.emit('signal-video-call', {room: roomInfo._id, roomName: roomInfo.name, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name, audioCall: true, avatar: JSON.parse(localStorage.user).avatar});
+      }else{
+        socket.emit('signal-video-call', {room: roomInfo._id, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name, audioCall: true, avatar: JSON.parse(localStorage.user).avatar});
+      } 
+    }
+  }
+}
+
+var myVar;
+
+export function myStopFunction() {
+    return (dispatch, getState) => {
+      return new Promise((resolve, reject) => {
+        clearTimeout(myVar);
+        resolve();
+      })
+    }
+}
+
 export function directVideoCall(){
   return (dispatch, getState) => {
     let state = {...getState().roomChat};
@@ -25,7 +79,8 @@ export function directVideoCall(){
       }
       dispatch(makeState('VDWdialog', true));
       dispatch(makeStateMain('busy', true));
-      setTimeout(_ => { 
+
+      myVar = setTimeout(function() { 
         socket.emit('end-call', '');
         dispatch(makeState('VDWdialog', false));
         dispatch(makeStateMain('busy', false));
@@ -668,9 +723,9 @@ const ACTION_HANDLERS = {
 }
 
 const initialState = {
-  widthLeft: "col-md-12",
+  widthLeft: "col-12",
   displayRight: 'none',
-  iconButton: 'col-md-9',
+  iconButton: 'col-9',
   emoji: 'none',
   // sendDisable: true,
   message_text:'',

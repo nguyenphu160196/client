@@ -17,7 +17,7 @@ import CreatRoom from 'material-ui/svg-icons/content/create'
 const Account = ({main, signOut, makeState, changeStatus}) => {
     return (
         <div className='row' style={{margin: '0 auto',boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px', padding: '8px 0px'}}>
-            <div className="col-sm-6 d-flex flex-row" style={{}}>
+            <div className="col-6 d-flex flex-row" style={{}}>
                     {localStorage.user && JSON.parse(localStorage.user).avatar.charAt(0) == '#'
                     ? 
                     <Avatar style={{margin: '5px', backgroundColor: localStorage.user ? JSON.parse(localStorage.user).avatar : "unset"}}
@@ -28,7 +28,7 @@ const Account = ({main, signOut, makeState, changeStatus}) => {
                     <Avatar src={imagesURL + JSON.parse(localStorage.user).avatar.split('/avatars/')[1]} style={{margin: '5px'}}></Avatar>  }
                     {localStorage.user && JSON.parse(localStorage.user).status == true ? <div style={{background: "lawngreen", left: 49, height: 12, width: 12, borderRadius: 100, bottom: 6, border: '1.5px solid #fff', position: 'absolute'}}></div> : <div style={{background: "red", left: 49, height: 12, width: 12, borderRadius: 100, bottom: 6, border: '1.5px solid #fff', position: 'absolute'}}></div>}
             </div>
-            <div className="col-sm-2" style={{display: 'flex', justifyContent:'center',alignItems:'center'}}>
+            <div className="col-2" style={{display: 'flex', justifyContent:'center',alignItems:'center'}}>
                 <IconButton 
                     tooltip="Search"
                     onClick={() => {
@@ -38,7 +38,7 @@ const Account = ({main, signOut, makeState, changeStatus}) => {
                         <Search />
                 </IconButton>
             </div>
-            <div className="col-sm-2" style={{display: 'flex', justifyContent:'center',alignItems:'center'}}>
+            <div className="col-2" style={{display: 'flex', justifyContent:'center',alignItems:'center'}}>
                 <IconButton 
                     tooltip="Create a new room"
                     onClick={() => {
@@ -48,7 +48,7 @@ const Account = ({main, signOut, makeState, changeStatus}) => {
                         <CreatRoom />
                 </IconButton>
             </div>
-            <div className="col-sm-2" style={{display: 'flex', justifyContent:'center',alignItems:'center'}}>
+            <div className="col-2" style={{display: 'flex', justifyContent:'center',alignItems:'center'}}>
                 <IconMenu
                     iconButtonElement={<IconButton tooltip="More"><MoreVertIcon /></IconButton>}
                     anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}

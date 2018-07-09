@@ -32,7 +32,7 @@ export class RealTime extends React.Component{
   }
 }
 
-export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog, makeStateRoom}) => {
+export const Main = ({ main, signOut, makeState, children, changeStatus, closeSnacke, search, dirrect, initial, hideRoom, closeDialog, makeStateRoom, myStopFunction}) => {
 
 return (
   <div style={{ margin: '0 auto',height: '100%' }} >
@@ -44,10 +44,10 @@ return (
   />
   <CallComing main={main} closeDialog={closeDialog} makeState={makeState} />
   <Progress display={main.block}></Progress>
-  <Stream main={main} makeState={makeState} makeStateRoom={makeStateRoom}/>
+  <Stream main={main} makeState={makeState} makeStateRoom={makeStateRoom} myStopFunction={myStopFunction}/>
     <div className='row' style={{margin: '0 auto',height: '100%'}}>
 
-        <div className='col-md-3' style={{borderRight: '1px solid lightgray', padding: '0px'}}>  
+        <div className='col-3' style={{borderRight: '1px solid lightgray', padding: '0px'}}>  
           <Snackbar 
             open={main.snackeOpen}
             message={main.snackeMess}
@@ -111,7 +111,7 @@ return (
             }
           </div>
         </div>
-        <div className='col-md-9' style={{padding: '0px'}}>
+        <div className='col-9' style={{padding: '0px'}}>
             {children}
         </div>
     </div>
@@ -130,7 +130,8 @@ Main.propTypes = {
   initial: PropTypes.func.isRequired,
   hideRoom: PropTypes.func.isRequired,
   closeDialog: PropTypes.func.isRequired,
-  makeStateRoom: PropTypes.func.isRequired
+  makeStateRoom: PropTypes.func.isRequired,
+  myStopFunction: PropTypes.func.isRequired
 }
 
 export default Main
