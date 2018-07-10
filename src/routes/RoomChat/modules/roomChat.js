@@ -1,5 +1,5 @@
 import {browserHistory} from 'react-router'
-import { api, socket, peer } from '../../../config'
+import { api, socket } from '../../../config'
 import {makeState as makeStateMain, getRoom} from '../../Main/modules/main'
 
 import $ from 'jquery'

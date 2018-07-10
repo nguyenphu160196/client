@@ -1,5 +1,5 @@
 import React from "react";
-import { socket, peer, api } from '../../../config'
+import { socket, api } from '../../../config'
 import { imagesURL } from '../../../config'
 
 import IconButton from 'material-ui/IconButton';
@@ -18,56 +18,10 @@ class Stream extends React.Component{
 	constructor(props) {
         super(props);
         this.state = {camera: true, audio: true, time:"00:00:00", members: [], callstack: []};
-        this.connectPeer = this.connectPeer.bind(this);
         this.stopStreamedVideo = this.stopStreamedVideo.bind(this);
       }
 	componentDidMount(){
-        peer.on('call', call => {
-            $('.remoteClass').append('<div style="margin-right: 20px" class="" id="'+call.peer+'"><video class="remoteStreamX" id="remoteStream'+call.peer+'" width="200"></video></div>');
-            navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-            .then(function(stream) {
-                let localVideo = document.querySelector('#localStream');
-                try {
-                    localVideo.srcObject = stream;
-                    localVideo.muted = true;
-                } 
-                catch(err) {
-                    localVideo.src = window.URL.createObjectURL(stream);
-                }
-                localVideo.onloadedmetadata = function(e) {
-                    let localplay = localVideo.play();
-                    if (localplay !== undefined) {
-                            localplay.then(_ => {}).catch(error => {
-                              console.log(error);
-                            });
-                          }
-                }; 
-                mediaConnection.push(call);
-                call.answer(stream);
-                call.on('stream', remoteStream => {
-                    let remoteVideo = document.querySelector('#remoteStream'+call.peer);
-                    try {
-                        remoteVideo.srcObject = remoteStream;
-                    } 
-                    catch(err) {
-                        remoteVideo.src = window.URL.createObjectURL(remoteStream);
-                    }
-                    remoteVideo.onloadedmetadata = function(e) {
-                        let remoteplay = remoteVideo.play();
-                        if (remoteplay !== undefined) {
-                            remoteplay.then(_ => {}).catch(error => {
-                              console.log(error);
-                            });
-                          }
-                    }; 
-                })
-            })
-            .catch(function(err) {
-              /* handle the error */
-            });  
-                
-              //video call timer
-            if(this.state.time == "00:00:00"){
+        if(this.state.time == "00:00:00"){
                 let seconds = 0, minutes = 0, hours = 0,
                 t;                
                 myVar = setInterval(() => {
@@ -84,7 +38,6 @@ class Stream extends React.Component{
                     this.props.makeState("VDTimer",(hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));       
                 }, 1000);
             }  
-        }) 
         //caller
         socket.on('recieve-accept-call', data => {
             this.props.makeStateRoom('VDWdialog', false);
@@ -108,68 +61,6 @@ class Stream extends React.Component{
         socket.on('recieve-update-callstack', data => {
             this.setState({callstack: data.callstack});
         })
-    }
-    connectPeer(id){
-        this.props.makeState('stream', 'block');
-        navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-        .then(function(stream) {
-            let localVideo = document.querySelector('#localStream');
-            try {
-                localVideo.srcObject = stream;
-                localVideo.muted = true;
-            } 
-            catch(err) {
-                localVideo.src = window.URL.createObjectURL(stream);
-            }
-            localVideo.onloadedmetadata = function(e) {
-                let localplay = localVideo.play();
-                    if (localplay !== undefined) {
-                            localplay.then(_ => {}).catch(error => {
-                              console.log(error);
-                            });
-                          }
-            };        
-            $('.remoteClass').append('<div style="margin-right: 20px" class="" id="'+id+'"><video class="remoteStreamX" id="remoteStream'+id+'" width="200"></video></div>');
-            let call = peer.call(id, stream);
-            call.on('stream', remoteStream => {
-                let remoteVideo = document.querySelector('#remoteStream'+id);
-                try {
-                    remoteVideo.srcObject = remoteStream;
-                } 
-                catch(err) {
-                    remoteVideo.src = window.URL.createObjectURL(remoteStream);
-                }
-                remoteVideo.onloadedmetadata = function(e) {
-                    let remoteplay = remoteVideo.play();
-                        if (remoteplay !== undefined) {
-                            remoteplay.then(_ => {}).catch(error => {
-                              console.log(error);
-                            });
-                          }
-                }; 
-            })
-        })
-        .catch(function(err) {
-            console.log(err);
-        });
-          //video call timer
-        if(this.state.time == "00:00:00"){
-            let seconds = 0, minutes = 0, hours = 0,
-            t;                
-            myVar = setInterval(() => {
-                seconds++;
-                if (seconds >= 60) {
-                    seconds = 0;
-                    minutes++;
-                    if (minutes >= 60) {
-                        minutes = 0;
-                        hours++;
-                    }
-                }                    
-                this.setState({time: (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds) });  
-                this.props.makeState("VDTimer",(hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ?  minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));      
-            }, 1000);
-        }
     }
     stopStreamedVideo(id) {
         let videoElem = document.getElementById(id);

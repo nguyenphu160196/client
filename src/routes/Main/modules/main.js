@@ -1,5 +1,5 @@
 import {browserHistory} from 'react-router'
-import  { api, socket, peer }  from '../../../config'
+import  { api, socket }  from '../../../config'
 import { imagesURL } from '../../../config'
 
 export const MAKE_STATE_MAIN = 'MAKE_STATE_MAIN'
@@ -9,24 +9,6 @@ export const GET_AVATAR = 'GET_AVATAR'
 export const CLOSE_DIALOG = 'CLOSE_DIALOG'
 
 import $ from "jquery"
-
-function connectPeer(id, stream){
-  console.log(stream);
-  let localVideo = document.querySelector('#localStream'); 
-  localVideo.srcObject = stream;
-  localVideo.onloadedmetadata = function(e) {
-      localVideo.play();
-  };         
-  $('.remoteClass').append('<div style="margin-right: 20px" class="" id="'+id+'"><video class="remoteStreamX" id="remoteStream'+id+'" width="200"></video></div>');
-  let call = peer.call(id, stream);
-  call.on('stream', remoteStream => {
-      let remoteVideo = document.querySelector('#remoteStream'+id); 
-        remoteVideo.srcObject = remoteStream;
-        remoteVideo.onloadedmetadata = function(e) {
-          remoteVideo.play();
-        };
-  })
-}
 
 
 export function initial(){
@@ -51,17 +33,12 @@ export function initial(){
           if(data.members.length != 0 && data.members.indexOf(JSON.parse(localStorage.user)._id) == 0){
               data.members.splice(0, 1);
               if(data.members.length != 0){
-                makeState('stream', 'block');
-                let constraints = { audio: true, video: true }; 
-                navigator.mediaDevices.getUserMedia(constraints)
-                .then(function(stream) {
                   if(data.callstack.length != 0){
                     data.callstack.map((value, t) => {
                       data.members.map((val, i) => {
                         if((value.from == val && value.to == JSON.parse(localStorage.user)._id) || (value.from == JSON.parse(localStorage.user)._id && value.to == val)){
 
                         }else{
-                            connectPeer(val, stream);
                             data.callstack.push({from: JSON.parse(localStorage.user)._id, to: val});
                         }
                       })
@@ -70,16 +47,11 @@ export function initial(){
                     socket.emit('transfer-to-next', data);
                   }else{
                       data.members.map((val, i) => {
-                          connectPeer(val, stream);
                           data.callstack.push({from: JSON.parse(localStorage.user)._id, to: val});
                       })
                       socket.emit('update-callstack', data);
                       socket.emit('transfer-to-next', data);
                   }
-                })
-                .catch(function(err) {
-                  console.log(err);
-                });
               }
           }
       })
