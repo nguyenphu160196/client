@@ -30,7 +30,7 @@ function connectPeer(id, stream){
 
 
 export function initial(){
-  return (dispatch, getState) => {    
+  return (dispatch, getState) => {  
     var x = document.getElementById("joinRoom");
     var y = document.getElementById("funcMessage"); 
     return new Promise((resolve, reject) => {

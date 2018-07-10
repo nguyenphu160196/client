@@ -35,7 +35,12 @@ class Stream extends React.Component{
                     localVideo.src = window.URL.createObjectURL(stream);
                 }
                 localVideo.onloadedmetadata = function(e) {
-                    localVideo.play();
+                    let localplay = localVideo.play();
+                    if (localplay !== undefined) {
+                            localplay.then(_ => {}).catch(error => {
+                              console.log(error);
+                            });
+                          }
                 }; 
                 mediaConnection.push(call);
                 call.answer(stream);
@@ -48,7 +53,12 @@ class Stream extends React.Component{
                         remoteVideo.src = window.URL.createObjectURL(remoteStream);
                     }
                     remoteVideo.onloadedmetadata = function(e) {
-                        remoteVideo.play();
+                        let remoteplay = remoteVideo.play();
+                        if (remoteplay !== undefined) {
+                            remoteplay.then(_ => {}).catch(error => {
+                              console.log(error);
+                            });
+                          }
                     }; 
                 })
             })
@@ -112,7 +122,12 @@ class Stream extends React.Component{
                 localVideo.src = window.URL.createObjectURL(stream);
             }
             localVideo.onloadedmetadata = function(e) {
-                localVideo.play();
+                let localplay = localVideo.play();
+                    if (localplay !== undefined) {
+                            localplay.then(_ => {}).catch(error => {
+                              console.log(error);
+                            });
+                          }
             };        
             $('.remoteClass').append('<div style="margin-right: 20px" class="" id="'+id+'"><video class="remoteStreamX" id="remoteStream'+id+'" width="200"></video></div>');
             let call = peer.call(id, stream);
@@ -125,7 +140,12 @@ class Stream extends React.Component{
                     remoteVideo.src = window.URL.createObjectURL(remoteStream);
                 }
                 remoteVideo.onloadedmetadata = function(e) {
-                    remoteVideo.play();
+                    let remoteplay = remoteVideo.play();
+                        if (remoteplay !== undefined) {
+                            remoteplay.then(_ => {}).catch(error => {
+                              console.log(error);
+                            });
+                          }
                 }; 
             })
         })
