@@ -1,6 +1,7 @@
 import {browserHistory} from 'react-router'
 import  { api, socket }  from '../../../config'
 import { imagesURL } from '../../../config'
+import SimpleWebRTC from 'simplewebrtc';
 
 export const MAKE_STATE_MAIN = 'MAKE_STATE_MAIN'
 export const CHANGE_STATUS = 'CHANGE_STATUS'
@@ -16,45 +17,6 @@ export function initial(){
     var x = document.getElementById("joinRoom");
     var y = document.getElementById("funcMessage"); 
     return new Promise((resolve, reject) => {
-        socket.on("recieve-offwebcam", data => {
-          $("#remoteStream"+data.remote).addClass("hidden");
-          if(data.path.charAt(0) != "#"){
-            $("#"+data.remote).append('<img id="ava'+data.remote+'" width="150" height="150" src="'+imagesURL+data.path.split("/avatars/")[1]+'" />');
-          }else{
-            $("#"+data.remote).append('<div id="ava'+data.remote+'" style="height: 150px; width: 150px; color: white;font-size: 90px; text-align: center; background-color:'+data.path+'">'+data.name.charAt(0).toUpperCase()+'</div>');
-          }
-        })
-        socket.on("recieve-onwebcam", data => {
-          $("#remoteStream"+data.remote).removeClass("hidden");
-          $("#ava"+data.remote).remove();
-        })
-        //reciever
-        socket.on('recieve-connect-to-anothers', data => {
-          if(data.members.length != 0 && data.members.indexOf(JSON.parse(localStorage.user)._id) == 0){
-              data.members.splice(0, 1);
-              if(data.members.length != 0){
-                  if(data.callstack.length != 0){
-                    data.callstack.map((value, t) => {
-                      data.members.map((val, i) => {
-                        if((value.from == val && value.to == JSON.parse(localStorage.user)._id) || (value.from == JSON.parse(localStorage.user)._id && value.to == val)){
-
-                        }else{
-                            data.callstack.push({from: JSON.parse(localStorage.user)._id, to: val});
-                        }
-                      })
-                    })
-                    socket.emit('update-callstack', data);
-                    socket.emit('transfer-to-next', data);
-                  }else{
-                      data.members.map((val, i) => {
-                          data.callstack.push({from: JSON.parse(localStorage.user)._id, to: val});
-                      })
-                      socket.emit('update-callstack', data);
-                      socket.emit('transfer-to-next', data);
-                  }
-              }
-          }
-      })
 
       socket.on('recieve-end-call', data => {
         dispatch(makeState('busy', data));

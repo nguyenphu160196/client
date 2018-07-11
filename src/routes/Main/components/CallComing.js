@@ -2,7 +2,7 @@ import React from 'react'
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
-import { socket, peer } from '../../../config'
+import { socket } from '../../../config'
 
 
 class CallComing extends React.Component{
