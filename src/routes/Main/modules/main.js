@@ -18,6 +18,28 @@ export function initial(){
     var y = document.getElementById("funcMessage"); 
     return new Promise((resolve, reject) => {
 
+      socket.on('recieve-end-audio-call', data => {
+        console.log(data);
+        let state = {...getState().main}.caller;
+          if(state && data.room == state.room){
+            $('#'+data.id).remove(); 
+          }
+        })
+      socket.on('recieve-start-audio-call', val => {
+        let state = {...getState().main};
+          if(state.caller && val.room == state.caller.room){
+              if(val.avatar.charAt(0) == '#'){
+                  $('#localStreamAudio').append(
+                      '<div id="'+val.id+'" tabindex="0" style="border: 10px; box-sizing: border-box; display: flex; font-family: Roboto, sans-serif; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); cursor: default; text-decoration: none; margin: 4px; padding: 0px; outline: none; font-size: inherit; font-weight: inherit; position: relative; background-color: rgb(224, 224, 224); border-radius: 100px; white-space: nowrap; width: 200px; height: 50px;"><div size="32" class="resize-img" style="color: rgb(255, 255, 255); background-color: '+val.avatar+'; user-select: none; display: inline-flex; align-items: center; justify-content: center; font-size: 25px; border-radius: 50%; height: 32px; width: 32px; margin-right: -4px;">'+val.name.charAt(0).toUpperCase()+'</div><span style="color: rgba(0, 0, 0, 0.87); font-size: 14px; font-weight: 400; line-height: 32px; padding-left: 12px; padding-right: 12px; user-select: none; white-space: nowrap;"><div style="font-size: 20px; margin: 10px;">'+val.name+'</div></span></div>'
+                  );
+              }else{
+                  $('#localStreamAudio').append(
+                      '<div id="'+val.id+'" tabindex="0" style="border: 10px; box-sizing: border-box; display: flex; font-family: Roboto, sans-serif; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); cursor: default; text-decoration: none; margin: 4px; padding: 0px; outline: none; font-size: inherit; font-weight: inherit; position: relative; background-color: rgb(224, 224, 224); border-radius: 100px; white-space: nowrap; width: 200px; height: 50px;"><img size="32" src="'+imagesURL+val.avatar.split('/avatars/')[1]+'" class="resize-img" style="color: rgb(255, 255, 255); background-color: rgb(188, 188, 188); user-select: none; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 50%; height: 32px; width: 32px; margin-right: -4px;"><span style="color: rgba(0, 0, 0, 0.87); font-size: 14px; font-weight: 400; line-height: 32px; padding-left: 12px; padding-right: 12px; user-select: none; white-space: nowrap;"><div style="font-size: 20px; margin: 10px;">'+val.name+'</div></span></div>'
+                  );
+              }
+          }
+      })
+
       socket.on('recieve-end-call', data => {
         dispatch(makeState('busy', data));
         dispatch(makeState('VDdialog', data));

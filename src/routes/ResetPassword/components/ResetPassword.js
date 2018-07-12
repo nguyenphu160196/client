@@ -14,14 +14,17 @@ export const ResetPassword = ({ resetpass, makeState, closeDialog, resetPass }) 
 				</div>
 				<div style={{width: '27%', margin: '80px auto', border: '1px solid lightgrey', padding: 10, borderRadius: 5}}>
 					<div style={{fontSize:32, marginBottom: 20, textAlign: 'center', color: 'grey'}}>Reset Password</div>
-					<form>
+					<form onSubmit={(event)=>{
+										event.preventDefault();
+										resetPass();
+									}}>
 					<div className="form-group">
 							<label htmlFor="exampleInputEmail1">New Password</label>
 							<input type="password" className="form-control" id="exampleInputEmail1" 
 								onChange={(e) => {
 									makeState('newpass', e.target.value);
 								}}
-								value={resetpass.newpass}
+								value={resetpass.newpass} required
 							/>
 						</div>
 						<div className="form-group">
@@ -30,14 +33,10 @@ export const ResetPassword = ({ resetpass, makeState, closeDialog, resetPass }) 
 								onChange={(e) => {
 									makeState('confirmpass', e.target.value)
 								}}
-								value={resetpass.confirmpass}
+								value={resetpass.confirmpass} required
 							/>
 						</div>
-						<div className="btn btn-primary form-control"
-							onClick={() => {
-								resetPass();
-							}}
-						>Reset Password</div>
+						<button type="submit" className="btn btn-primary form-control">Reset Password</button>
 					</form>
 				</div>
 				<div className="footerRSP col-12"><p style={{textAlign: 'center', marginTop: 16}}>The Facebook Messenger logo is trademarks of their respective owners.</p></div>

@@ -19,6 +19,7 @@ class CallComing extends React.Component{
                 primary={true}
                 onClick={() => {
                     this.props.closeDialog();
+                    socket.emit('start-audio-call', {id: JSON.parse(localStorage.user)._id, name: JSON.parse(localStorage.user).name, avatar: JSON.parse(localStorage.user).avatar, room: this.props.main.caller.room});
                     socket.emit('accept-call', this.props.main.caller);
                     this.props.makeState('VDdialog', false);
                     this.props.makeState('stream','block');

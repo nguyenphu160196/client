@@ -25,7 +25,7 @@ export function audioCall(){
       }
       dispatch(makeState('VDWdialog', true));
       dispatch(makeStateMain('busy', true));
-      dispatch(makeStateMain('caller', {audioCall: true}));
+      dispatch(makeStateMain('caller', {room: roomInfo._id, roomName: roomInfo.name, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name, audioCall: true}));
 
       myVar = setTimeout(function() { 
         socket.emit('end-call', '');
