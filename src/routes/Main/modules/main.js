@@ -13,7 +13,10 @@ import $ from "jquery"
 
 
 export function initial(){
-  return (dispatch, getState) => {  
+  return (dispatch, getState) => { 
+    // if(localStorage.user && JSON.parse(localStorage.user).room.length != 0){
+    //   browserHistory.push('/c/' + JSON.parse(localStorage.user).room[0]);
+    // }
     var x = document.getElementById("joinRoom");
     var y = document.getElementById("funcMessage"); 
     return new Promise((resolve, reject) => {

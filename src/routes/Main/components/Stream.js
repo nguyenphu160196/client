@@ -18,7 +18,7 @@ import SimpleWebRTC from 'simplewebrtc';
 var webrtc = new SimpleWebRTC({
                     url: "http://localhost:8888",
                     localVideoEl: 'localStream',
-                    remoteVideosEl: '',
+                    remoteVideosEl: ''
                 });
 
 
@@ -31,7 +31,7 @@ class Stream extends React.Component{
         this.state = {camera: true, audio: true, time:"00:00:00", room: '', answered: []};
       }
 	componentDidMount(){
-        console.log(webrtc)
+        console.log(webrtc);
         webrtc.on('videoRemoved', function (video, peer) {
             console.log('video removed ', peer);
             var remotes = document.getElementById('remoteStream');
@@ -59,6 +59,7 @@ class Stream extends React.Component{
             });
         //caller
         socket.on('recieve-accept-call', data => {
+            console.log(data);
             this.props.makeState('stream', 'block');
             this.props.makeStateRoom('VDWdialog', false);
             this.props.myStopFunction();
@@ -116,6 +117,7 @@ class Stream extends React.Component{
         })
         // reciever
         socket.on('recieve-answer-call', data => {
+            console.log(data);
             if(data.audioCall){
                 webrtc.config.media.video = false;
                 if(data.avatar.charAt(0) == '#'){
@@ -232,10 +234,12 @@ class Stream extends React.Component{
                     <IconButton id="stopVideoCall"
                         onClick={() => {
                             socket.emit('clear-call-stack', '');
-                            socket.emit('end-audio-call', this.props.main.caller.room);
+                            if(this.props.main.caller.audioCall){
+                                socket.emit('end-audio-call', this.props.main.caller.room);
+                            }
                             webrtc.leaveRoom();
                             webrtc.stopLocalVideo();
-                            // location.reload();
+                            location.reload();
                         }}
                     >
                         <CallEnd color="red" />

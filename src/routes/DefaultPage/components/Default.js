@@ -17,13 +17,11 @@ export const Default = ({ defaultpage }) => (
 				<div className="carousel-item active" style={{justifyContent: 'center'}}>
 					<img src={require("../assets/img-4.png")} />
 					<div className="carousel-caption" style={{bottom: '-80px', color: 'black'}}>
-						<p>Build massively scalable multiparty video applications.</p>
 					</div>  
 				</div>
 				<div className="carousel-item" style={{justifyContent: 'center'}}>
 					<img src={require("../assets/jitsi-front.png")} />
 					<div className="carousel-caption" style={{bottom: '-50px', color: 'black'}}>
-						<p>More secure, more flexible, and completely free video conferencing.</p>
 					</div>
 				</div>
 				<div className="carousel-item" style={{justifyContent: 'center'}}>

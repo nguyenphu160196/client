@@ -7,11 +7,10 @@ const httphost = "http://localhost:9090";
 
 
 export const baseURL = httphost+"/api/v1";
-export const filesURL = httphost+"/files/";
 export const imagesURL = httphost+"/images/";
 
 export const api = axios.create({
-  baseURL: httphost+'/api/v1',
+  baseURL: baseURL,
   timeout: 60000
 });
 
