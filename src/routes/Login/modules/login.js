@@ -29,6 +29,7 @@ export function passwordForgotten(){
                 dispatch(makeState('progressRE', false));
                 dispatch(makeState('messageRE', ""));
             }, err => {
+                console.log(err);
                 dispatch(makeState('progressRE', false));
                 dispatch(makeState('messageRE', err.response.data.message));
             })

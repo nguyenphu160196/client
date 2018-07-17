@@ -5,8 +5,7 @@ export const CLOSE_DIALOG = "CLOSE_DIALOG"
 
 export function resetPass(){
   return(dispatch, getState) => {
-    let pathname = window.location.pathname;
-    let token = (new RegExp("/resetpassword/")).test(pathname) ? pathname.split('/resetpassword/')[1] : '';
+    let token = window.location.href.split('resource?access_token=')[1];
     let state = {...getState().resetpass};
     let newpass = state.newpass;
     let confirmpass = state.confirmpass;

@@ -16,7 +16,8 @@ import FullscreenExit from 'material-ui/svg-icons/navigation/fullscreen-exit';
 
 import SimpleWebRTC from 'simplewebrtc';
 var webrtc = new SimpleWebRTC({
-                    url: "http://localhost:8888",
+                    // url: "http://localhost:8888",
+                    url: "http://35.240.211.84:8888",
                     localVideoEl: 'localStream',
                     remoteVideosEl: ''
                 });

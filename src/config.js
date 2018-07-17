@@ -1,9 +1,8 @@
 import axios from 'axios';
 import io from 'socket.io-client'
 
-const httphost = "http://localhost:9090";
-// const httphost = "";
-// const httphost = "https://kltn0901.herokuapp.com";
+// const httphost = "http://localhost:9090";
+const httphost = "http://35.240.211.84:9090";
 
 
 export const baseURL = httphost+"/api/v1";
