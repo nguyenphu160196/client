@@ -10,7 +10,7 @@ export const ResetPassword = ({ resetpass, makeState, closeDialog, resetPass }) 
 			<DialogMessage dialog={resetpass.dialog} message={resetpass.message} closeDialog={closeDialog} />
 				<div className="col-12 d-flex justify-content-between" style={{padding: '15px 20px'}}>
 					<div style={{fontFamily: 'Arial', fontSize: 20}} className="d-flex"><div className="icon"></div><div style={{fontStyle: 'italic', color: 'grey', marginLeft: 10, alignSelf: 'center'}}>kltn14110901</div></div>
-					<a className="btn btn-primary" style={{color: '#fff'}} href="http://localhost:8080">Back to Login</a>
+					<a className="btn btn-primary" style={{color: '#fff'}} href="https://cut-air.herokuapp.com">Back to Login</a>
 				</div>
 				<div style={{width: '27%', margin: '80px auto', border: '1px solid lightgrey', padding: 10, borderRadius: 5}}>
 					<div style={{fontSize:32, marginBottom: 20, textAlign: 'center', color: 'grey'}}>Reset Password</div>

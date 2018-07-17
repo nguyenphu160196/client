@@ -21,6 +21,12 @@ export function initial(){
     var y = document.getElementById("funcMessage"); 
     return new Promise((resolve, reject) => {
 
+      $(window).on("unload", function(e) {
+        if(localStorage.audioCall && localStorage.audioCall != '' && localStorage.audioCall != undefined){
+          socket.emit('end-audio-call', localStorage.audioCall);
+        }       
+      });
+
       socket.on('recieve-end-audio-call', data => {
         console.log(data);
         let state = {...getState().main}.caller;

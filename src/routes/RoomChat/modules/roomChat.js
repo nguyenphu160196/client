@@ -45,7 +45,7 @@ export function audioCall(){
       if(roomInfo.direct == false){
         socket.emit('signal-video-call', {room: roomInfo._id, roomName: roomInfo.name, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name, audioCall: true, avatar: JSON.parse(localStorage.user).avatar});
       }else{
-        socket.emit('signal-video-call', {room: roomInfo._id, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name, audioCall: true, avatar: JSON.parse(localStorage.user).avatar});
+        socket.emit('signal-video-call', {room: roomInfo._id, caller: JSON.parse(localStorage.user)._id, callerName: JSON.parse(localStorage.user).name, audioCall: true, avatar: JSON.parse(localStorage.user).avatar});     
       } 
     }
   }
