@@ -204,8 +204,12 @@ export function initial(){
               message.push(data.message);
             }
           })
+          if(message[message.length-1] == message[message.length-2]){
+                message.splice(message.length-2,1);
+              }
           dispatch(makeState('message', message));
           $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
+        
         }
       });
       socket.on('recieve-typing', data => {
@@ -417,9 +421,25 @@ export function sendMessage(){
         })
         .then(res => {
           socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array, file: res.data.file});
+          currentMessage.push({
+            roomId: room_id,
+            user: id,
+            text: message_text,
+            file: res.data.file,
+            seen: array
+          })
+          dispatch(makeState('message', currentMessage));
         })
       }else{
         socket.emit('client-send-message', {room: room_id, message: message_text, recieve: array, file: []});
+        currentMessage.push({
+            roomId: room_id,
+            user: id,
+            text: message_text,
+            file: [],
+            seen: array
+          })
+          dispatch(makeState('message', currentMessage));
       }
       resolve();
     })

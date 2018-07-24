@@ -15,6 +15,7 @@ export default (store) => ({
       injectReducer(store, { key: 'roomChat', reducer });
       store.dispatch(makeState('typing',[]));
       store.dispatch(makeState('message_text',''));
+      // p_wrap.textContent = '';
       store.dispatch(creRoomInfo());
       store.dispatch(makeState('widthLeft','col-12'));
       store.dispatch(makeState('iconButton','col-9'));

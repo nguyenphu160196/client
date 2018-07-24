@@ -31,7 +31,7 @@ export default class Message extends React.Component{
 								<pre style={{color: '#fff', fontFamily: 'inherit', margin: 0, wordWrap: 'break-word', whiteSpace: 'pre-wrap'}}>{data.text}</pre>
 							</div>
 							<ReactTooltip id={"OwnMessage" + i} place="top" type="dark" effect="float">
-								<span>{this.converDate(data.createAt)}</span>
+								<span>{this.converDate(data.createAt ? data.createAt : Date.now())}</span>
 							</ReactTooltip>
 						</div>
 					)
@@ -56,7 +56,7 @@ export default class Message extends React.Component{
 								</pre>
 							</div>
 							<ReactTooltip id={"OwnMessage" + i} place="top" type="dark" effect="float">
-								<span>{this.converDate(data.createAt)}</span>
+								<span>{this.converDate(data.createAt ? data.createAt : Date.now())}</span>
 							</ReactTooltip>
 						</div>
 					)
